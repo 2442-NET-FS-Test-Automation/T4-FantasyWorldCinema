@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="GymBooking.ControllerApi/GymBooking.ControllerApi.csproj" />
+  <Project Path="GymBooking.Data/GymBooking.Data.csproj" />
+</Solution>
