@@ -1,5 +1,5 @@
 <h1 style="font-size: 50px; font-weight: bold; color: #0076ff; margin-bottom: 20px; text-align: center;">
-    GymBooking
+    Fantasy World Cinema
 </h1>
 <h3 style="font-size: 15px; font-weight: bold; color: #0076ff; margin-bottom: 20px; text-align: center;">
     Team 4
