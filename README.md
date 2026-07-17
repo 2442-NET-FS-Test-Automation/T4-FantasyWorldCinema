@@ -16,7 +16,7 @@
     Description
 </h1>
 
-## Gym Booking is a platform for managing classes at a gym, focused on scheduling and booking recurring classes. The system manages users, trainers, spaces, class categories, and schedules, allowing customers to sign up for available classes. In addition, administrative staff can track student attendance and monitor operational information for each class.
+## Fantasy World Cinema is a platform for managing and selling tickets for movie screenings. The system's catalog consists of a combination of movie, screening date, theater, and available seats, allowing moviegoers to purchase tickets for a specific screening. In addition, box office staff can manage sales, check seat availability, and manage operational information for each screening.
 
 
 
