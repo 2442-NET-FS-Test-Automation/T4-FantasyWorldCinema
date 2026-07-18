@@ -1,0 +1,72 @@
+erDiagram
+    ROLES ||--|{ USERS : per
+    MOVIES ||--|{ SHOWTIMES : areProyectedOn
+    SHOWTIMES }|--|| ROOMS : areProyectedIn
+    CINEMAS ||--|{ ROOMS : Contains
+    ROOMS ||--|{ SEATS : Has
+    USERS ||--|{ TRANSACTIONS : Purchases
+    TRANSACTIONS ||--|{ TRANSACTIONSSEATS : Contains
+    TRANSACTIONSSEATS }|--|| SEATS : Contains
+    TRANSACTIONS }|--|| SHOWTIMES : Has
+    ROLES {
+        int RoleId PK
+        nvarchar(50) RoleName
+    }
+    USERS {
+        int UserId PK
+        nvarchar(50) Username "UQ-NN"
+        nvarchar(150) Email "UQ-NN"
+        varchar(256) PasswordHash "NN"
+        nvarchar(255) FullName
+        int RoleId FK
+        datetime2 CreatedAt
+    }
+    CINEMAS {
+        int CinemaId PK
+        nvarchar(100) CinemaName "UQ-NN"
+        nvarchar(255) Address
+        smallint City
+    }
+    ROOMS {
+        int RoomId PK
+        int CinemaId FK
+        nvarchar(100) RoomName "NN"
+        tinyint Capacity
+    }
+    MOVIES {
+        int MovieId PK
+        nvarchar(255) Title "NN"
+        tinyint Genre
+        smallint DurationMinutes
+        tinyint Rating
+        nvarchar(1000) Synopsis "NN"
+        nvarchar(1000) PosterUrl
+    }
+    SHOWTIMES {
+        int ShowtimeId PK
+        int MovieId FK
+        int RoomId FK
+        date ShowDate "NN"
+        time StartTime "NN"
+        time EndTime "NN"
+        money Price
+    }
+    SEATS {
+        int SeatId PK
+        int RoomId FK
+        char(1) Row
+        smallinit Number
+    }
+    TRANSACTIONS {
+        int TransactionId PK
+        int UserId FK
+        int ShowtimeId FK
+        datetime2 PurchaseDate "NN"
+        money TotalAmount
+        tinyint Status
+    }
+    TRANSACTIONSSEATS {
+        int TransactionSeatId PK
+        int TransactionId FK
+        int SeatId FK
+    }
