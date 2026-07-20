@@ -13,12 +13,12 @@ public class Movies
     public string Title {get; set; } = default!;
 
     [Required]
-    public int Genre {get; set; }
+    public Genre Genre {get; set; }
 
     [Required]
     public int DurationMinutes {get; set; }
 
-    public int Rating {get; set; }
+    public Rating Rating {get; set; }
 
     [MaxLength(1000)]
     public string Synopsis {get; set; } = default!;

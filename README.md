@@ -46,7 +46,7 @@
 
 - - - 
 # React project (WebSpa Front-end, JS template)
-- npm create vite@latest GymBooking.WebSpa -- --template react
+- npm create vite@latest GymBooking.WebSpa -- --template react-ts
     ## To download dependencies 
     - cd GymBooking.WebSpa/
     - npm install

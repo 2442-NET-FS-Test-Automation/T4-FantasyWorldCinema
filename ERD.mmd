@@ -9,32 +9,32 @@ erDiagram
     TRANSACTIONSSEATS }|--|| SEATS : Contains
     TRANSACTIONS }|--|| SHOWTIMES : Has
     ROLES {
-        int RoleId PK
+        int Role_Id PK
         nvarchar(50) RoleName
     }
     USERS {
-        int UserId PK
+        int User_Id PK
         nvarchar(50) Username "UQ-NN"
         nvarchar(150) Email "UQ-NN"
         varchar(256) PasswordHash "NN"
         nvarchar(255) FullName
-        int RoleId FK
+        int Role_Id FK
         datetime2 CreatedAt
     }
     CINEMAS {
-        int CinemaId PK
+        int Cinema_Id PK
         nvarchar(100) CinemaName "UQ-NN"
-        nvarchar(255) Address
+        nvarchar(1000) Address
         smallint City
     }
     ROOMS {
-        int RoomId PK
-        int CinemaId FK
+        int Room_Id PK
+        int Cinema_Id FK
         nvarchar(100) RoomName "NN"
         tinyint Capacity
     }
     MOVIES {
-        int MovieId PK
+        int Movie_Id PK
         nvarchar(255) Title "NN"
         tinyint Genre
         smallint DurationMinutes
@@ -43,30 +43,32 @@ erDiagram
         nvarchar(1000) PosterUrl
     }
     SHOWTIMES {
-        int ShowtimeId PK
-        int MovieId FK
+        int Showtime_Id PK
+        int Movie_Id FK
         int RoomId FK
         date ShowDate "NN"
         time StartTime "NN"
         time EndTime "NN"
-        money Price
+        decimal Price
     }
     SEATS {
-        int SeatId PK
-        int RoomId FK
+        int Seat_Id PK
+        int Room_Id FK
         char(1) Row
-        smallinit Number
+        tinyint Number
     }
     TRANSACTIONS {
-        int TransactionId PK
-        int UserId FK
-        int ShowtimeId FK
+        int Transaction_Id PK
+        int User_Id FK
+        int Showtime_Id FK
         datetime2 PurchaseDate "NN"
-        money TotalAmount
+        decimal TotalAmount
         tinyint Status
+        rowversion RowVersion
     }
     TRANSACTIONSSEATS {
-        int TransactionSeatId PK
-        int TransactionId FK
-        int SeatId FK
+        int TransactionSeat_Id PK
+        int Transaction_Id FK
+        int Seat_Id FK
+        rowversion RowVersion
     }

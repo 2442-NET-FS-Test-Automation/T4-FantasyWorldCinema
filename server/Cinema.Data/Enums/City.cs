@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace Cinema.Data.Entities;
 
-public enum City
+public enum City : short
 {
     /* === AGUASCALIENTES === */
     [Description("Aguascalientes")] Aguascalientes,

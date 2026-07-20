@@ -12,7 +12,7 @@ public class Users
     [Required, MaxLength(50)]
     public string Username {get; set; } = default!;
 
-    [Required, MaxLength(150)]
+    [Required, MaxLength(150), EmailAddress]
     public string Email {get; set; } = default!;
 
     [Required]
@@ -25,7 +25,7 @@ public class Users
     public int Role_Id {get; set; }
     public Roles Role {get; set; } = default!;
 
-    public DateOnly CreatedAt {get; set; }
+    public DateTime CreatedAt {get; set; }
 
     public ICollection<Transactions> transactions {get; set; } = default!;
 }

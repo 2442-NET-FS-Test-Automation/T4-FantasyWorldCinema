@@ -18,7 +18,7 @@ public class Transactions
     public int Showtime_Id {get; set; }
     public Showtimes Showtime {get; set; } = default!;
 
-    public DateOnly PurchaseDate {get; set; }
+    public DateTime PurchaseDate {get; set; }
 
     [Required, Range(.1, float.MaxValue), Precision(10,2)]
     public decimal TotalAmount {get; set; }
