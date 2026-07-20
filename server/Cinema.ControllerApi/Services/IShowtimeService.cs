@@ -5,5 +5,5 @@ namespace Cinema.ControllerApi.Services;
 
 public interface IShowtimeService
 {
-    
+    public Task<IReadOnlyList<Showtimes>> GetByCinemaAsync(int cinema_Id);
 }
