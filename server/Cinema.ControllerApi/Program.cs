@@ -5,9 +5,13 @@ using Cinema.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Serilog;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var conn_string = builder.Configuration.GetConnectionString("Cinema") ?? 
+    "Server=localhost,1433;Database=FaWoCinemaDb;User Id=sa;Password=LibraryPass1!;TrustServerCertificate=true";
+builder.Services.AddDbContextFactory<CinemaDbContext>(o => o.UseSqlServer(conn_string));
 // Add services to the container.
 
 builder.Services.AddControllers();
