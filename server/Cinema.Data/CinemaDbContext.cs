@@ -69,5 +69,10 @@ public class CinemaDbContext : DbContext
         // Setting Row Version's properties
         b.Entity<Transactions>().Property(i => i.RowVersion).IsRowVersion();
         b.Entity<TransactionSeats>().Property(i => i.RowVersion).IsRowVersion();
+
+        // Setting Unique Values
+        b.Entity<Users>().HasIndex(i => i.Username).IsUnique();
+        b.Entity<Users>().HasIndex(i => i.Email).IsUnique();
+        b.Entity<Cinemas>().HasIndex(i => i.CinemaName).IsUnique();
     }
 }
