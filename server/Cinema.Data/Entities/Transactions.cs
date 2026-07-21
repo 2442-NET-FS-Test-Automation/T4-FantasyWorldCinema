@@ -24,7 +24,7 @@ public class Transactions
     public decimal TotalAmount {get; set; }
 
     [Required]
-    public int Status {get; set; }
+    public Status Status {get; set; }
 
     public ICollection<TransactionSeats> transactionSeats {get; set; } = default!;
     public byte[] RowVersion {get; set; } = default!;

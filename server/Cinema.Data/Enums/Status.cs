@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace Cinema.Data.Entities;
 
-public enum Status
+public enum Status : byte
 {
     /* The user initiated the purchase but has not yet completed the payment. */
     [Description("Payment Pending")] Pending = 1,
