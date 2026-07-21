@@ -15,9 +15,10 @@ public class ShowtimeRepository : IShowtimeRepository
     public async Task<IReadOnlyList<Showtimes>> GetShowtimesByCinemaAsync(int cinema_Id)
     {
         CinemaDbContext db = await _factory.CreateDbContextAsync();
-        return await db.Showtimes.Join(db.Rooms, s => s.Room_Id, r => r.Room_Id, (s, r) => new { s, r})
-            .Where(re => re.r.Cinema_Id == cinema_Id && re.s.ShowDate.ToDateTime(re.s.EndTime) > DateTime.UtcNow)
-            .Select(re => re.s)
+        return await db.Showtimes
+            .Include(s => s.Movie) 
+            .Include(s => s.Room)
+            .Where(s => s.Room.Cinema_Id == cinema_Id && s.ShowDate.ToDateTime(s.EndTime) > DateTime.UtcNow)
             .ToListAsync();
     }
 }

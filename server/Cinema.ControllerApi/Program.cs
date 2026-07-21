@@ -24,6 +24,10 @@ builder.Services.AddScoped<IShowtimeService, ShowtimeService>();
 // Adding out mapping profile for AutoMapper
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(MappingProfile).Assembly));
 
+Log.Logger = new LoggerConfiguration()
+            .WriteTo.Console()  // Write to console, and write to file - starting a new file each day.
+            .WriteTo.File("logs/Cinema-log-.log", rollingInterval: RollingInterval.Day)
+            .CreateLogger();
 
 builder.Host.UseSerilog(); // Telling the builder to use Serilog
 
