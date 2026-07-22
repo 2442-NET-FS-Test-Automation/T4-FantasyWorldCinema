@@ -2,15 +2,16 @@ using Cinema.ControllerApi.Services;
 using Cinema.ControllerApi.Mapping;
 using Cinema.Data.Entities;
 using Cinema.Data;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity;
 using Serilog;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var conn_string = builder.Configuration.GetConnectionString("Cinema") ?? 
-    "Server=localhost,1433;Database=FaWoCinemaDb;User Id=sa;Password=LibraryPass1!;TrustServerCertificate=true";
+    throw new InvalidOperationException("Not Found Connection string 'Cinema' in appsettings.json.");
 builder.Services.AddDbContextFactory<CinemaDbContext>(o => o.UseSqlServer(conn_string));
 // Add services to the container.
 
@@ -18,8 +19,34 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IArgon2Hasher, Argon2Hasher>();
 builder.Services.AddScoped<IShowtimeRepository, ShowtimeRepository>();
 builder.Services.AddScoped<IShowtimeService, ShowtimeService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+var jwtKey = builder.Configuration["JwtSettings:Secret"];
+var jwtIssuer = builder.Configuration["JwtSettings:Issuer"];
+var jwtAudience = builder.Configuration["JwtSettings:Audience"];
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer( o => o.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true, 
+        ValidIssuer = jwtIssuer,
+       
+        ValidateAudience = true, 
+        ValidAudience = jwtAudience,
+       
+        ValidateIssuerSigningKey = true, 
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey!)),
+       
+        ValidateLifetime = true
+    });
+
+builder.Services.AddAuthorization(); 
+
+
 
 // Adding out mapping profile for AutoMapper
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(MappingProfile).Assembly));
@@ -57,6 +84,7 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
