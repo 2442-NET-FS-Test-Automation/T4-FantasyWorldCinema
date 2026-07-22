@@ -13,6 +13,7 @@ public class MappingProfile : Profile
             .ForCtorParam("Showtime_Id", o => o.MapFrom(s => s.Showtime_Id))
             .ForCtorParam("Movie", o => o.MapFrom(s => s.Movie.Title))
             .ForCtorParam("Room", o => o.MapFrom(s => s.Room.RoomName))
+            .ForCtorParam("Room_Id", o => o.MapFrom(s => s.Room.Room_Id))
             .ForCtorParam("ShowDate", o => o.MapFrom(s => s.ShowDate))
             .ForCtorParam("StartTime", o => o.MapFrom(s => s.StartTime))
             .ForCtorParam("EndTime", o => o.MapFrom(s => s.EndTime))

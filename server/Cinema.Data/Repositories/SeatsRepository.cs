@@ -13,17 +13,23 @@ public class SeatsRepository : ISeatsRepository
         _factory = factory;
     }
 
-    public async Task<IReadOnlyList<(int Seat_Id, char Row, int Number, Status LastTransaction)>> GetSeatsByShowtimeAsync(int Showtime_Id)
+    public async Task<IReadOnlyList<(int Seat_Id, char Row, int Number, Status LastTransaction)>> 
+        GetSeatsByShowtimeAsync(int Showtime_Id, int Room_Id)
     {
         CinemaDbContext db = await _factory.CreateDbContextAsync();
-        var queryResult = await db.TransactionSeats
-            .Where(ts => ts.Transaction.Showtime_Id == Showtime_Id)
+
+        var queryResult = await db.Seats
+            .Where(s => s.Room_Id == Room_Id)
             .Select(s => new
             {
                 Seat_Id = s.Seat_Id,
-                Row = s.Seat.Row,
-                Number = s.Seat.Number,
-                LastTransaction = s.Transaction.Status 
+                Row = s.Row,
+                Number = s.Number,
+                LastTransaction = s.transactionSeats
+                    .Where(ts => ts.Seat_Id == s.Seat_Id && ts.Transaction.Showtime_Id == Showtime_Id)
+                    .OrderByDescending(ts => ts.Transaction.PurchaseDate)
+                    .Select(ts => ts.Transaction.Status)
+                    .FirstOrDefault()
                     
             }).ToListAsync();
 

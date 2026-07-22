@@ -4,5 +4,6 @@ namespace Cinema.Data;
 
 public interface ISeatsRepository
 {
-    public Task<IReadOnlyList<(int Seat_Id, char Row, int Number, Status LastTransaction)>> GetSeatsByShowtimeAsync(int Showtime_Id);
+    public Task<IReadOnlyList<(int Seat_Id, char Row, int Number, Status LastTransaction)>> 
+        GetSeatsByShowtimeAsync(int Showtime_Id, int Room_Id);
 }
