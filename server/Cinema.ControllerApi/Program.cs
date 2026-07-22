@@ -19,13 +19,20 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Build Tokens Services
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IArgon2Hasher, Argon2Hasher>();
+// Build Showtime Services
 builder.Services.AddScoped<IShowtimeRepository, ShowtimeRepository>();
 builder.Services.AddScoped<IShowtimeService, ShowtimeService>();
+// Build Seats Services
 builder.Services.AddScoped<ISeatsRepository, SeatsRepository>();
 builder.Services.AddScoped<ISeatsService, SeatsService>();
+// Build User Services
 builder.Services.AddScoped<IUserService, UserService>();
+// Build Cinema Services
+builder.Services.AddScoped<ICinemaRepository, CinemaRepository>();
+builder.Services.AddScoped<ICinemaService, CinemaService>();
 
 var jwtKey = builder.Configuration["JwtSettings:Secret"];
 var jwtIssuer = builder.Configuration["JwtSettings:Issuer"];

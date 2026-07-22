@@ -1,6 +1,7 @@
 using AutoMapper;
 using Cinema.ControllerApi.DTOs;
 using Cinema.Data.Entities;
+using Cinema.Data.Extensions;
 
 namespace Cinema.ControllerApi.Mapping;
 
@@ -25,6 +26,12 @@ public class MappingProfile : Profile
             .ForCtorParam("Row", o => o.MapFrom(s => s.Row))
             .ForCtorParam("Number", o => o.MapFrom(s => s.Number))
             .ForCtorParam("IsFree", o => o.MapFrom(s => s.LastTransaction));
+
+        // Map Simple Cinemas
+        CreateMap<Cinemas, SimpleCinemaDto>()
+            .ForCtorParam("Cinema_Id", o => o.MapFrom(s => s.Cinema_Id))
+            .ForCtorParam("CinemaName", o => o.MapFrom(s => s.CinemaName))
+            .ForCtorParam("CinemaCity", o => o.MapFrom(s => s.City.GetDescription()));
 
     }
 }
