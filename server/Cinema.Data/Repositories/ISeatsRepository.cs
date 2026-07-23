@@ -6,4 +6,6 @@ public interface ISeatsRepository
 {
     public Task<IReadOnlyList<(int Seat_Id, char Row, int Number, Status LastTransaction)>> 
         GetSeatsByShowtimeAsync(int Showtime_Id, int Room_Id);
+
+    public Task<bool> AreSeatsOccupiedAsync(int showtimeId, List<int> seatIds);
 }
