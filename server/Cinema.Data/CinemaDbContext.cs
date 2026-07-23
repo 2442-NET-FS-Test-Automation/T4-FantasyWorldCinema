@@ -63,7 +63,7 @@ public class CinemaDbContext : DbContext
             .HasForeignKey(ts => ts.Seat_Id);
         
         b.Entity<TransactionSeats>().HasOne(ts => ts.Transaction)
-            .WithMany(t => t.transactionSeats)
+            .WithMany(t => t.TransactionSeats)
             .HasForeignKey(ts => ts.Transaction_Id)
             .OnDelete(DeleteBehavior.NoAction);;
 

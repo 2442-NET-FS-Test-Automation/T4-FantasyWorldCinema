@@ -33,6 +33,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 // Build Cinema Services
 builder.Services.AddScoped<ICinemaRepository, CinemaRepository>();
 builder.Services.AddScoped<ICinemaService, CinemaService>();
+// Build Transaction Services
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
+
 
 var jwtKey = builder.Configuration["JwtSettings:Secret"];
 var jwtIssuer = builder.Configuration["JwtSettings:Issuer"];
