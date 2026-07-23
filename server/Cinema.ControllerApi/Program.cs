@@ -72,7 +72,7 @@ const string SpaCorsPolicy = "spa"; // string name for our policy
 
 // Configuring our CORS policy
 builder.Services.AddCors( o=> o.AddPolicy(SpaCorsPolicy, p =>
-    p.WithOrigins("http://127.0.0.1:5500")
+    p.WithOrigins("http://localhost:5173", "http://127.0.0.1:5500")
     .AllowAnyHeader()
     .AllowAnyMethod()
 ));
@@ -92,6 +92,8 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+
+app.UseCors(SpaCorsPolicy);
 
 app.UseAuthentication();
 app.UseAuthorization();
