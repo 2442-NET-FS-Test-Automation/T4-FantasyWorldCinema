@@ -37,6 +37,9 @@ builder.Services.AddScoped<ICinemaService, CinemaService>();
 // Build Transaction Services
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
+// Build Movies Services
+builder.Services.AddScoped<IMoviesRepository, MoviesRepository>();
+builder.Services.AddScoped<IMoviesService, MoviesService>();
 
 // Hangfire services
 builder.Services.AddHangfire(config => config
