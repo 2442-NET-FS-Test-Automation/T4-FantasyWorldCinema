@@ -1,5 +1,4 @@
 import type { ShowtimeItem } from "../types";
-import { useState } from "react";
 
 interface ShowtimeCardProps {
     movie: string;

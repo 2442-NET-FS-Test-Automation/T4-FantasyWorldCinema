@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import type { CinemaItem , FetchState} from "../types";
 import { getCinemas } from "../api/Cinema";
 import { CinemaSearchBar } from "../Components/CinemaSearchBar";

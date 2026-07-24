@@ -4,12 +4,6 @@ import { GetShowtimesByCinema } from "../api/Showtimes";
 import { ShowtimeCard } from "../Components/ShowtimeCard";
 import { useParams } from "react-router-dom";
 
-interface Movies {
-    Movie: string;
-    Date: Date;
-    Times: Date[];
-}
-
 
 export function DisplayShowtimes() {
     const { CinemaId } = useParams<{ CinemaId: string }>();
