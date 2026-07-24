@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +37,14 @@ builder.Services.AddScoped<ICinemaService, CinemaService>();
 // Build Transaction Services
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
+
+// Hangfire services
+builder.Services.AddHangfire(config => config
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(conn_string));
+builder.Services.AddHangfireServer();
 
 
 var jwtKey = builder.Configuration["JwtSettings:Secret"];
@@ -77,7 +86,7 @@ const string SpaCorsPolicy = "spa"; // string name for our policy
 // Configuring our CORS policy
 builder.Services.AddCors( o=> o.AddPolicy(SpaCorsPolicy, p =>
     p.WithOrigins("http://localhost:5173", "http://127.0.0.1:5500")
-    .AllowAnyHeader()
+    .AllowAnyHeader() // Map the hangfire dashboard UI
     .AllowAnyMethod()
 ));
 
@@ -89,6 +98,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseHangfireDashboard();
 }
 
 // Swagger stuff added to app
