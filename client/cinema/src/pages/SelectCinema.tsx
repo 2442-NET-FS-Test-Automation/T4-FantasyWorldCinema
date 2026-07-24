@@ -34,7 +34,8 @@ export function SelectCinema() {
     return (
         <section className="Cinema-Selection">
             <h2 className="Cinema-Selection-Title"> Select you Cinema</h2>
-            <CinemaSearchBar cinemas={items }/>
+            {fState !== "loaded" ? <p>Loading...</p> : <CinemaSearchBar cinemas={items }/>}
+            
 
         </section>
     )
