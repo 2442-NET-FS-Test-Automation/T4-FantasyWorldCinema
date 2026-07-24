@@ -11,6 +11,11 @@ public class UserService : IUserService
     private readonly CinemaDbContext _db;
     private readonly IArgon2Hasher _passwordHasher;
 
+
+    public const int ROLE_ADMIN = 1;
+    public const int ROLE_CONSUMER = 2;
+
+
     public UserService(CinemaDbContext db, IArgon2Hasher passwordHasher)
     {
         _db = db;
@@ -39,10 +44,6 @@ public class UserService : IUserService
         bool exists = await _db.Users.AnyAsync(u => u.Username == dto.Username || u.Email == dto.Email);
         if (exists) throw new InvalidOperationException("Username or Email already in use");
 
-        /* Search role taken by dto and verify if it exist in DB */        
-        var targetRole = await _db.Roles.FirstOrDefaultAsync(r => r.RoleName == dto.RoleName);
-        if (targetRole == null) throw new InvalidOperationException($"The role '{dto.RoleName}' does not exist.");
-
         /* 2- Hash password using Argon2 Services */
         string hashedPassword = _passwordHasher.HashPassword(dto.Password);
 
@@ -53,7 +54,7 @@ public class UserService : IUserService
             Email = dto.Email,
             PasswordHash = hashedPassword,
             FullName = dto.FullName,
-            Role_Id = targetRole.Role_Id,
+            Role_Id =  ROLE_CONSUMER, // targetRole.Role_Id = 2 
             CreatedAt = DateTime.UtcNow
         };
 

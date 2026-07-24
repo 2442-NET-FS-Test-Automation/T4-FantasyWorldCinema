@@ -14,9 +14,7 @@ public record RegisterDto(
     string Email,
     
     [Required, StringLength(100, MinimumLength = 8, ErrorMessage = "The password must be between 8 and 100 characters long.")]
-    string Password,
-
-    [Required] string RoleName
+    string Password
 );
 
 public record LoginDto(

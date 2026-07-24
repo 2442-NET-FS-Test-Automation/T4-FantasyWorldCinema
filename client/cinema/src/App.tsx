@@ -3,7 +3,6 @@ import { AuthProvider } from "./auth/AuthContext";
 import { ProtectedRoute } from "./auth/ProtectedRoute";
 import { LoginPage } from "./pages/LoginPage";
 import { SelectCinema } from "./pages/SelectCinema";
-// import { SelectCinema } from "./pages/SelectCinema";
 
 export default function App() {
   return (
