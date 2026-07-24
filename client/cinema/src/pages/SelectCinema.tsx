@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
 import type { CinemaItem , FetchState} from "../types";
 import { getCinemas } from "../api/Cinema";
 import { CinemaSearchBar } from "../Components/CinemaSearchBar";
@@ -34,7 +33,8 @@ export function SelectCinema() {
     return (
         <section className="Cinema-Selection">
             <h2 className="Cinema-Selection-Title"> Select you Cinema</h2>
-            <CinemaSearchBar cinemas={items }/>
+            {fState !== "loaded" ? <p>Loading...</p> : <CinemaSearchBar cinemas={items }/>}
+            
 
         </section>
     )
