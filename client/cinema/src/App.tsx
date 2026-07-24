@@ -3,6 +3,7 @@ import { AuthProvider } from "./auth/AuthContext";
 import { ProtectedRoute } from "./auth/ProtectedRoute";
 import { LoginPage } from "./pages/LoginPage";
 import { SelectCinema } from "./pages/SelectCinema";
+import { DisplayShowtimes } from "./pages/DisplayShowtimes";
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
           {/* Rutas protegidas */}
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<SelectCinema />} />
+            <Route path="/Showtimes/:CinemaId" element={<DisplayShowtimes />} />
             {/* Other Path Routes Here: <Route path="/ETC ETC" element={<ETC ETC />} /> */}
           </Route>
 

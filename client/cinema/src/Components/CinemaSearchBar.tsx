@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import type { CinemaItem } from "../types";
 import { useState } from "react";
 
@@ -8,7 +9,9 @@ interface CinemaSearchBarProps {
 
 
 export function CinemaSearchBar ({cinemas }: CinemaSearchBarProps) {
+    const navigate = useNavigate();
     const [query, setQuery] = useState("");
+    const [selectedCinemaId, setSelectedCinemaId] = useState<number | null>(null);
     const [isOpen, setIsOpen] = useState(false);
 
     // Filtering values
@@ -33,13 +36,16 @@ export function CinemaSearchBar ({cinemas }: CinemaSearchBarProps) {
                         onClick={() => {
                             setQuery(item.cinemaName);
                             setIsOpen(false);
+                            setSelectedCinemaId(item.cinema_Id);
                         }}>
                             {item.cinemaName}
                         </li>
                     ))}
                 </ul>
             )}
-            <button type="button" className="Cinema-Search-Button">Seleccionar</button>
+            <button type="button" className="Cinema-Search-Button"
+            onClick={() => navigate(`/Showtimes/${selectedCinemaId}`)}
+            >Seleccionar</button>
         </div>
     )
 }

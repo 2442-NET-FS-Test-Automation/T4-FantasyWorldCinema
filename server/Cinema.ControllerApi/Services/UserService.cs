@@ -31,6 +31,10 @@ public class UserService : IUserService
 
         if (user == null) { return null; }
 
+        bool isExactUsername = string.Equals(user.Username, identifier, StringComparison.Ordinal);
+        bool isExactEmail = string.Equals(user.Email, identifier, StringComparison.Ordinal);
+        if ( identifier.Contains('@') ? !isExactEmail : !isExactUsername ) { return null; }
+
         /* 2- Verifies Hash of the password with the Argon2 Tool */
         bool isValid = _passwordHasher.VerifyPassword(password, user.PasswordHash);
         if (!isValid) { return null; }
