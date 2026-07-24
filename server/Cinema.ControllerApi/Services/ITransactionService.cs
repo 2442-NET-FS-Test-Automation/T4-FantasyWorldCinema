@@ -8,4 +8,5 @@ public interface ITransactionService
 {
     public Task<ServiceResult<TransactionResponseDto>> CreateAsync(int userId, CreateTransactionDto requestDto);
     public Task<ServiceResult<TransactionResponseDto>> GetTransactionByIdAsync(int transactionId, int userId);
+    public Task ValidateAndExpireTransactionsAsync(int transactionId);
 }

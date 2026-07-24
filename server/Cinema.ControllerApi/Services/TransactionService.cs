@@ -5,24 +5,25 @@ using Cinema.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using Serilog;
+using Hangfire;
 namespace Cinema.ControllerApi.Services;
 
 public class TransactionService : ITransactionService
 {
     private readonly ITransactionRepository _transactionRepository;
-    private readonly IShowtimeRepository _showtimeRepository;
     private readonly ISeatsRepository _seatsRepository;
     private readonly IShowtimeService _showtimeService;
     private readonly IMapper _mapper;
+    private readonly IBackgroundJobClient _backgroundJobClient;
 
-    public TransactionService(ITransactionRepository transactionRepo, IShowtimeRepository showtimeRepo,
-        ISeatsRepository seatsRepo, IShowtimeService showtimeService, IMapper mapper)
+    public TransactionService(ITransactionRepository transactionRepo, ISeatsRepository seatsRepo, 
+        IShowtimeService showtimeService, IMapper mapper, IBackgroundJobClient backgroundJobClient)
     {
         _transactionRepository = transactionRepo;
-        _showtimeRepository = showtimeRepo;
         _seatsRepository = seatsRepo;
         _showtimeService = showtimeService;
         _mapper = mapper;
+        _backgroundJobClient = backgroundJobClient;
     }
     
     /// <summary>
@@ -89,6 +90,13 @@ public class TransactionService : ITransactionService
         // 5. Delegate the transaction saving to the repository
         Transactions savedEntity = await _transactionRepository.CreateTransactionAsync(transactionEntity);
 
+        // 5.5 Starts de background job to expire the transaction if not already.
+        _backgroundJobClient.Schedule<ITransactionService>(
+            x => x.ValidateAndExpireTransactionsAsync(savedEntity.Transaction_Id),
+            TimeSpan.FromSeconds(15) // Just for demo
+            // TimeSpan.FromMinutes(10)
+        );
+
         // 6. Delegates the transaction created fecth to the repository and maps it.
         Transactions? createdTransaction = await _transactionRepository.GetTransactionWithDetailsAsync(savedEntity.Transaction_Id);
         TransactionResponseDto responseDto = _mapper.Map<TransactionResponseDto>(createdTransaction);
@@ -128,5 +136,27 @@ public class TransactionService : ITransactionService
             IsSuccess = true,
             Data = responseDto
         };
+    }
+
+    /// <summary>
+    /// Checks id the transactions still has the "Pending" Status.
+    /// </summary>
+    /// <param name="transactionId"></param>
+    /// <returns></returns>
+    public async Task ValidateAndExpireTransactionsAsync(int transactionId)
+    {
+        Transactions? transaction = await _transactionRepository.GetTransactionAsync(transactionId);
+        if (transaction is null)
+        {
+            Log.Warning("Transaction #{TransactionId} no longer exists. Changed status is not necessary.", transactionId);
+            return;
+        }
+
+        if (transaction.Status == Status.Pending)
+        {
+            Log.Information("Transaction #{TransactionId} exceeded the 15 second Pending time limit. It is updated to expired.", transactionId);
+            await _transactionRepository.SetTransactionStatus(transactionId);
+        }
+
     }
 }

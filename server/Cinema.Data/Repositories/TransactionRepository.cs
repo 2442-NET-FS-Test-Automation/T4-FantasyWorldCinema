@@ -28,7 +28,7 @@ public class TransactionRepository : ITransactionRepository
     }
 
     /// <summary>
-    /// -Makes a query to bring all transaction data.
+    /// -Makes a query to bring all transaction related data.
     /// </summary>
     /// <param name="transactionId"></param>
     /// <returns>The transaction entity with other entities attached.</returns>
@@ -45,5 +45,27 @@ public class TransactionRepository : ITransactionRepository
             .Include(t => t.TransactionSeats)
                 .ThenInclude(ts => ts.Seat)
             .FirstOrDefaultAsync(t => t.Transaction_Id == transactionId);
+    }
+
+    /// <summary>
+    /// Get a transaction by id.
+    /// </summary>
+    /// <param name="transactionId"></param>
+    /// <returns>A transaction</returns>
+    public async Task<Transactions?> GetTransactionAsync(int transactionId)
+    {
+        CinemaDbContext db = await _factory.CreateDbContextAsync();
+
+        return await db.Transactions
+            .FindAsync(transactionId);
+    }
+
+    public async Task SetTransactionStatus(int transactionId)
+    {
+        CinemaDbContext db = await _factory.CreateDbContextAsync();
+
+        await db.Transactions
+            .Where(t => t.Transaction_Id == transactionId)
+            .ExecuteUpdateAsync(s => s.SetProperty(t => t.Status, Status.Expired));
     }
 }
