@@ -30,6 +30,7 @@ public class TokenService : ITokenService
         /* 2- Map claims using the properties from Users */
         var claims = new[]
         {
+            new Claim(ClaimTypes.NameIdentifier, user.User_Id.ToString()),
             new Claim(ClaimTypes.Name, user.Username),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.Role, user.Role.RoleName)

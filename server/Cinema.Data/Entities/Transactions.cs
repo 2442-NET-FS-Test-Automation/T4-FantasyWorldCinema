@@ -26,6 +26,6 @@ public class Transactions
     [Required]
     public Status Status {get; set; } = 0;
 
-    public ICollection<TransactionSeats> transactionSeats {get; set; } = default!;
+    public ICollection<TransactionSeats> TransactionSeats {get; set; } = default!;
     public byte[] RowVersion {get; set; } = default!;
 }

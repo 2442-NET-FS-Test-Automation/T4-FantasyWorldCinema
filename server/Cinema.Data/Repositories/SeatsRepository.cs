@@ -37,4 +37,39 @@ public class SeatsRepository : ISeatsRepository
             .Select(x => (x.Seat_Id, x.Row, x.Number, x.LastTransaction))
             .ToList();
     }
+
+
+    /// <summary>
+    /// -Checks if the selected seats corresponds to the selected showtime.
+    /// -Makes a query that fetch all transactions and transactions seats that are 
+    /// related to the showtime and if those transactions have an invalid status.
+    /// </summary>
+    /// <param name="showtimeId"></param>
+    /// <param name="seatIds"></param>
+    /// <returns>A boolean meaning if at leats one seat is occuppied.</returns>
+    public async Task<bool> AreSeatsOccupiedAsync(int showtimeId, List<int> seatIds)
+    {   
+        CinemaDbContext db = await _factory.CreateDbContextAsync();
+
+        int validSeatsCount = await db.Showtimes
+            .Where(s => s.Showtime_Id == showtimeId)
+            .Join(db.Rooms, s => s.Room_Id, r => r.Room_Id, (s, r) => r)
+            .Join(db.Seats, r => r.Room_Id, st => st.Room_Id, (r, st) => st)
+            .CountAsync(st => seatIds.Contains(st.Seat_Id));
+
+        bool validSeats = validSeatsCount == seatIds.Count;
+        if (validSeats)
+        {
+            Status[] unavailableStatuses = [Status.Pending, Status.Completed, Status.Used];
+
+            bool unavailable = await db.Transactions
+                .Where(t => t.Showtime_Id == showtimeId && unavailableStatuses.Contains(t.Status))
+                .Join(db.TransactionSeats, t => t.Transaction_Id, ts => ts.Transaction_Id, (t, ts) => ts)
+                .AnyAsync(ts => seatIds.Contains(ts.Seat_Id));
+
+            return unavailable;
+        }
+
+        return true;
+    }
 }
