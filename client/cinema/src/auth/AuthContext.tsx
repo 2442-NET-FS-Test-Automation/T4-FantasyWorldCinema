@@ -1,6 +1,6 @@
 import { createContext, useReducer } from "react";
 import type { ReactNode } from "react";
-import { login as loginRequest } from "../api/auth";
+import { login as loginRequest, register as registerRequest } from "../api/auth";
 import { decodeToken } from "./jwt";
 import { getToken, setToken, clearToken } from "./storage";
 import { authReducer, initialAuthState } from "./authReducer";
@@ -12,6 +12,7 @@ import type { AuthState } from "./authReducer";
 interface AuthContextValue extends AuthState {
     login: (identifier: string, password: string) => Promise<boolean>;
     logout: () => void;
+    register: (fullName: string, username: string, email: string, password: string) => Promise<boolean>;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
@@ -42,14 +43,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const user = decodeToken(token);
 
             if (!user) throw new Error("token missing expected claims");
-            
+
             /* If our token is present with the correct claims - we can now store it */
             setToken(token);
             dispatch({ type: "login_success", user });
-            return true; 
+            return true;
 
         } catch {
             dispatch({ type: "login_failure", error: "invalid credentials or server error" });
+            return false;
+        }
+    }
+
+    async function register(fullName: string, username: string, email: string, password: string): Promise<boolean> {
+        dispatch({ type: "login_start" });
+        try {
+            await registerRequest(fullName, username, email, password);
+
+            dispatch({ type: "logout" });
+            return true;
+        }
+        catch {
+            dispatch({ type: "login_failure", error: "registration failed or server error" });
             return false;
         }
     }
@@ -60,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <AuthContext.Provider value={{ ...state, login, logout }}>
+        <AuthContext.Provider value={{ ...state, login, logout, register }}>
             {children} {/* Children represents any components rendering inside of the AuthContext.Provider */}
         </AuthContext.Provider>
     );
