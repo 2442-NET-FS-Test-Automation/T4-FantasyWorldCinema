@@ -10,6 +10,17 @@ export async function login(identifier: string, password: string): Promise<strin
     password,
   });
 
-  // Retornamos el string del token que envía .NET
   return response.data.token;
+}
+
+
+export async function register(fullName: string, username: string, email: string, password: string): Promise<boolean> {
+  await api.post("/auth/register", {
+    FullName: fullName,
+    Username: username,
+    Email: email,
+    Password: password
+  });
+
+  return true;
 }
