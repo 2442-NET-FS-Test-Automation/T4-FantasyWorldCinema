@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import type { CinemaItem } from "../types";
 import { useState, useMemo } from "react";
-import { AutoComplete, Flex, Input } from "antd";
+import { AutoComplete, Flex, Button } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import "../CSS/Styles.css"
 
 interface CinemaSearchBarProps {
     cinemas: CinemaItem[];
@@ -30,26 +32,32 @@ export function CinemaSearchBar ({cinemas }: CinemaSearchBarProps) {
 
 
     return (
-        <div className="Cinema-Search-Container">
-            <Flex gap={0}>
-            <Flex vertical gap={12} >
-            <AutoComplete className="Cinema-Search-Input"
-                placeholder="Your cinema"
-                value={query}
-                options={options}
-                onSearch={(value) => setQuery(value)}
-                onChange={(value) => setQuery(value)}
-                onSelect={(value, option: any) => {
-                    setQuery(value);
-                    setSelectedCinemaId(option.id);
-                }}
-                filterOption={false} />
-            </Flex>
-            <button type="button" className="Cinema-Search-Button"
+    <Flex vertical gap={18} style={{width: "100%"}}>
+        <AutoComplete
+            size="large"
+            style={{ width: "100%" }}
+            placeholder="Search a cinema..."
+            value={query}
+            options={options}
+            onSearch={(value) => setQuery(value)}
+            onChange={(value) => setQuery(value)}
+            onSelect={(value, option: any) => {
+                setQuery(value);
+                setSelectedCinemaId(option.id);
+            }}
+            filterOption={false}
+        />
+
+        <Button
+            type="primary"
+            icon={<SearchOutlined />}
+            size="large"
+            block
+            disabled={!selectedCinemaId}
             onClick={() => navigate(`/Showtimes/${selectedCinemaId}`)}
-            >Seleccionar</button>
-            </Flex>
-            
-        </div>
-    )
+        >
+            Select Cinema
+        </Button>
+    </Flex>
+);
 }
