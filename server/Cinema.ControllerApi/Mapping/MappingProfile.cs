@@ -40,6 +40,7 @@ public class MappingProfile : Profile
             .ForCtorParam("Genre", o => o.MapFrom(s => s.Genre))
             .ForCtorParam("Rating", o => o.MapFrom(s => s.Rating))
             .ForCtorParam("Synopsis", o => o.MapFrom(s => s.Synopsis))
-            .ForCtorParam("DurationMinutes", o => o.MapFrom(s => s.DurationMinutes));
+            .ForCtorParam("DurationMinutes", o => o.MapFrom(s => s.DurationMinutes))
+            .ForCtorParam("Poster", o => o.MapFrom(s => s.PosterUrl));
     }
 }
