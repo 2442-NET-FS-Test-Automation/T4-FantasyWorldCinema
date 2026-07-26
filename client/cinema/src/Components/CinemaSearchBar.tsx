@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import type { CinemaItem } from "../types";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { AutoComplete, Flex, Input } from "antd";
 
 interface CinemaSearchBarProps {
     cinemas: CinemaItem[];
@@ -12,40 +13,43 @@ export function CinemaSearchBar ({cinemas }: CinemaSearchBarProps) {
     const navigate = useNavigate();
     const [query, setQuery] = useState("");
     const [selectedCinemaId, setSelectedCinemaId] = useState<number | null>(null);
-    const [isOpen, setIsOpen] = useState(false);
 
-    // Filtering values
-    const filteredItems = cinemas.filter((item) => 
-        item.cinemaName?.toLowerCase().includes(query.toLowerCase()));
+    const options = useMemo(() => {
+        return cinemas
+            .filter(cinema =>
+                cinema.cinemaName
+                    ?.toLowerCase()
+                    .includes(query.toLowerCase())
+            )
+            .map(cinema => ({
+                value: cinema.cinemaName,
+                label: cinema.cinemaName,
+                id: cinema.cinema_Id
+            }));
+    }, [cinemas, query]);
+
 
     return (
         <div className="Cinema-Search-Container">
-            <input type="text" className="Cinema-Search-Input"
-            placeholder="Your cinema"
-            value={query}
-            onChange={(e) => {
-                setQuery(e.target.value);
-                setIsOpen(true);}}
-                onFocus={() => setIsOpen(true)} />
-            {isOpen && filteredItems.length > 0 && (
-                <ul className="Cinema-Search-Options">
-                    
-                    {filteredItems.map((item) => (
-                        <li className="Cinema-Search-Option-Row"
-                        key={item.cinema_Id}
-                        onClick={() => {
-                            setQuery(item.cinemaName);
-                            setIsOpen(false);
-                            setSelectedCinemaId(item.cinema_Id);
-                        }}>
-                            {item.cinemaName}
-                        </li>
-                    ))}
-                </ul>
-            )}
+            <Flex gap={0}>
+            <Flex vertical gap={12} >
+            <AutoComplete className="Cinema-Search-Input"
+                placeholder="Your cinema"
+                value={query}
+                options={options}
+                onSearch={(value) => setQuery(value)}
+                onChange={(value) => setQuery(value)}
+                onSelect={(value, option: any) => {
+                    setQuery(value);
+                    setSelectedCinemaId(option.id);
+                }}
+                filterOption={false} />
+            </Flex>
             <button type="button" className="Cinema-Search-Button"
             onClick={() => navigate(`/Showtimes/${selectedCinemaId}`)}
             >Seleccionar</button>
+            </Flex>
+            
         </div>
     )
 }
