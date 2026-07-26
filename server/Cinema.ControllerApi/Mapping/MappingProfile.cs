@@ -32,6 +32,14 @@ public class MappingProfile : Profile
             .ForCtorParam("Cinema_Id", o => o.MapFrom(s => s.Cinema_Id))
             .ForCtorParam("CinemaName", o => o.MapFrom(s => s.CinemaName))
             .ForCtorParam("CinemaCity", o => o.MapFrom(s => s.City.GetDescription()));
-
+        
+        // Map Movies
+        CreateMap<Movies, MoviesDTO>()
+            .ForCtorParam("Movie_Id", o => o.MapFrom(s => s.Movie_Id))
+            .ForCtorParam("Title", o => o.MapFrom(s => s.Title))
+            .ForCtorParam("Genre", o => o.MapFrom(s => s.Genre))
+            .ForCtorParam("Rating", o => o.MapFrom(s => s.Rating))
+            .ForCtorParam("Synopsis", o => o.MapFrom(s => s.Synopsis))
+            .ForCtorParam("DurationMinutes", o => o.MapFrom(s => s.DurationMinutes));
     }
 }
