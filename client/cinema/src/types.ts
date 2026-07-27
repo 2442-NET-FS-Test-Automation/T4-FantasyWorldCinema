@@ -18,4 +18,14 @@ export interface ShowtimeItem {
     price: number;
 }
 
+export interface MovieItem {
+    movie_Id: number;
+    title: string;
+    genre: string;
+    rating: string,
+    synopsis: string,
+    durationMinutes: number;
+    poster: string;
+}
+
 export type FetchState = "idle" | "loading" | "loaded" | "failed";

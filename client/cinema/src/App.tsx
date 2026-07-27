@@ -18,22 +18,17 @@ export function AppContent() {
   return (
       <BrowserRouter>
         <Navbar />
-          <main className="min-h-screen bg-gray-50 pt-24">
+          <main className="min-h-screen">
             <Routes>
-              {/* <Route path="/" element={<Navigate to="/home" replace />} /> */}
+              <Route path="/" element={<Navigate to="/home" replace />} />
               {/* Public routes */}
 
-              <Route path="/" element={<SelectCinema />} /> {/* DELETE */}
-              <Route path="/Showtimes/:CinemaId" element={<DisplayShowtimes />} /> {/* DELETE */}
+              {/* <Route path="/" element={<SelectCinema />} /> 
+              <Route path="/Showtimes/:CinemaId" element={<DisplayShowtimes />} /> */}
 
-              {/* <Route path="/home" element={<Home />} />
-              <Route path="/cinema/:cinemaId" element={<CinemaDetails />} />
-              <Route path="/showtime/:showtimeId" element={<ShowtimeDetails />} /> */}
-
-              {/* Protected routes - any logged ones */}
-              <Route element={<ProtectedRoute />}>
-                {/* <Route path="/profile/:userId" element={<Profile />} /> */}
-              </Route>
+              <Route path="/home" element={<SelectCinema />} />
+              <Route path="/cinema/:cinemaId" element={<DisplayShowtimes />} />
+              {/* <Route path="/showtime/:showtimeId" element={<ShowtimeDetails />} /> */}
 
               {/* Protected routes - only CONSUMERS */}
               {/* <Route element={<ProtectedRoute allowedRoles={["Consumer"]} />}> */}

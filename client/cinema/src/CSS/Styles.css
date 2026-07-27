@@ -1,0 +1,65 @@
+.Flex-Home-Background {
+    min-height: 105vh;
+    background-image: url(../assets/MedievalCatle.png);
+    background-size: cover; 
+    background-position: center;
+
+
+    padding-top: 6rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-bottom: 2rem;
+}
+
+.Cinema-Card {
+    width: 600px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 50%);
+}
+
+.Title-Cinema {
+    display: flex;
+    font-family: "Comics Sans";
+    align-self: center;
+    justify-content: center;
+}
+
+.Movies-Card {
+    margin-top: 30px;
+    width: 90vw;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 50%);
+}
+
+.Movie-Card {
+    background: rgba(255, 255, 255, 50%);
+}
+
+.Movie-Title {
+    min-height: 64px;          /* Reserva espacio para 2 líneas */
+    margin-bottom: 12px !important;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2;     /* Máximo 2 líneas */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.Poster-Size {
+    display: flex;
+    width: 80%;
+    margin: auto;
+    justify-content: center;
+    align-self: center;
+    border-radius: 16px;
+}
+
+
+@media (min-width: 768px) {
+    .Flex-Home-Background {
+        padding-top: 7rem;
+        padding-left: 5rem;
+        padding-right: 5rem;
+        padding-bottom: 3rem;
+    }
+}
