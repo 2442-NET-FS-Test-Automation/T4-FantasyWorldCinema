@@ -90,7 +90,7 @@ export function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
             {contextHolder}
 
             <Typography.Title level={2} style={{ margin: 0, color: '#4d5078', fontFamily: 'inherit' }}>
-              ¡Hello!
+              Hello!
             </Typography.Title>
             <Typography.Paragraph style={{ margin: '4px 0', fontSize: 16, fontFamily: 'inherit' }}>
               Register your account to become a Fantasy World Cinema member!

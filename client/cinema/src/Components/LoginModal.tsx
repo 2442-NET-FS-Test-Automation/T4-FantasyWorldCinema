@@ -72,13 +72,13 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
           <div
             className="font-primary text-slate-800 p-8 bg-cover bg-center bg-no-repeat w-full h-full min-h-[400px] rounded-x1"
             style={{
-              backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.80), rgba(255, 255, 255, 0.80)), url("Fantasy_World_Login_Background.webp")',
+              backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRy7CYk0xLnqf89H5bTf3Up95ICheOGl82CuxAZkiLGU_AW0ncPDjeYnVE&s=10)',
             }}
           >
             {contextHolder}
 
             <Typography.Title level={2} style={{ margin: 0, color: '#4d5078', fontFamily: 'inherit' }}>
-              ¡Hello!
+              Hello!
             </Typography.Title>
             <Typography.Paragraph style={{ margin: '4px 0', fontSize: 16, fontFamily: 'inherit' }}>
               Access to buy your tickets at Fantasy World Cinema!
