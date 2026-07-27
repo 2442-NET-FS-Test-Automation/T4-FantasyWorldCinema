@@ -3,6 +3,7 @@ import type { ShowtimeItem, FetchState } from "../types";
 import { GetShowtimesByCinema } from "../api/Showtimes";
 import { ShowtimeCard } from "../Components/ShowtimeCard";
 import { useParams } from "react-router-dom";
+import { Flex } from "antd";
 
 
 export function DisplayShowtimes() {
@@ -21,7 +22,7 @@ export function DisplayShowtimes() {
 
         let active = true;
         setFState("loading");
-        
+        console.log("Cinema ID: " + CinemaId);
         GetShowtimesByCinema(Cinema_Id).then((data) =>{
             if(!active) return;
             setItems(data);
@@ -55,20 +56,22 @@ export function DisplayShowtimes() {
         }, {});
     }, [items, selectedDate]);
 
-    console.log(items);
-    console.log(groupedShowtimes);
-
     return (
             <section className="Showtime-section">
                 <h2 className="Showtime-section-title"> Choose your movie</h2>
                 <input type="date" className="Showtimes-date-selector"
                     value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)}/>
-                {fState !== "loaded" ? <p>Loading...</p> :
+                {fState === "loading" && <p>Loading...</p> }
+                {fState === "loaded" &&
                 <div className="Showtimes-container">
                     {Object.entries(groupedShowtimes).map(([movie, showtimes]) => (
-                        <ShowtimeCard key={movie} movie={movie} showtimes={showtimes} />
+                        <Flex vertical>
+                            <ShowtimeCard key={movie} movie={movie} showtimes={showtimes} />
+                        </Flex>
+                        
                         ))}
                 </div>}
+                {fState === "failed" && <p>Not movies available</p>}
                 
     
             </section>
