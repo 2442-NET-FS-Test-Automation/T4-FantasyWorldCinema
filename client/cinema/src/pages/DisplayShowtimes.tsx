@@ -3,7 +3,9 @@ import type { ShowtimeItem, FetchState } from "../types";
 import { GetShowtimesByCinema } from "../api/Showtimes";
 import { ShowtimeCard } from "../Components/ShowtimeCard";
 import { useParams } from "react-router-dom";
-import { Flex } from "antd";
+import { Flex, Card, Row, Col } from "antd";
+import "../CSS/Styles.css";
+import "../CSS/Backgrounds.css";
 
 
 export function DisplayShowtimes() {
@@ -22,7 +24,6 @@ export function DisplayShowtimes() {
 
         let active = true;
         setFState("loading");
-        console.log("Cinema ID: " + CinemaId);
         GetShowtimesByCinema(Cinema_Id).then((data) =>{
             if(!active) return;
             setItems(data);
@@ -55,25 +56,43 @@ export function DisplayShowtimes() {
             return acc;
         }, {});
     }, [items, selectedDate]);
+    console.log(fState);
+    console.log(groupedShowtimes);
 
     return (
-            <section className="Showtime-section">
+            <Flex vertical id="DisplayShowtimes"    
+                justify="center"
+                align="center"
+                className="Flex-Background">
                 <h2 className="Showtime-section-title"> Choose your movie</h2>
                 <input type="date" className="Showtimes-date-selector"
                     value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)}/>
                 {fState === "loading" && <p>Loading...</p> }
                 {fState === "loaded" &&
-                <div className="Showtimes-container">
-                    {Object.entries(groupedShowtimes).map(([movie, showtimes]) => (
-                        <Flex vertical>
-                            <ShowtimeCard key={movie} movie={movie} showtimes={showtimes} />
-                        </Flex>
-                        
+                <Card  className="Movies-Card">
+                    <Row gutter={[24, 24]}>
+                        {Object.entries(groupedShowtimes).map(([movie, showtimes]) => (
+                            <Col
+                                key={movie}
+                                xs={24}
+                                sm={12}
+                                md={8}
+                                lg={6}
+                            >
+                                <ShowtimeCard
+                                    title={movie}
+                                    poster={showtimes[0].poster}
+                                    rating={showtimes[0].rating}
+                                    showtimes={showtimes}
+                                />
+                            </Col>
                         ))}
-                </div>}
+                    </Row>
+                    
+                </Card>}
                 {fState === "failed" && <p>Not movies available</p>}
                 
     
-            </section>
+            </Flex>
         )
 }

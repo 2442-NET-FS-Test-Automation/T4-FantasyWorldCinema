@@ -15,6 +15,7 @@ public class MappingProfile : Profile
             .ForCtorParam("Movie", o => o.MapFrom(s => s.Movie.Title))
             .ForCtorParam("Poster", o => o.MapFrom(s => s.Movie.PosterUrl))
             .ForCtorParam("Room", o => o.MapFrom(s => s.Room.RoomName))
+            .ForCtorParam("Rating", o => o.MapFrom(s => s.Movie.Rating.GetDescription()))
             .ForCtorParam("Room_Id", o => o.MapFrom(s => s.Room.Room_Id))
             .ForCtorParam("ShowDate", o => o.MapFrom(s => s.ShowDate))
             .ForCtorParam("StartTime", o => o.MapFrom(s => s.StartTime))

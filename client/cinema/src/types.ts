@@ -11,6 +11,7 @@ export interface ShowtimeItem {
     showtime_Id: number;
     movie: string;
     poster: string;
+    rating: string;
     room: string;
     room_Id: number;
     showDate: Date;
