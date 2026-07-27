@@ -18,7 +18,9 @@ public class MappingProfile : Profile
             .ForCtorParam("ShowDate", o => o.MapFrom(s => s.ShowDate))
             .ForCtorParam("StartTime", o => o.MapFrom(s => s.StartTime))
             .ForCtorParam("EndTime", o => o.MapFrom(s => s.EndTime))
-            .ForCtorParam("Price", o => o.MapFrom(s => s.Price));
+            .ForCtorParam("Price", o => o.MapFrom(s => s.Price))
+            .ForCtorParam("Rating", o => o.MapFrom(s => s.Movie.Rating.ToString()))
+            .ForCtorParam("PosterUrl", o => o.MapFrom(s => s.Movie.PosterUrl));
 
         // Map Seats by Showtime
         CreateMap<(int Seat_Id, char Row, int Number, Status LastTransaction), SeatsDTO>()

@@ -1,13 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthContext";
-import { ProtectedRoute/* , AnonymousRoute */ } from "./auth/ProtectedRoute";
 import { SelectCinema } from "./pages/SelectCinema";
 import { DisplayShowtimes } from "./pages/DisplayShowtimes";
 import { Navbar } from "./Components/Navbar";
-import { useState } from "react";
-import { Button } from "antd";
 
 import { useAuth } from './auth/useAuth';
+import { ShowtimeDetails } from "./pages/ShowtimeDetails";
 
 
 
@@ -28,7 +26,7 @@ export function AppContent() {
 
               <Route path="/home" element={<SelectCinema />} />
               <Route path="/cinema/:cinemaId" element={<DisplayShowtimes />} />
-              {/* <Route path="/showtime/:showtimeId" element={<ShowtimeDetails />} /> */}
+              <Route path="/showtime/:showtimeId" element={<ShowtimeDetails />} />
 
               {/* Protected routes - only CONSUMERS */}
               {/* <Route element={<ProtectedRoute allowedRoles={["Consumer"]} />}> */}
