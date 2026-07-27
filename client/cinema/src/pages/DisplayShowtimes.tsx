@@ -79,7 +79,7 @@ export function DisplayShowtimes() {
                 justify="center"
                 align="center"
                 className="Flex-Background">
-                {availableDates.length > 0 ? <>
+                {(availableDates.length > 0 && fState === "loaded") && <>
                 <Typography.Title level={2}>Choose your Date</Typography.Title>
                 <div className="Showtime-Date-Container">
                     {availableDates.map(date => (
@@ -96,7 +96,6 @@ export function DisplayShowtimes() {
                         </Button>
                     ))}
                 </div>
-                {fState === "loading" && <p>Loading...</p> }
                 {fState === "loaded" &&
                 <Card  className="Movies-Card">
                     <Row gutter={[24, 24]}>
@@ -119,9 +118,9 @@ export function DisplayShowtimes() {
                     </Row>
                     
                 </Card>}
-                {fState === "failed" && <p>Not movies available</p>}
-                </> : 
-                <Typography.Title level={2}>Not find Available Showtimes</Typography.Title>}
+                </>}
+                {(fState === "failed" && availableDates.length === 0) && <Typography.Title level={2}>Not find Available Showtimes</Typography.Title>}
+                {fState === "loading" && <Typography.Title level={2}>Loading</Typography.Title>}
                 
     
             </Flex>

@@ -168,7 +168,9 @@ public class CinemaDbContext : DbContext
             new Showtimes { Showtime_Id = 2, Movie_Id = 3, Room_Id = 4, ShowDate = new DateOnly(2026, 07, 29), StartTime = new TimeOnly(21, 0), EndTime = new TimeOnly(23,14), Price = 3.99m},
             new Showtimes { Showtime_Id = 3, Movie_Id = 2, Room_Id = 3, ShowDate = new DateOnly(2026, 07, 30), StartTime = new TimeOnly(19, 55), EndTime = new TimeOnly(22,25), Price = 4.99m},
             new Showtimes { Showtime_Id = 4, Movie_Id = 4, Room_Id = 2, ShowDate = new DateOnly(2026, 07, 30), StartTime = new TimeOnly(15, 5), EndTime = new TimeOnly(17,3), Price = 6.29m},
-            new Showtimes { Showtime_Id = 5, Movie_Id = 5, Room_Id = 5, ShowDate = new DateOnly(2026, 07, 28), StartTime = new TimeOnly(20, 25), EndTime = new TimeOnly(22,11), Price = 7.59m}
+            new Showtimes { Showtime_Id = 5, Movie_Id = 5, Room_Id = 5, ShowDate = new DateOnly(2026, 07, 28), StartTime = new TimeOnly(20, 25), EndTime = new TimeOnly(22,11), Price = 7.59m},
+            new Showtimes { Showtime_Id = 6, Movie_Id = 1, Room_Id = 2, ShowDate = new DateOnly(2026, 07, 28), StartTime = new TimeOnly(20, 25), EndTime = new TimeOnly(22,11), Price = 7.59m},
+            new Showtimes { Showtime_Id = 7, Movie_Id = 2, Room_Id = 3, ShowDate = new DateOnly(2026, 07, 30), StartTime = new TimeOnly(22, 45), EndTime = new TimeOnly(00,56), Price = 4.99m}
         );
 
         b.Entity<Users>().HasData(
