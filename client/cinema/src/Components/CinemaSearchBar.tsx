@@ -54,7 +54,7 @@ export function CinemaSearchBar ({cinemas }: CinemaSearchBarProps) {
             size="large"
             block
             disabled={!selectedCinemaId}
-            onClick={() => navigate(`/Showtimes/${selectedCinemaId}`)}
+            onClick={() => navigate(`/cinema/${selectedCinemaId}`)}
         >
             Select Cinema
         </Button>

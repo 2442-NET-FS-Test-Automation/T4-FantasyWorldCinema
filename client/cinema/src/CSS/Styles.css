@@ -1,7 +1,14 @@
 .Flex-Home-Background {
     min-height: 105vh;
-    padding: 24px;
     background-image: url(../assets/MedievalCatle.png);
+    background-size: cover; 
+    background-position: center;
+
+
+    padding-top: 6rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-bottom: 2rem;
 }
 
 .Cinema-Card {
@@ -45,4 +52,14 @@
     justify-content: center;
     align-self: center;
     border-radius: 16px;
+}
+
+
+@media (min-width: 768px) {
+    .Flex-Home-Background {
+        padding-top: 7rem;
+        padding-left: 5rem;
+        padding-right: 5rem;
+        padding-bottom: 3rem;
+    }
 }

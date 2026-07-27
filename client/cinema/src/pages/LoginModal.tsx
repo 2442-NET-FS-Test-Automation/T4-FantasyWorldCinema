@@ -44,7 +44,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
           background: 'transparent'
         },
         content: {
-          backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.80), rgba(255, 255, 255, 0.80)), url("../public/Fantasy_World_Login_Background.webp")',
+          backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.80), rgba(255, 255, 255, 0.80)), url("Fantasy_World_Login_Background.webp")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }
