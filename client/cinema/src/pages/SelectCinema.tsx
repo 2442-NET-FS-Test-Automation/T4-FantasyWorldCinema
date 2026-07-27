@@ -7,6 +7,8 @@ import { getCinemas } from "../api/Cinema";
 import { CinemaSearchBar } from "../Components/CinemaSearchBar";
 import { GetMovies } from "../api/Movies";
 import { MovieCard } from "../Components/MovieCard";
+import "../CSS/Backgrounds.css";
+import "../CSS/Styles.css";
 
 const { Title, Paragraph } = Typography;
 
@@ -69,7 +71,7 @@ export function SelectCinema() {
 
     return (
         <>
-        <Flex vertical
+        <Flex vertical id="home"
             justify="center"
             align="center"
             className="Flex-Home-Background" >
