@@ -68,5 +68,36 @@ public class UserService : IUserService
         return newUser;
     }
 
+
+    public async Task<Users?> GetByUsernameAsync(string username)
+    {
+        return await _db.Users
+            .FirstOrDefaultAsync(u => u.Username == username);
+    }
+
+    public async Task<bool> UpdateProfileAsync(string username, UpdateProfileDto dto)
+    {
+        /* 1- Verify Username in DB */
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == username);
+        if (user == null) return false;
+
+        /* 2. Valid if the new Username or Email already is in use by another user */
+        bool conflict = await _db.Users.AnyAsync(u => 
+            (u.Username == dto.Username || u.Email == dto.Email) && u.User_Id != user.User_Id); 
+
+        if (conflict) 
+        {
+            throw new InvalidOperationException("Username or Email already in use by another user");
+        }
+
+        /* 3- Update User entity with maped DTO */
+        user.FullName = dto.FullName;
+        user.Username = dto.Username;
+        user.Email = dto.Email;
+
+        /* 4- Save new user info into DB */
+        await _db.SaveChangesAsync();
+        return true;
+    }
 }
 

@@ -2,9 +2,9 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
 import logotype from '../assets/Logotype.png'
 import logo from '../assets/Logo1-1.png'
-import { LoginModal } from "../pages/LoginModal";
-import { RegisterModal } from "../pages/RegisterModal";
-import { ProfilePage } from "../pages/ProfilePage";
+import { LoginModal } from "./LoginModal";
+import { RegisterModal } from "./RegisterModal";
+import { ProfilePage } from "./ProfilePage";
 import { useState } from "react";
 import Avatar from 'antd/es/avatar/Avatar';
 import { UserOutlined } from '@ant-design/icons';
