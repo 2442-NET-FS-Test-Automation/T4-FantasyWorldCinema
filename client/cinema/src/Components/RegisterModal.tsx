@@ -1,5 +1,5 @@
 import { useAuth } from '../auth/useAuth';
-import { Typography, Input, Form, Modal, Divider, message, ConfigProvider } from 'antd';
+import { Typography, Input, Form, Modal, Divider, message, ConfigProvider, Flex } from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone, UserOutlined, LockOutlined, MailOutlined, IdcardOutlined } from '@ant-design/icons';
 
 interface RegisterModalProps {
@@ -81,22 +81,20 @@ export function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
             }
           }}
         >
-          <div
-            className="font-primary text-slate-800 p-8 bg-cover bg-center bg-no-repeat w-full h-full min-h-[400px] rounded-x1"
-            style={{
-              backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.80), rgba(255, 255, 255, 0.80)), url("/Fantasy_World_Login_Background.webp")',
-            }}
+          <Flex vertical 
+            id="LoginRegister"
+            className="Flex-LoginRegister-Background"
           >
             {contextHolder}
 
-            <Typography.Title level={2} style={{ margin: 0, color: '#4d5078', fontFamily: 'inherit' }}>
+            <Typography.Title level={2} className='auth-title'>
               Hello!
             </Typography.Title>
-            <Typography.Paragraph style={{ margin: '4px 0', fontSize: 16, fontFamily: 'inherit' }}>
+            <Typography.Paragraph className='auth-subtitle'>
               Register your account to become a Fantasy World Cinema member!
             </Typography.Paragraph>
 
-            <Divider style={{ borderColor: '#4d5078', color: '#4d5078', fontSize: '24px', fontWeight: 'bold', fontFamily: 'inherit' }}>
+            <Divider className='auth-divider'>
               SignUp
             </Divider>
 
@@ -213,7 +211,7 @@ export function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
                 </div>
               </div>
             </Form>
-          </div>
+          </Flex>
         </Modal>
       </ConfigProvider>
     </div>

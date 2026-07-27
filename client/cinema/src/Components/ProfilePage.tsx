@@ -128,10 +128,33 @@ export function ProfilePage({ isOpen, onClose }: ProfilePageProps) {
                         <Typography.Text strong style={{ fontSize: 16, fontFamily: 'inherit' }}>Profile Settings</Typography.Text>
                     </Space>
                 }
+                extra={
+                    <Button
+                        color="danger"
+                        variant="outlined"
+                        size="middle"
+                        icon={<LogoutOutlined />}
+                        onClick={handleLogout}
+                        style={{ fontFamily: 'var(--font-primary), sans-serif' }}
+                    >
+                        Log Out
+                    </Button>
+                }
                 placement="right"
                 size="60%"
                 onClose={onClose}
                 open={isOpen}
+
+                styles={{
+                    header: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.80)',
+                        borderBottom: '1px solid rgba(0,0,0,0.05)'
+                    },
+                    body: {
+                        padding: '3%'
+                    }
+                }}
+                className="drawer-auth-bg"
             >
                 {contextHolder}
                 {user ? (
@@ -145,12 +168,12 @@ export function ProfilePage({ isOpen, onClose }: ProfilePageProps) {
                                 </Typography.Title>
                                 <Space size="middle" separator={<span>•</span>}>
 
-                                    <Typography.Text type="secondary" style={{ fontSize: 9, fontFamily: 'inherit' }}>
-                                        Role: {user.role || 'Unknown'}
+                                    <Typography.Text type="secondary" style={{ fontSize: 12, fontFamily: 'inherit', color:!isEditing ? '#000000' : 'inherit'}}>
+                                        {user.role || 'Unknown'}
                                     </Typography.Text>
 
                                     {createdAt && (
-                                        <Typography.Text type="secondary" style={{ fontSize: 9, fontFamily: 'inherit' }}>
+                                        <Typography.Text type="secondary" style={{ fontSize: 12, fontFamily: 'inherit', color:!isEditing ? '#000000' : 'inherit'}}>
                                             <CalendarOutlined style={{ marginRight: 4 }} />
                                             Member since: {new Date(createdAt).toLocaleDateString()}
                                         </Typography.Text>
@@ -177,7 +200,7 @@ export function ProfilePage({ isOpen, onClose }: ProfilePageProps) {
                                         prefix={<IdcardOutlined />}
                                         placeholder="Full Name"
                                         type="text"
-                                        style={{ fontFamily: 'system-ui, sans-serif' }}
+                                        style={{ fontFamily: 'system-ui, sans-serif', color:!isEditing ? '#000000' : 'inherit'}}
                                     />
                                 </Form.Item>
 
@@ -196,7 +219,7 @@ export function ProfilePage({ isOpen, onClose }: ProfilePageProps) {
                                         prefix={<UserOutlined />}
                                         placeholder="UserName"
                                         type="text"
-                                        style={{ fontFamily: 'system-ui, sans-serif' }}
+                                        style={{ fontFamily: 'system-ui, sans-serif', color:!isEditing ? '#000000' : 'inherit'}}
                                     />
                                 </Form.Item>
 
@@ -215,7 +238,7 @@ export function ProfilePage({ isOpen, onClose }: ProfilePageProps) {
                                         prefix={<MailOutlined />}
                                         placeholder="Email"
                                         type="email"
-                                        style={{ fontFamily: 'system-ui, sans-serif' }}
+                                        style={{ fontFamily: 'system-ui, sans-serif', color:!isEditing ? '#000000' : 'inherit'}}
                                     />
                                 </Form.Item>
 
@@ -262,18 +285,6 @@ export function ProfilePage({ isOpen, onClose }: ProfilePageProps) {
                             </Form>
 
                             <Divider style={{ margin: '24px 0 12px 0' }} />
-
-                            <Button
-                                color="danger"
-                                variant="outlined"
-                                size="large"
-                                block
-                                icon={<LogoutOutlined />}
-                                onClick={handleLogout}
-                                style={{ fontFamily: 'var(--font-primary), sans-serif' }}
-                            >
-                                Log Out
-                            </Button>
 
                         </Space>
                     </Spin>
