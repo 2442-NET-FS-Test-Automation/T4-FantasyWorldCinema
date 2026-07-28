@@ -1,7 +1,28 @@
 #home {
-    background-image: url(../assets/MedievalCatle.png);
+    background-image:
+        linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+        url(patterns.jpg);
+    padding: 3%;
 }
 
-#DisplayShowtimes { 
-    background-image: url();
+#DisplayShowtimes {
+    background-image:
+        linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+        url(patterns.jpg);
+    padding: 3%;
+}
+
+#LoginRegister {
+    background-image:
+        linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+        url(signWallpaper.jpg);
+    padding: 3%;
+}
+
+.drawer-auth-bg {
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.90), rgba(255, 255, 255, 0.90)), 
+    url("wallpaper.webp") !important;
+  background-repeat: repeat !important;
+  background-size: auto !important;
 }
