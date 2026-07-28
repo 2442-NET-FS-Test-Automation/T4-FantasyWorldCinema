@@ -25,7 +25,7 @@ export function AppContent() {
               <Route path="/Showtimes/:CinemaId" element={<DisplayShowtimes />} /> */}
 
               <Route path="/home" element={<SelectCinema />} />
-              <Route path="/cinema/:cinemaId" element={<DisplayShowtimes />} />
+              <Route path="/cinema/:CinemaId" element={<DisplayShowtimes />} />
               <Route path="/showtime/:showtimeId" element={<ShowtimeDetails />} />
 
               {/* Protected routes - only CONSUMERS */}
