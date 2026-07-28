@@ -20,6 +20,7 @@ public class MoviesController : ControllerBase
     }
 
     [HttpGet]
+    [ResponseCache(Duration = 30)]
     public async Task<ActionResult<IEnumerable<MoviesDTO>>> GetMoviesAsync()
     {
         IReadOnlyList<Movies> movies = await _service.GetMoviesAsync();

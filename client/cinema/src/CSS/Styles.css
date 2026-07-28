@@ -81,6 +81,14 @@
     border-radius: 16px;
 }
 
+.Showtime-Date-Container {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 10px 10px;
+    scrollbar-width: none;
+}
+
 
 @media (min-width: 768px) {
     .Flex-Home-Background {

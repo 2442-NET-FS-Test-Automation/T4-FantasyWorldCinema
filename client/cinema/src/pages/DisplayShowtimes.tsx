@@ -3,7 +3,7 @@ import type { ShowtimeItem, FetchState } from "../types";
 import { GetShowtimesByCinema } from "../api/Showtimes";
 import { ShowtimeCard } from "../Components/ShowtimeCard";
 import { useParams } from "react-router-dom";
-import { Flex, Card, Row, Col } from "antd";
+import { Flex, Card, Row, Col, Button, Typography } from "antd";
 import "../CSS/Styles.css";
 import "../CSS/Backgrounds.css";
 
@@ -39,6 +39,7 @@ export function DisplayShowtimes() {
             
         
     }, [])
+    
 
     // Filter showtimes by date and group it by movie
     const groupedShowtimes = useMemo(() => {
@@ -56,18 +57,45 @@ export function DisplayShowtimes() {
             return acc;
         }, {});
     }, [items, selectedDate]);
-    console.log(fState);
-    console.log(groupedShowtimes);
+    
+    const availableDates = useMemo(() => {
+        return [...new Set(
+            items.map(showtime =>
+                new Date(showtime.showDate).toISOString().split("T")[0]
+            )
+        )].sort();
+    }, [items]);
+
+    useEffect(() => {
+        if (availableDates.length > 0 && !availableDates.includes(selectedDate)) {
+            setSelectedDate(availableDates[0]);
+        }
+    }, [availableDates]);
+
+
 
     return (
             <Flex vertical id="DisplayShowtimes"    
                 justify="center"
                 align="center"
                 className="Flex-Background">
-                <h2 className="Showtime-section-title"> Choose your movie</h2>
-                <input type="date" className="Showtimes-date-selector"
-                    value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)}/>
-                {fState === "loading" && <p>Loading...</p> }
+                {(availableDates.length > 0 && fState === "loaded") && <>
+                <Typography.Title level={2}>Choose your Date</Typography.Title>
+                <div className="Showtime-Date-Container">
+                    {availableDates.map(date => (
+                        <Button style={{columnGap: 10}}
+                            key={date}
+                            type={selectedDate === date ? "primary" : "default"}
+                            onClick={() => setSelectedDate(date)}
+                        >
+                            {new Date(date).toLocaleDateString("es-MX", {
+                                weekday: "short",
+                                day: "numeric",
+                                month: "short"
+                            })}
+                        </Button>
+                    ))}
+                </div>
                 {fState === "loaded" &&
                 <Card  className="Movies-Card">
                     <Row gutter={[24, 24]}>
@@ -90,7 +118,9 @@ export function DisplayShowtimes() {
                     </Row>
                     
                 </Card>}
-                {fState === "failed" && <p>Not movies available</p>}
+                </>}
+                {(fState === "failed" && availableDates.length === 0) && <Typography.Title level={2}>Not find Available Showtimes</Typography.Title>}
+                {fState === "loading" && <Typography.Title level={2}>Loading</Typography.Title>}
                 
     
             </Flex>

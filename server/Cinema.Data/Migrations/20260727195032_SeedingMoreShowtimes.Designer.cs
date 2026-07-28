@@ -4,6 +4,7 @@ using Cinema.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cinema.Data.Migrations
 {
     [DbContext(typeof(CinemaDbContext))]
-    partial class CinemaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260727195032_SeedingMoreShowtimes")]
+    partial class SeedingMoreShowtimes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1267,7 +1270,7 @@ namespace Cinema.Data.Migrations
                             Movie_Id = 2,
                             Price = 4.99m,
                             Room_Id = 3,
-                            ShowDate = new DateOnly(2026, 7, 30),
+                            ShowDate = new DateOnly(2026, 7, 28),
                             StartTime = new TimeOnly(22, 45, 0)
                         });
                 });

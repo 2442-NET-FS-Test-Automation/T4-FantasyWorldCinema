@@ -1,6 +1,7 @@
 import { Card, Typography, Tag, Button, Flex } from "antd";
 import type { ShowtimeItem } from "../types";
 import "../CSS/Styles.css"
+import { useNavigate } from "react-router";
 
 interface ShowtimeCardProps {
     title: string;
@@ -10,6 +11,7 @@ interface ShowtimeCardProps {
 }
 
 export function ShowtimeCard({title, poster, rating, showtimes}:ShowtimeCardProps) {
+    const navigate = useNavigate();
     return(
         <Card className="Movie-Card">
             <img src={poster} className="Poster-Size"/>
@@ -34,7 +36,7 @@ export function ShowtimeCard({title, poster, rating, showtimes}:ShowtimeCardProp
             }
             <Flex>
                 {showtimes.map((showtime: ShowtimeItem) =>
-                <Button>{showtime.startTime}</Button>
+                <Button onClick={() => navigate(`/showtime/${showtime.showtime_Id}`)}>{showtime.startTime}</Button>
                 )}
             </Flex>
         </Card>
