@@ -1,7 +1,31 @@
-#home {
-    background-image: url(../assets/MedievalCatle.png);
+body {
+    /* Color base más oscuro */
+    background-color: #0f0f12;
+    
+    /* Degradado radial cinemático (nace arriba al centro) */
+    background-image: radial-gradient(circle at top center, rgba(212, 175, 55, 0.04) 0%, #1e1e24 35%, #0f0f12 100%);
+    
+    /* Fija el fondo para que no se mueva al hacer scroll */
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    
+    /* Asegura que ocupe toda la pantalla */
+    min-height: 100vh;
+    margin: 0;
+    
+    /* Color de texto base para toda la app */
+    color: #ffffff; 
 }
 
-#DisplayShowtimes { 
-    background-image: url();
+#home, 
+#DisplayShowtimes {
+    background: transparent;
+    padding: 3%;
+}
+
+#LoginRegister {
+    background-image:
+        linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+        url(signWallpaper.jpg);
+    padding: 3%;
 }

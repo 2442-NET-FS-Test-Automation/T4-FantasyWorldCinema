@@ -1,19 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthContext";
-import { ProtectedRoute/* , AnonymousRoute */ } from "./auth/ProtectedRoute";
 import { SelectCinema } from "./pages/SelectCinema";
 import { DisplayShowtimes } from "./pages/DisplayShowtimes";
 import { Navbar } from "./Components/Navbar";
-import { useState } from "react";
-import { Button } from "antd";
-
-import { useAuth } from './auth/useAuth';
-
-
+import { ManageCatalog } from "./pages/ManageCatalog";
+import { ProtectedRoute } from "./auth/ProtectedRoute";
+import { ShowtimeDetails } from "./pages/ShowtimeDetails";
 
 export function AppContent() {
-  
-  const { user } = useAuth();
 
   return (
       <BrowserRouter>
@@ -23,12 +17,9 @@ export function AppContent() {
               <Route path="/" element={<Navigate to="/home" replace />} />
               {/* Public routes */}
 
-              {/* <Route path="/" element={<SelectCinema />} /> 
-              <Route path="/Showtimes/:CinemaId" element={<DisplayShowtimes />} /> */}
-
               <Route path="/home" element={<SelectCinema />} />
               <Route path="/cinema/:CinemaId" element={<DisplayShowtimes />} />
-              {/* <Route path="/showtime/:showtimeId" element={<ShowtimeDetails />} /> */}
+              <Route path="/showtime/:showtimeId" element={<ShowtimeDetails />} />
 
               {/* Protected routes - only CONSUMERS */}
               {/* <Route element={<ProtectedRoute allowedRoles={["Consumer"]} />}> */}
@@ -36,12 +27,13 @@ export function AppContent() {
               {/* </Route> */}
 
               {/* Protected routes - only ADMINS */}
-              {/* <Route element={<ProtectedRoute allowedRoles={["Admin"]} />}> */}
-              {/* <Route path="/manage-catalog" element={<ManageCatalog />} />
+              <Route element={<ProtectedRoute allowedRoles={["Admin"]} />}>
+                <Route path="/admin/catalog" element={<ManageCatalog />} />
+                  {/* 
                   <Route path="/manage-catalog/movies" element={<ManageMovies />} />
                   <Route path="/manage-catalog/showtimes" element={<ManageShowtimes />} />
                   <Route path="/reports" element={<Reports />} /> */}
-              {/* </Route> */}
+              </Route>
 
               {/* Default redirection Page */}
               <Route path="*" element={<Navigate to="/" replace />} />

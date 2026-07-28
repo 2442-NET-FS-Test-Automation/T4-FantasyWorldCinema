@@ -1,6 +1,5 @@
 import { useAuth } from '../auth/useAuth';
-import { useState } from 'react';
-import { Button, Typography, Input, Form, Modal, Divider, message, ConfigProvider } from 'antd';
+import { Button, Typography, Input, Form, Modal, Divider, message, ConfigProvider, Flex } from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone, UserOutlined, LockOutlined, LogoutOutlined } from '@ant-design/icons';
 
 interface LoginModalProps {
@@ -9,147 +8,159 @@ interface LoginModalProps {
 }
 
 export function LoginModal({ isOpen, onClose }: LoginModalProps) {
-  const [identifier, setIdentifier] = useState('');
-  const [password, setPassword] = useState('');
-
   const { login, logout, status } = useAuth();
   const [messageApi, contextHolder] = message.useMessage();
 
-  const handleFormSubmit = async () => {
-    const success = await login(identifier, password);
+  const handleFormSubmit = async (values: any) => {
+    const success = await login(values.identifier, values.password);
     if (success) {
-      console.log("Successfully logIn");
       messageApi.open({
         type: 'success',
-        content: 'LogIn Successfully',
+        content: 'Welcome back!',
       });
       onClose();
     } else {
-      console.log("Failed to logIn");
       messageApi.open({
         type: 'error',
-        content: 'Wrong User or Password',
+        content: 'Invalid Username or Password',
       });
     }
   };
 
   return (
-    <div className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-50">
-      <ConfigProvider
-        theme={{
-          token: {
-            fontFamily: 'var(--font-primary), font-primary, sans-serif',
-            colorPrimary: '#4d5078',
-
-            paddingMD: 0,
-            paddingLG: 0,
-            paddingContentHorizontalLG: 0,
+    <ConfigProvider
+      theme={{
+        token: {
+          fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          colorPrimary: '#d4af37',
+          colorBgElevated: '#0f0f12',
+          colorText: '#ffffff',
+          colorTextDescription: '#94a3b8',
+          colorTextPlaceholder: '#64748b',
+          borderRadiusLG: 16,
+        },
+        components: {
+          Input: {
+            colorBgContainer: '#1e1e24',
+            colorBorder: '#2a2a32',
+            colorText: '#ffffff',
+            controlHeightLG: 48,
           },
-          components: {
-            Input: {
-              fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            },
-            Modal: {
-              padding: 0,
-              paddingMD: 0,
-              paddingLG: 0,
-            }
+          Divider: {
+            colorSplit: 'rgba(212, 175, 55, 0.2)',
+            colorTextHeading: '#d4af37',
+          }
+        },
+      }}
+    >
+      <Modal
+        open={isOpen}
+        onCancel={onClose}
+        footer={null}
+        centered
+        width={440}
+        styles={{
+          mask: {
+            backdropFilter: 'blur(8px)',
+            backgroundColor: 'rgba(0, 0, 0, 0.65)',
           },
+          body: {
+            padding: '36px 32px',
+            backgroundColor: '#0f0f12',
+            border: '1px solid rgba(212, 175, 55, 0.15)',
+            borderRadius: '16px',
+          }
         }}
       >
-        <Modal
-          open={isOpen}
-          onCancel={onClose}
-          footer={null}
-          styles={{
-            body: {
-              padding: 0,
-              overflow: 'hidden',
-              borderRadius: '5px',
-            }
-          }}
-        >
-          <div
-            className="font-primary text-slate-800 p-8 bg-cover bg-center bg-no-repeat w-full h-full min-h-[400px] rounded-x1"
-            style={{
-              backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.80), rgba(255, 255, 255, 0.80)), url("Fantasy_World_Login_Background.webp")',
+        <Flex vertical id="LoginRegister">
+          {contextHolder}
+
+          <Typography.Title 
+            level={2} 
+            className='auth-title text-center mb-1!'
+            style={{ 
+              fontFamily: 'var(--font-primary), font-primary, serif', 
+              color: '#ffffff',
+              fontSize: '2rem',
+              letterSpacing: '1px'
             }}
           >
-            {contextHolder}
+            HELLO!
+          </Typography.Title>
+          
+          <Typography.Paragraph 
+            className='auth-subtitle text-center text-slate-400! mb-6!'
+            style={{ fontSize: '14px', lineHeight: '1.5' }}
+          >
+            Access to buy your tickets at Fantasy World Cinema!
+          </Typography.Paragraph>
 
-            <Typography.Title level={2} style={{ margin: 0, color: '#4d5078', fontFamily: 'inherit' }}>
-              ¡Hello!
-            </Typography.Title>
-            <Typography.Paragraph style={{ margin: '4px 0', fontSize: 16, fontFamily: 'inherit' }}>
-              Access to buy your tickets at Fantasy World Cinema!
-            </Typography.Paragraph>
+          <Divider className='auth-divider my-4!'>
+            <span style={{ 
+              fontFamily: 'var(--font-primary), font-primary, serif', 
+              letterSpacing: '2px',
+              fontSize: '16px'
+            }}>
+              LOGIN
+            </span>
+          </Divider>
 
-            <Divider style={{ borderColor: '#4d5078', color: '#4d5078', fontSize: '24px', fontWeight: 'bold', fontFamily: 'inherit' }}>
-              LogIn
-            </Divider>
-
-            {status !== 'authenticated' ? (
-              <Form onFinish={handleFormSubmit} layout='vertical'>
-                <Form.Item
-                  name="identifier"
-                  rules={[{ required: true, message: "Please input your username!" }]}
-                >
-                  <Input
-                    size="large"
-                    prefix={<UserOutlined />}
-                    placeholder="UserName | Email"
-                    type="text"
-                    value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
-                    style={{ fontFamily: 'system-ui, sans-serif' }}
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  name="password"
-                  rules={[{ required: true, message: "Please input your password!" }]}
-                >
-                  <Input.Password
-                    size="large"
-                    prefix={<LockOutlined />}
-                    placeholder="Password"
-                    iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    style={{ fontFamily: 'system-ui, sans-serif' }}
-                  />
-                </Form.Item>
-
-                <div className="flex justify-center w-full mt-6">
-                  <div className="flex bg-slate-600/80 rounded-full p-1 border border-slate-500 shadow-inner text-base">
-                    <button
-                      type="submit"
-                      disabled={status === 'authenticating'}
-                      className="cursor-pointer group relative flex items-center justify-center px-8 h-10 rounded-full text-white bg-slate-700 hover:bg-slate-800 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <span className="inline-block transition-all duration-300 group-hover:scale-105 group-hover:drop-shadow-[0_0_6px_rgba(255,255,255,0.8)] font-semibold">
-                        {status === 'authenticating' ? 'Authenticating...' : 'LogIn'}
-                      </span>
-                    </button>
-                  </div>
-                </div>
-              </Form>
-            ) : (
-              <div className="flex justify-center w-full mt-4">
-                <Button
-                  color="danger"
-                  variant="outlined"
+          {status !== 'authenticated' ? (
+            <Form onFinish={handleFormSubmit} layout='vertical' className="mt-4">
+              <Form.Item
+                name="identifier"
+                rules={[{ required: true, message: "Please input your username!" }]}
+              >
+                <Input
                   size="large"
-                  onClick={logout}
-                  icon={<LogoutOutlined />}
+                  prefix={<UserOutlined className="text-slate-400" />}
+                  placeholder="UserName | Email"
+                  type="text"
+                  className="hover:border-[#d4af37]! focus:border-[#d4af37]!"
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="password"
+                rules={[{ required: true, message: "Please input your password!" }]}
+              >
+                <Input.Password
+                  size="large"
+                  prefix={<LockOutlined className="text-slate-400" />}
+                  placeholder="Password"
+                  iconRender={(visible) => (visible ? <EyeTwoTone twoToneColor="#d4af37" /> : <EyeInvisibleOutlined />)}
+                  className="hover:border-[#d4af37]! focus:border-[#d4af37]!"
+                />
+              </Form.Item>
+
+              <div className="w-full mt-8">
+                <button
+                  type="submit"
+                  disabled={status === 'authenticating'}
+                  className="w-full h-12 cursor-pointer relative flex items-center justify-center rounded-xl text-black bg-[#d4af37] hover:bg-[#e6c24a] transition-all duration-300 font-bold uppercase tracking-wider text-sm shadow-[0_4px_20px_rgba(212,175,55,0.25)] hover:shadow-[0_4px_25px_rgba(212,175,55,0.45)] disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 active:translate-y-0"
                 >
-                  LogOut
-                </Button>
+                  <span>
+                    {status === 'authenticating' ? 'Authenticating...' : 'LogIn'}
+                  </span>
+                </button>
               </div>
-            )}
-          </div>
-        </Modal>
-      </ConfigProvider>
-    </div>
+            </Form>
+          ) : (
+            <div className="flex justify-center w-full mt-6">
+              <Button
+                danger
+                type="primary"
+                size="large"
+                onClick={logout}
+                icon={<LogoutOutlined />}
+                className="w-full h-12 rounded-xl font-semibold"
+              >
+                LogOut
+              </Button>
+            </div>
+          )}
+        </Flex>
+      </Modal>
+    </ConfigProvider>
   );
 }

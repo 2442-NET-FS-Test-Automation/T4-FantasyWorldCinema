@@ -20,14 +20,16 @@ public class MappingProfile : Profile
             .ForCtorParam("ShowDate", o => o.MapFrom(s => s.ShowDate))
             .ForCtorParam("StartTime", o => o.MapFrom(s => s.StartTime))
             .ForCtorParam("EndTime", o => o.MapFrom(s => s.EndTime))
-            .ForCtorParam("Price", o => o.MapFrom(s => s.Price));
+            .ForCtorParam("Price", o => o.MapFrom(s => s.Price))
+            .ForCtorParam("Rating", o => o.MapFrom(s => s.Movie.Rating.ToString()))
+            .ForCtorParam("Poster", o => o.MapFrom(s => s.Movie.PosterUrl));
 
         // Map Seats by Showtime
-        CreateMap<(int Seat_Id, char Row, int Number, Status LastTransaction), SeatsDTO>()
+        CreateMap<(int Seat_Id, char Row, int Number, int IsFree), SeatsDTO>()
             .ForCtorParam("Seat_Id", o => o.MapFrom(s => s.Seat_Id))
             .ForCtorParam("Row", o => o.MapFrom(s => s.Row))
             .ForCtorParam("Number", o => o.MapFrom(s => s.Number))
-            .ForCtorParam("IsFree", o => o.MapFrom(s => s.LastTransaction));
+            .ForCtorParam("IsFree", o => o.MapFrom(s => s.IsFree));
 
         // Map Simple Cinemas
         CreateMap<Cinemas, SimpleCinemaDto>()
