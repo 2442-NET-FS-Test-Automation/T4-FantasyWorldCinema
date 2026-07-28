@@ -18,8 +18,6 @@ export interface ShowtimeItem {
     startTime: TimeString;
     endTime: TimeString;
     price: number;
-    rating: string;
-    posterUrl: string;
 }
 
 export interface MovieItem {

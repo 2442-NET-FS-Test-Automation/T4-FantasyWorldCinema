@@ -77,7 +77,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
           <Typography.Title 
             level={2} 
-            className='auth-title text-center !mb-1'
+            className='auth-title text-center mb-1!'
             style={{ 
               fontFamily: 'var(--font-primary), font-primary, serif', 
               color: '#ffffff',
@@ -89,13 +89,13 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
           </Typography.Title>
           
           <Typography.Paragraph 
-            className='auth-subtitle text-center !text-slate-400 !mb-6'
+            className='auth-subtitle text-center text-slate-400! mb-6!'
             style={{ fontSize: '14px', lineHeight: '1.5' }}
           >
             Access to buy your tickets at Fantasy World Cinema!
           </Typography.Paragraph>
 
-          <Divider className='auth-divider !my-4'>
+          <Divider className='auth-divider my-4!'>
             <span style={{ 
               fontFamily: 'var(--font-primary), font-primary, serif', 
               letterSpacing: '2px',
@@ -116,7 +116,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                   prefix={<UserOutlined className="text-slate-400" />}
                   placeholder="UserName | Email"
                   type="text"
-                  className="hover:!border-[#d4af37] focus:!border-[#d4af37]"
+                  className="hover:border-[#d4af37]! focus:border-[#d4af37]!"
                 />
               </Form.Item>
 
@@ -129,7 +129,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                   prefix={<LockOutlined className="text-slate-400" />}
                   placeholder="Password"
                   iconRender={(visible) => (visible ? <EyeTwoTone twoToneColor="#d4af37" /> : <EyeInvisibleOutlined />)}
-                  className="hover:!border-[#d4af37] focus:!border-[#d4af37]"
+                  className="hover:border-[#d4af37]! focus:border-[#d4af37]!"
                 />
               </Form.Item>
 

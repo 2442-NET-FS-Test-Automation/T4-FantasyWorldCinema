@@ -4,6 +4,7 @@ import { SelectCinema } from "./pages/SelectCinema";
 import { DisplayShowtimes } from "./pages/DisplayShowtimes";
 import { Navbar } from "./Components/Navbar";
 import { ManageCatalog } from "./pages/ManageCatalog";
+import { ProtectedRoute } from "./auth/ProtectedRoute";
 import { useState } from "react";
 import { Button } from "antd";
 

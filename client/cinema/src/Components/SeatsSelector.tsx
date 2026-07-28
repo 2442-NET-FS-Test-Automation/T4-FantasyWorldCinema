@@ -28,23 +28,25 @@ export const SeatSelector: React.FC<SeatSelectorProps> = ({
   return (
     <div className="flex flex-col w-full max-w-lg mx-auto font-sans">
       
-      {/* Encabezado Limpio */}
+      {/* Encabezado Adaptado al Tema Oscuro */}
       <div className="flex justify-between items-end mb-4 px-2">
-        <h3 className="text-xl font-semibold text-gray-800 tracking-tight">Select your seats</h3>
-        <span className={`text-sm font-medium px-3 py-1 rounded-full transition-colors duration-300 ${
-          seatsLeft === 0 ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
+        <h3 className="text-xl font-semibold text-white tracking-tight">Select your seats</h3>
+        <span className={`text-sm font-semibold px-3 py-1 rounded-full transition-colors duration-300 ${
+          seatsLeft === 0 
+            ? "bg-[#d4af37] text-black shadow-[0_0_10px_rgba(212,175,55,0.4)]" 
+            : "bg-transparent border border-[#d4af37] text-[#d4af37]"
         }`}>
           {seatsLeft} left
         </span>
       </div>
 
-      {/* Contenedor Principal (Estilo Tarjeta Moderna) */}
-      <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8 sm:p-10 flex flex-col items-center transition-all">
+      {/* Contenedor Principal (Fondo oscuro con borde dorado sutil) */}
+      <div className="bg-[#1e1e24] rounded-2xl shadow-inner border border-[rgba(212,175,55,0.15)] p-8 sm:p-10 flex flex-col items-center transition-all">
         
-        {/* Pantalla Rediseñada (Estilo Brillo/Luz) */}
+        {/* Pantalla Rediseñada (Brillo Dorado) */}
         <div className="w-full max-w-xs flex flex-col items-center mb-12">
-          <div className="w-full h-1.5 bg-gradient-to-r from-transparent via-indigo-300 to-transparent rounded-full shadow-[0_4px_15px_rgba(99,102,241,0.4)]"></div>
-          <span className="text-[10px] font-bold text-gray-400 tracking-[0.3em] mt-4">SCREEN</span>
+          <div className="w-full h-1.5 bg-linear-to-r from-transparent via-[#d4af37] to-transparent rounded-full shadow-[0_4px_15px_rgba(212,175,55,0.4)]"></div>
+          <span className="text-[10px] font-bold text-[#64748b] tracking-[0.3em] mt-4">SCREEN</span>
         </div>
 
         {/* Cuadrícula de Asientos */}
@@ -53,7 +55,7 @@ export const SeatSelector: React.FC<SeatSelectorProps> = ({
             <div key={rowKey} className="flex items-center gap-6">
               
               {/* Etiqueta de Fila */}
-              <span className="w-4 text-sm font-bold text-gray-400 text-center select-none">
+              <span className="w-4 text-sm font-bold text-[#94a3b8] text-center select-none">
                 {rowKey}
               </span>
 
@@ -72,18 +74,18 @@ export const SeatSelector: React.FC<SeatSelectorProps> = ({
                       onClick={() => onSeatToggle(seat.seat_Id)}
                       disabled={disabled}
                       aria-label={`Seat ${seat.row}${seat.number}`}
-                      className="relative flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-md transition-transform duration-200"
+                      className="relative flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d4af37] rounded-md transition-transform duration-200"
                     >
                       <MdEventSeat 
                         className={`
                           text-3xl sm:text-4xl transition-all duration-300 ease-out
                           ${occupied 
-                            ? 'text-rose-900 cursor-not-allowed' 
+                            ? 'text-rose-900/60 cursor-not-allowed' 
                             : selected
-                              ? 'text-indigo-600 scale-110 drop-shadow-md cursor-pointer'
+                              ? 'text-[#d4af37] scale-110 drop-shadow-[0_0_8px_rgba(212,175,55,0.6)] cursor-pointer'
                               : disableUnselected
-                                ? 'text-gray-200 opacity-60 cursor-not-allowed'
-                                : 'text-gray-300 hover:text-indigo-400 hover:scale-105 cursor-pointer'
+                                ? 'text-[#64748b] opacity-40 cursor-not-allowed'
+                                : 'text-[#94a3b8] hover:text-[#d4af37] hover:scale-105 cursor-pointer'
                           }
                         `} 
                       />
@@ -96,19 +98,19 @@ export const SeatSelector: React.FC<SeatSelectorProps> = ({
         </div>
       </div>
       
-      {/* Leyenda con Íconos */}
+      {/* Leyenda con Íconos (Colores Actualizados) */}
       <div className="flex justify-center gap-6 mt-6">
         <div className="flex items-center gap-2">
-          <MdEventSeat className="text-gray-300 text-xl" /> 
-          <span className="text-xs font-semibold text-gray-500">Available</span>
+          <MdEventSeat className="text-[#94a3b8] text-xl" /> 
+          <span className="text-xs font-semibold text-[#64748b]">Available</span>
         </div>
         <div className="flex items-center gap-2">
-          <MdEventSeat className="text-indigo-600 text-xl" /> 
-          <span className="text-xs font-semibold text-gray-500">Selected</span>
+          <MdEventSeat className="text-[#d4af37] text-xl drop-shadow-[0_0_4px_rgba(212,175,55,0.6)]" /> 
+          <span className="text-xs font-semibold text-[#64748b]">Selected</span>
         </div>
         <div className="flex items-center gap-2">
-          <MdEventSeat className="text-rose-900 text-xl" /> 
-          <span className="text-xs font-semibold text-gray-500">Occupied</span>
+          <MdEventSeat className="text-rose-900/60 text-xl" /> 
+          <span className="text-xs font-semibold text-[#64748b]">Occupied</span>
         </div>
       </div>
 
