@@ -43,4 +43,10 @@ public class MoviesRepository : IMoviesRepository
         await db.SaveChangesAsync();
         return newMovie;
     }
+
+    public async Task<IReadOnlyList<Movies>> GetAllMoviesAsync()
+    {
+        CinemaDbContext db = await _factory.CreateDbContextAsync();
+        return await db.Movies.ToListAsync();
+    }
 }

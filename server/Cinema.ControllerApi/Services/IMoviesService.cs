@@ -8,4 +8,5 @@ public interface IMoviesService
 {
     public Task<IReadOnlyList<Movies>> GetMoviesAsync();
     public Task<Movies> SetMoviesAsync(MovieCreateDto newMovie);
+    public Task<IReadOnlyList<Movies>> GetAllMoviesAsync();
 }

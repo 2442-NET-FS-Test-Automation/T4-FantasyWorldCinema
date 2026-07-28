@@ -20,4 +20,6 @@ public class MoviesService : IMoviesService
         return _repo.SetMoviesAsync(nm.Title, nm.Genre, nm.DurationMinutes,
         nm.Rating, nm.Synopsis, nm.Poster);
     }
+
+    public Task<IReadOnlyList<Movies>> GetAllMoviesAsync() => _repo.GetAllMoviesAsync();
 }

@@ -29,6 +29,16 @@ public class MoviesController : ControllerBase
         return Ok(mappedItems);
     }
 
+    [HttpGet("/api/Movies/All")]
+    public async Task<ActionResult<IEnumerable<MoviesDTO>>> GetAllMoviesAsync()
+    {
+        IReadOnlyList<Movies> movies = await _service.GetAllMoviesAsync();
+
+        IEnumerable<MoviesDTO> mappedItems = _mapper.Map<IEnumerable<MoviesDTO>>(movies);
+        return Ok(mappedItems);
+    }
+
+
     [HttpPost]
     [Authorize(Roles = "admin")]
     public async Task<ActionResult<MoviesDTO>> PostMovieAsync(MovieCreateDto newMovie)
