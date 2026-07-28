@@ -5,17 +5,9 @@ import { DisplayShowtimes } from "./pages/DisplayShowtimes";
 import { Navbar } from "./Components/Navbar";
 import { ManageCatalog } from "./pages/ManageCatalog";
 import { ProtectedRoute } from "./auth/ProtectedRoute";
-import { useState } from "react";
-import { Button } from "antd";
-
-import { useAuth } from './auth/useAuth';
 import { ShowtimeDetails } from "./pages/ShowtimeDetails";
 
-
-
 export function AppContent() {
-  
-  const { user } = useAuth();
 
   return (
       <BrowserRouter>
@@ -24,9 +16,6 @@ export function AppContent() {
             <Routes>
               <Route path="/" element={<Navigate to="/home" replace />} />
               {/* Public routes */}
-
-              {/* <Route path="/" element={<SelectCinema />} /> 
-              <Route path="/Showtimes/:CinemaId" element={<DisplayShowtimes />} /> */}
 
               <Route path="/home" element={<SelectCinema />} />
               <Route path="/cinema/:CinemaId" element={<DisplayShowtimes />} />
