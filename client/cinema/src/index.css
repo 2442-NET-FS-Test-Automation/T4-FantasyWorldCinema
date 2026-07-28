@@ -12,10 +12,17 @@
         src: url('/fonts/Swordsman.woff2') format('woff2');
         font-weight: normal;
     }
+
+    @font-face {
+        font-family: 'MovieName-PrimaryFont';
+        src: url('/fonts/ROMANTIC.woff2') format('woff2');
+        font-weight: normal;
+    }
 }
 
 @theme {
     --font-primary: 'Navbar-PrimaryFont', sans-serif;
     --font-secondary: 'Navbar-SecondaryFont', serif;
+    --font-movieName: 'MovieName-PrimaryFont', serif;
 
 }

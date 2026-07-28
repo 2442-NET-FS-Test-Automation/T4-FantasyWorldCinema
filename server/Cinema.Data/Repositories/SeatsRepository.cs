@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Cinema.Data.Entities;
 using Cinema.Data;
@@ -13,10 +14,12 @@ public class SeatsRepository : ISeatsRepository
         _factory = factory;
     }
 
-    public async Task<IReadOnlyList<(int Seat_Id, char Row, int Number, Status LastTransaction)>> 
+    public async Task<IReadOnlyList<(int Seat_Id, char Row, int Number, int IsFree)>> 
         GetSeatsByShowtimeAsync(int Showtime_Id, int Room_Id)
     {
         CinemaDbContext db = await _factory.CreateDbContextAsync();
+
+        Status[] availableSeatStatus = [Status.Failed, Status.Expired, Status.Cancelled];
 
         var queryResult = await db.Seats
             .Where(s => s.Room_Id == Room_Id)
@@ -25,16 +28,16 @@ public class SeatsRepository : ISeatsRepository
                 Seat_Id = s.Seat_Id,
                 Row = s.Row,
                 Number = s.Number,
-                LastTransaction = s.transactionSeats
+                IsFree = s.transactionSeats
                     .Where(ts => ts.Seat_Id == s.Seat_Id && ts.Transaction.Showtime_Id == Showtime_Id)
                     .OrderByDescending(ts => ts.Transaction.PurchaseDate)
-                    .Select(ts => ts.Transaction.Status)
+                    .Select(ts => availableSeatStatus.Contains(ts.Transaction.Status) ? 0 : 1 )
                     .FirstOrDefault()
                     
             }).ToListAsync();
 
          return queryResult
-            .Select(x => (x.Seat_Id, x.Row, x.Number, x.LastTransaction))
+            .Select(x => (x.Seat_Id, x.Row, x.Number, x.IsFree))
             .ToList();
     }
 

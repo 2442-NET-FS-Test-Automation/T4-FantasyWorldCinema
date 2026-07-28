@@ -29,4 +29,18 @@ public class ShowtimeController : ControllerBase
         return Ok(mappedItems);
     }
 
+    [HttpGet("{showtimeId}")]
+    public async Task<IActionResult> GetShowtimeByIdAsync(int showtimeId)
+    {
+        Showtimes? showtime = await _service.GetShowtimeByIdAsync(showtimeId);
+
+        if (showtime is null)
+        {
+            return NotFound(new { message = "Showtime not found"});
+        }
+
+        ShowtimeDto mappedItems = _mapper.Map<ShowtimeDto>(showtime);
+        return Ok(mappedItems);
+    }
+
 }

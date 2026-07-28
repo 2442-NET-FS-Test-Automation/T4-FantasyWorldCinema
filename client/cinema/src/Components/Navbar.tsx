@@ -20,8 +20,8 @@ export const Navbar = () => {
     <div className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-50">
       <nav className="bg-slate-500/20 backdrop-blur-lg shadow-2xl rounded-full px-6 py-1.5 flex justify-between items-center border border-slate-400/30 transition-colors duration-300">
         
-        <div className="flex items-center w-[140px] min-[1140px]:w-[300px]">
-          <Link to="/" className="relative flex-shrink-0 h-7 w-full">
+        <div className="flex items-center w-35 min-[1140px]:w-75">
+          <Link to="/" className="relative shrink-0 h-7 w-full">
             <picture className="contents">
               <source media="(min-width: 1140px)" srcSet={logotype} />
               <img 
@@ -69,7 +69,7 @@ export const Navbar = () => {
           </div>
         )}
 
-        <div className="flex items-center justify-end w-[140px] min-[1140px]:w-[300px] font-primary">
+        <div className="flex items-center justify-end w-35 min-[1140px]:w-75 font-primary">
           
           {user ? (
             <div className="flex items-center gap-4">

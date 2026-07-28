@@ -31,3 +31,15 @@ export interface MovieItem {
 }
 
 export type FetchState = "idle" | "loading" | "loaded" | "failed";
+
+export interface SeatItem {
+  seat_Id: number;
+  row: string;
+  number: string;
+  isFree: number; 
+}
+
+export interface CreateTransactionItem {
+    showtimeId: number;
+    seatIds: number[];
+}

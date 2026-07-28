@@ -22,7 +22,7 @@ public class SeatsController : ControllerBase
     [HttpGet("{Showtime_Id}")]
     public async Task<ActionResult<IEnumerable<SeatsDTO>>> GetSeatsByShowtimeAsync(int Showtime_Id, int Room_Id)
     {
-        IReadOnlyList<(int Seat_Id, char Row, int Number, Status LastTransaction)> seats 
+        IReadOnlyList<(int Seat_Id, char Row, int Number, int IsFree)> seats 
             = await _service.GetSeatsByShowtimeAsync(Showtime_Id, Room_Id);
         
         IEnumerable<SeatsDTO> mappedSeats = _mapper.Map<IEnumerable<SeatsDTO>>(seats);
