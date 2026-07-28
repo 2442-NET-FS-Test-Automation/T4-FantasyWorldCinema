@@ -18,6 +18,8 @@ public class ShowtimeService : IShowtimeService
 
     public Task<Showtimes> GetShowtimeByIdAsync(int Showtime_Id) => _repo.GetShowtimeById(Showtime_Id);
 
+    public Task<IReadOnlyList<Showtimes>> GetAllShowtimesAsync() => _repo.GetAllShowtimesAsync();
+
     /// <summary>
     /// Checks if the showtime exists and if the end of the showtime is later than the present time.
     /// </summary>
@@ -30,8 +32,7 @@ public class ShowtimeService : IShowtimeService
 
         DateTime endTime = currentShowtime.ShowDate.ToDateTime(currentShowtime.EndTime);
 
-        DateTime nowsTime = DateTime.UtcNow;
 
-        return endTime > nowsTime ? currentShowtime : null;
+        return endTime > DateTime.UtcNow ? currentShowtime : null;
     }
 }

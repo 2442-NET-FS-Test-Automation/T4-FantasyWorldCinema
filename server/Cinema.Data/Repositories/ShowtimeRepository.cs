@@ -12,6 +12,12 @@ public class ShowtimeRepository : IShowtimeRepository
         _factory = factory;
     }
 
+    public async Task<IReadOnlyList<Showtimes>> GetAllShowtimesAsync()
+    {
+        CinemaDbContext db = await _factory.CreateDbContextAsync();
+        return await db.Showtimes.ToListAsync();
+    }
+
     public async Task<IReadOnlyList<Showtimes>> GetShowtimesByCinemaAsync(int cinema_Id)
     {
         CinemaDbContext db = await _factory.CreateDbContextAsync();
