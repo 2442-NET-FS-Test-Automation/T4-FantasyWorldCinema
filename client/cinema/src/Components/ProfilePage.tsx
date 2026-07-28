@@ -1,6 +1,26 @@
 import { useEffect, useState } from 'react';
-import { Drawer, Typography, Button, Space, Avatar, Divider, Form, Input, Spin, message, ConfigProvider } from 'antd';
-import { UserOutlined, LogoutOutlined, MailOutlined, IdcardOutlined, CalendarOutlined } from '@ant-design/icons';
+import { 
+    Drawer, 
+    Typography, 
+    Button, 
+    Avatar, 
+    Form, 
+    Input, 
+    Spin, 
+    message, 
+    ConfigProvider, 
+    Tag 
+} from 'antd';
+import { 
+    UserOutlined, 
+    LogoutOutlined, 
+    MailOutlined, 
+    IdcardOutlined, 
+    CalendarOutlined, 
+    EditOutlined, 
+    CheckOutlined, 
+    CloseOutlined 
+} from '@ant-design/icons';
 import { useAuth } from '../auth/useAuth';
 import { getProfile, updateProfile } from '../api/auth';
 
@@ -18,6 +38,14 @@ export function ProfilePage({ isOpen, onClose }: ProfilePageProps) {
     const [profileBackup, setProfileBackup] = useState<any>(null);
     const [isEditing, setIsEditing] = useState<boolean>(false);
 
+    // Monitoreamos los campos en tiempo real para detectar cambios reales
+    const formValues = Form.useWatch([], form);
+    const hasChanges = isEditing && profileBackup && (
+        formValues?.fullName !== profileBackup.fullName ||
+        formValues?.username !== profileBackup.username ||
+        formValues?.email !== profileBackup.email
+    );
+
     useEffect(() => {
         if (isOpen && user?.name) {
             setLoading(true);
@@ -34,15 +62,15 @@ export function ProfilePage({ isOpen, onClose }: ProfilePageProps) {
                     setProfileBackup(fetchedProfile);
                     setCreatedAt(data.createdAt ?? data.CreatedAt ?? '');
                     setIsEditing(false);
-                    setLoading(false);
                 })
                 .catch((err) => {
                     console.error(err);
+                })
+                .finally(() => {
                     setLoading(false);
                 });
         }
     }, [isOpen, user?.name, form]);
-
 
     const handleFormSubmit = async (values: any) => {
         if (!user?.name) return;
@@ -59,11 +87,10 @@ export function ProfilePage({ isOpen, onClose }: ProfilePageProps) {
                 const usernameCambiado = values.username !== profileBackup.username;
                 const emailCambiado = values.email !== profileBackup.email;
 
-
                 if (usernameCambiado || emailCambiado) {
                     messageApi.open({
                         type: 'warning',
-                        content: "It's necessary to re-LogIn due to credential changes.",
+                        content: "Credentials changed. Please log in again.",
                         duration: 3
                     });
 
@@ -77,14 +104,8 @@ export function ProfilePage({ isOpen, onClose }: ProfilePageProps) {
                         content: 'Profile updated successfully!',
                     });
 
-                    setProfileBackup({
-                        fullName: values.fullName,
-                        username: values.username,
-                        email: values.email
-                    });
-
+                    setProfileBackup(values);
                     setIsEditing(false);
-                    setLoading(false);
                 }
             } else {
                 throw new Error("Update failed");
@@ -93,9 +114,8 @@ export function ProfilePage({ isOpen, onClose }: ProfilePageProps) {
             console.error(err);
             messageApi.open({
                 type: 'error',
-                content: 'Username or Email is already in use',
+                content: 'Username or Email is already in use.',
             });
-            setLoading(false);
         } finally {
             setLoading(false);
         }
@@ -106,191 +126,215 @@ export function ProfilePage({ isOpen, onClose }: ProfilePageProps) {
         onClose();
     };
 
-
     return (
         <ConfigProvider
             theme={{
                 token: {
-                    fontFamily: 'var(--font-primary), font-primary, sans-serif',
-                    colorPrimary: '#4d5078',
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    colorPrimary: '#d4af37',
+                    colorBgElevated: '#0f0f12',
+                    colorText: '#ffffff',
+                    colorTextDescription: '#94a3b8',
+                    colorTextPlaceholder: '#475569',
+                    borderRadiusLG: 12,
                 },
                 components: {
                     Input: {
-                        fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                        colorBgContainer: 'rgba(24, 24, 27, 0.7)',
+                        colorBorder: '#27272a',
+                        colorText: '#ffffff',
+                        controlHeightLG: 46,
+                        colorTextDisabled: '#ffffff',
+                        colorBgContainerDisabled: 'rgba(18, 18, 21, 0.5)',
+                        activeBorderColor: '#d4af37',
+                        hoverBorderColor: '#e6c24a',
                     },
+                    Form: {
+                        labelColor: '#e4e4e7',
+                    }
                 },
             }}
         >
             <Drawer
                 title={
-                    <Space>
-                        <UserOutlined style={{ color: '#4d5078' }} />
-                        <Typography.Text strong style={{ fontSize: 16, fontFamily: 'inherit' }}>Profile Settings</Typography.Text>
-                    </Space>
+                    <div className="flex items-center gap-2">
+                        <UserOutlined className="text-[#d4af37] text-lg" />
+                        <span className="text-white font-semibold tracking-wide text-lg">
+                            Profile Settings
+                        </span>
+                    </div>
                 }
                 extra={
                     <Button
-                        color="danger"
-                        variant="outlined"
+                        danger
+                        type="primary"
                         size="middle"
                         icon={<LogoutOutlined />}
                         onClick={handleLogout}
-                        style={{ fontFamily: 'var(--font-primary), sans-serif' }}
+                        className="rounded-xl font-semibold"
+                        style={{ fontFamily: 'var(--font-primary), font-primary, serif' }}
                     >
                         Log Out
                     </Button>
                 }
                 placement="right"
-                size="60%"
+                width={460}
                 onClose={onClose}
                 open={isOpen}
-
                 styles={{
+                    mask: {
+                        backdropFilter: 'blur(10px)',
+                        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                    },
                     header: {
-                        backgroundColor: 'rgba(255, 255, 255, 0.80)',
-                        borderBottom: '1px solid rgba(0,0,0,0.05)'
+                        backgroundColor: '#0f0f12',
+                        borderBottom: '1px solid rgba(212, 175, 55, 0.15)',
+                        padding: '20px 24px'
                     },
                     body: {
-                        padding: '3%'
+                        /* Degradado ambiental suave en el Drawer */
+                        background: 'radial-gradient(circle at top right, rgba(212, 175, 55, 0.08) 0%, rgba(20, 20, 26, 0.6) 45%, #0f0f12 100%)',
+                        padding: '24px'
                     }
                 }}
-                className="drawer-auth-bg"
             >
                 {contextHolder}
+
                 {user ? (
                     <Spin spinning={loading}>
-                        <Space orientation="vertical" size="large" style={{ width: '100%' }}>
-
-                            <Space orientation="vertical" align="center" style={{ width: '100%', textAlign: 'center' }}>
-                                <Avatar size={80} icon={<UserOutlined />} style={{ backgroundColor: '#4d5078' }} />
-                                <Typography.Title level={4} style={{ margin: '8px 0 0 0', fontFamily: 'inherit' }}>
+                        <div className="flex flex-col items-center gap-6 w-full">
+                            
+                            {/* --- TARJETA DEL PERFIL --- */}
+                            <div className="flex flex-col items-center text-center w-full p-6 rounded-2xl bg-zinc-900/60 backdrop-blur-md border border-white/10 shadow-lg">
+                                <Avatar 
+                                    size={88} 
+                                    icon={<UserOutlined className="text-3xl text-zinc-300" />} 
+                                    className="bg-zinc-900 border-2 border-[#d4af37]/80 shadow-[0_0_20px_rgba(212,175,55,0.2)] mb-3"
+                                />
+                                
+                                <h3 className="text-xl font-semibold text-white tracking-wide m-0">
                                     {user.name}
-                                </Typography.Title>
-                                <Space size="middle" separator={<span>•</span>}>
+                                </h3>
 
-                                    <Typography.Text type="secondary" style={{ fontSize: 12, fontFamily: 'inherit', color:!isEditing ? '#000000' : 'inherit'}}>
-                                        {user.role || 'Unknown'}
-                                    </Typography.Text>
+                                <div className="flex items-center gap-2 mt-2 flex-wrap justify-center">
+                                    <Tag color="gold" className="uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border-0 text-[11px] bg-[#d4af37]/15 text-[#d4af37]">
+                                        {user.role || 'Member'}
+                                    </Tag>
 
                                     {createdAt && (
-                                        <Typography.Text type="secondary" style={{ fontSize: 12, fontFamily: 'inherit', color:!isEditing ? '#000000' : 'inherit'}}>
-                                            <CalendarOutlined style={{ marginRight: 4 }} />
-                                            Member since: {new Date(createdAt).toLocaleDateString()}
-                                        </Typography.Text>
+                                        <span className="text-xs text-zinc-400 flex items-center gap-1">
+                                            <CalendarOutlined className="text-zinc-500" />
+                                            {new Date(createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                                        </span>
                                     )}
-                                </Space>
-                            </Space>
+                                </div>
+                            </div>
 
-                            <Divider style={{ margin: '12px 0' }} />
-
-
-                            <Form form={form} onFinish={handleFormSubmit} layout='vertical'>
-
+                            {/* --- FORMULARIO DE EDICIÓN --- */}
+                            <Form 
+                                form={form} 
+                                onFinish={handleFormSubmit} 
+                                layout="vertical" 
+                                className="w-full space-y-4"
+                            >
                                 <Form.Item
-                                    label={<span style={{ fontFamily: 'var(--font-primary), sans-serif' }}>Full Name</span>}
+                                    label={<span className="text-xs uppercase tracking-wider text-zinc-400 font-semibold">Full Name</span>}
                                     name="fullName"
                                     rules={[
                                         { required: true, message: "Please input your full name!" },
-                                        { max: 255, message: "The full name cannot exceed 255 characters." }
+                                        { max: 255, message: "Maximum 255 characters allowed." }
                                     ]}
                                 >
                                     <Input
                                         disabled={!isEditing}
                                         size="large"
-                                        prefix={<IdcardOutlined />}
+                                        prefix={<IdcardOutlined className={isEditing ? "text-[#d4af37]" : "text-zinc-500"} />}
                                         placeholder="Full Name"
-                                        type="text"
-                                        style={{ fontFamily: 'system-ui, sans-serif', color:!isEditing ? '#000000' : 'inherit'}}
                                     />
                                 </Form.Item>
 
                                 <Form.Item
-                                    label={<span style={{ fontFamily: 'var(--font-primary), sans-serif' }}>User Name</span>}
+                                    label={<span className="text-xs uppercase tracking-wider text-zinc-400 font-semibold">Username</span>}
                                     name="username"
                                     rules={[
                                         { required: true, message: "Please input your username!" },
-                                        { min: 3, max: 50, message: "The username must be between 3 and 50 characters long." },
-                                        { pattern: /^[a-zA-Z0-9]+$/, message: "The username can only contain letters and numbers." }
+                                        { min: 3, max: 50, message: "Between 3 and 50 characters." },
+                                        { pattern: /^[a-zA-Z0-9]+$/, message: "Only letters and numbers allowed." }
                                     ]}
                                 >
                                     <Input
                                         disabled={!isEditing}
                                         size="large"
-                                        prefix={<UserOutlined />}
-                                        placeholder="UserName"
-                                        type="text"
-                                        style={{ fontFamily: 'system-ui, sans-serif', color:!isEditing ? '#000000' : 'inherit'}}
+                                        prefix={<UserOutlined className={isEditing ? "text-[#d4af37]" : "text-zinc-500"} />}
+                                        placeholder="Username"
                                     />
                                 </Form.Item>
 
                                 <Form.Item
-                                    label={<span style={{ fontFamily: 'var(--font-primary), sans-serif' }}>Email Address</span>}
+                                    label={<span className="text-xs uppercase tracking-wider text-zinc-400 font-semibold">Email Address</span>}
                                     name="email"
                                     rules={[
                                         { required: true, message: "Please input your email!" },
-                                        { type: 'email', message: "The email format is invalid." },
-                                        { max: 150, message: "The email cannot exceed 150 characters." }
+                                        { type: 'email', message: "Invalid email address format." },
+                                        { max: 150, message: "Maximum 150 characters allowed." }
                                     ]}
                                 >
                                     <Input
                                         disabled={!isEditing}
                                         size="large"
-                                        prefix={<MailOutlined />}
+                                        prefix={<MailOutlined className={isEditing ? "text-[#d4af37]" : "text-zinc-500"} />}
                                         placeholder="Email"
-                                        type="email"
-                                        style={{ fontFamily: 'system-ui, sans-serif', color:!isEditing ? '#000000' : 'inherit'}}
                                     />
                                 </Form.Item>
 
-                                <div className="flex justify-center w-full mt-6">
-                                    <div className="flex bg-slate-600/80 rounded-full p-1 border border-slate-500 shadow-inner text-base gap-1">
-
+                                {/* --- BOTONES DE ACCIÓN --- */}
+                                <div className="pt-4 flex items-center gap-3 w-full">
+                                    {!isEditing ? (
                                         <button
                                             type="button"
-                                            disabled={loading}
-                                            onClick={() => {
-                                                if (!isEditing) {
-                                                    setIsEditing(true);
-                                                } else {
-                                                    form.submit();
-                                                }
-                                            }}
-                                            className="cursor-pointer group relative flex items-center justify-center px-8 h-10 rounded-full text-white bg-slate-700 hover:bg-slate-800 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            onClick={() => setIsEditing(true)}
+                                            className="w-full h-11 flex items-center justify-center gap-2 rounded-xl bg-zinc-800/80 hover:bg-zinc-700/80 text-white font-medium text-xs tracking-wider uppercase transition-all duration-200 border border-zinc-700/80 cursor-pointer shadow-sm"
                                         >
-                                            <span className="inline-block transition-all duration-300 group-hover:scale-105 group-hover:drop-shadow-[0_0_6px_rgba(255,255,255,0.8)] font-semibold">
-                                                {loading ? 'Saving...' : isEditing ? 'Save Changes' : 'Edit Profile'}
-                                            </span>
+                                            <EditOutlined className="text-[#d4af37]" />
+                                            <span>Edit Profile</span>
                                         </button>
-
-                                        {isEditing && (
+                                    ) : (
+                                        <>
                                             <button
                                                 type="button"
                                                 disabled={loading}
                                                 onClick={() => {
-                                                    if (profileBackup) {
-                                                        form.setFieldsValue(profileBackup);
-                                                    }
+                                                    if (profileBackup) form.setFieldsValue(profileBackup);
                                                     setIsEditing(false);
                                                 }}
-                                                className="cursor-pointer group relative flex items-center justify-center px-6 h-10 rounded-full text-slate-200 bg-transparent hover:bg-white/10 transition-colors duration-300 disabled:opacity-50"
+                                                className="w-1/3 h-11 flex items-center justify-center gap-1.5 rounded-xl bg-zinc-800/80 hover:bg-zinc-800 text-zinc-300 font-medium text-xs tracking-wider uppercase transition-all duration-200 border border-zinc-700/60 cursor-pointer"
                                             >
-                                                <span className="inline-block transition-all duration-300 group-hover:scale-105 font-medium">
-                                                    Cancel
-                                                </span>
+                                                <CloseOutlined />
+                                                <span>Cancel</span>
                                             </button>
-                                        )}
 
-                                    </div>
+                                            <button
+                                                type="button"
+                                                disabled={loading || !hasChanges}
+                                                onClick={() => form.submit()}
+                                                className={`w-2/3 h-11 flex items-center justify-center gap-2 rounded-xl font-bold text-xs tracking-wider uppercase transition-all duration-200 shadow-[0_4px_15px_rgba(212,175,55,0.25)] ${
+                                                    loading || !hasChanges
+                                                        ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-zinc-700/50 shadow-none'
+                                                        : 'bg-[#d4af37] hover:bg-[#e6c24a] text-black cursor-pointer'
+                                                }`}
+                                            >
+                                                <CheckOutlined />
+                                                <span>{loading ? 'Saving...' : 'Save Changes'}</span>
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
                             </Form>
-
-                            <Divider style={{ margin: '24px 0 12px 0' }} />
-
-                        </Space>
+                        </div>
                     </Spin>
                 ) : (
-                    <div style={{ textAlign: 'center', paddingTop: 40 }}>
-                        <Typography.Text type="secondary" style={{ fontFamily: 'var(--font-primary), sans-serif' }}>
+                    <div className="text-center py-12">
+                        <Typography.Text type="secondary">
                             You are not currently logged in.
                         </Typography.Text>
                     </div>
