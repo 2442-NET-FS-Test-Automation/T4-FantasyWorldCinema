@@ -6,6 +6,7 @@ import { getCinemas } from "../api/Cinema";
 import { CinemaSearchBar } from "../Components/CinemaSearchBar";
 import { GetMovies } from "../api/Movies";
 import { MovieCard } from "../Components/MovieCard";
+import { MovieDrawer } from "../Components/MovieDrawer";
 
 const { Title, Paragraph } = Typography;
 
@@ -18,6 +19,14 @@ export function SelectCinema() {
 
     const moviesPerSlide: number = 4;
     const moviesGroup = [];
+
+    const [selectedMovie, setSelectedMovie] = useState<MovieItem | null>(null);
+    const [drawerOpen, setDrawerOpen] = useState(false);
+
+    const handleMovieClick = (movie: MovieItem) => {
+        setSelectedMovie(movie);
+        setDrawerOpen(true);
+    };
 
     useEffect(() => {
         let active = true;
@@ -139,7 +148,11 @@ export function SelectCinema() {
                             >
                                 {displayMovies.map((movie, index) => (
                                     <div key={`${movie.movie_Id}-${index}`} className="px-3 sm:px-4 py-6"> 
-                                        <MovieCard movie={movie} />
+                                        <MovieCard movie={movie} onClick={() => handleMovieClick(movie)}/>
+                                        <MovieDrawer
+                                            movie={selectedMovie}
+                                            open={drawerOpen}
+                                            onClose={() => setDrawerOpen(false)}/>
                                     </div>
                                 ))}
                             </Carousel>
@@ -147,6 +160,7 @@ export function SelectCinema() {
                     )}
                 </div>
             </div>
+            
         </ConfigProvider>
     );
 }

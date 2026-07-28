@@ -14,7 +14,7 @@ export interface ShowtimeItem {
     rating: string;
     room: string;
     room_Id: number;
-    showDate: Date;
+    showDate: string;
     startTime: TimeString;
     endTime: TimeString;
     price: number;

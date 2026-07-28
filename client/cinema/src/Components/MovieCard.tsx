@@ -3,7 +3,7 @@ import { Typography, Tag } from "antd";
 
 interface MovieProps {
     movie: MovieItem;
-    onClick?: () => void; 
+    onClick: () => void; 
 }
 
 export function MovieCard({ movie, onClick }: MovieProps) {
@@ -55,6 +55,7 @@ export function MovieCard({ movie, onClick }: MovieProps) {
                     {movie.synopsis}
                 </Typography.Paragraph>
             </div>
+            
         </div>
     );
 }

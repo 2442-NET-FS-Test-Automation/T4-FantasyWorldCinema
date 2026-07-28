@@ -24,7 +24,7 @@ public class CinemaRepository : ICinemaRepository
         CinemaDbContext db = await _factory.CreateDbContextAsync();
         IReadOnlyList<int> Cinemas_Ids = await db.Showtimes
             .Include(s => s.Room)
-            .Where(s => s.Movie_Id == Movie_Id)
+            .Where(s => s.Movie_Id == Movie_Id && s.ShowDate.ToDateTime(s.EndTime) > DateTime.UtcNow)
             .Select(s => s.Room.Cinema_Id).ToListAsync();
         
         return await db.Cinemas
