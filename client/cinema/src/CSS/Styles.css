@@ -3,7 +3,6 @@
     max-width: 100vw;
     overflow-x: hidden;
     min-height: 105vh;
-    background-size: cover; 
     background-position: center;
 
 
@@ -11,6 +10,32 @@
     padding-left: 1rem;
     padding-right: 1rem;
     padding-bottom: 2rem;
+}
+
+/* Login & Register Styles */
+.auth-title {
+  margin: 0 !important;
+  color: #ffffff !important;
+  font-family: inherit;
+}
+
+.auth-subtitle {
+  margin: 4px 0 !important;
+  color: #ffffff;
+  font-size: 16px;
+  font-family: inherit;
+}
+
+.auth-divider {
+  border-color: #4d5078 !important;
+  font-size: 24px;
+  font-weight: bold;
+  font-family: inherit;
+}
+
+.auth-divider .ant-divider-inner-text {
+  color: #ffffff !important;
+  font-size: 24px;
 }
 
 .Cinema-Card {

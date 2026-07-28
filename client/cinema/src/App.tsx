@@ -4,6 +4,7 @@ import { ProtectedRoute/* , AnonymousRoute */ } from "./auth/ProtectedRoute";
 import { SelectCinema } from "./pages/SelectCinema";
 import { DisplayShowtimes } from "./pages/DisplayShowtimes";
 import { Navbar } from "./Components/Navbar";
+import { ManageCatalog } from "./pages/ManageCatalog";
 import { useState } from "react";
 import { Button } from "antd";
 
@@ -36,12 +37,13 @@ export function AppContent() {
               {/* </Route> */}
 
               {/* Protected routes - only ADMINS */}
-              {/* <Route element={<ProtectedRoute allowedRoles={["Admin"]} />}> */}
-              {/* <Route path="/manage-catalog" element={<ManageCatalog />} />
+              <Route element={<ProtectedRoute allowedRoles={["Admin"]} />}>
+                <Route path="/admin/catalog" element={<ManageCatalog />} />
+                  {/* 
                   <Route path="/manage-catalog/movies" element={<ManageMovies />} />
                   <Route path="/manage-catalog/showtimes" element={<ManageShowtimes />} />
                   <Route path="/reports" element={<Reports />} /> */}
-              {/* </Route> */}
+              </Route>
 
               {/* Default redirection Page */}
               <Route path="*" element={<Navigate to="/" replace />} />
