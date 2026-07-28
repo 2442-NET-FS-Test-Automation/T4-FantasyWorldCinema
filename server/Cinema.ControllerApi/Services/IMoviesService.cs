@@ -7,4 +7,5 @@ namespace Cinema.ControllerApi.Services;
 public interface IMoviesService
 {
     public Task<IReadOnlyList<Movies>> GetMoviesAsync();
+    public Task<Movies> SetMoviesAsync(MovieCreateDto newMovie);
 }

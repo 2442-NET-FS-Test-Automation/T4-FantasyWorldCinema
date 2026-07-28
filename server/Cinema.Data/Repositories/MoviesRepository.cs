@@ -22,4 +22,25 @@ public class MoviesRepository : IMoviesRepository
                 s.ShowDate.ToDateTime(s.EndTime) >= DateTime.UtcNow))
             .ToListAsync();
     }
+
+    public async Task<Movies> SetMoviesAsync(string title, string genre, 
+        int durationMinutes, string rating, string synopsis, string poster)
+    {
+        CinemaDbContext db = await _factory.CreateDbContextAsync();
+        Enum.TryParse<Genre>(genre, out Genre newGenre);
+        Enum.TryParse<Rating>(rating, out Rating newRating);
+        Movies newMovie = new Movies
+        {
+            Title = title,
+            Genre = newGenre,
+            DurationMinutes = durationMinutes,
+            Rating = newRating,
+            Synopsis = synopsis,
+            PosterUrl = poster
+        };
+
+        db.Movies.Add(newMovie);
+        await db.SaveChangesAsync();
+        return newMovie;
+    }
 }

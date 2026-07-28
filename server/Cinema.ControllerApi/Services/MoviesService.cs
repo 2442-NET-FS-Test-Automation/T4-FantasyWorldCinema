@@ -14,4 +14,10 @@ public class MoviesService : IMoviesService
     }
 
     public async Task<IReadOnlyList<Movies>> GetMoviesAsync() => await _repo.GetMoviesAsync();
+
+    public Task<Movies> SetMoviesAsync(MovieCreateDto nm)
+    {
+        return _repo.SetMoviesAsync(nm.Title, nm.Genre, nm.DurationMinutes,
+        nm.Rating, nm.Synopsis, nm.Poster);
+    }
 }
