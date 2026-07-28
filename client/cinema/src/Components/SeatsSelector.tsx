@@ -1,5 +1,6 @@
 import React from 'react';
 import type { SeatItem } from '../types';
+import { MdEventSeat } from 'react-icons/md';
 
 interface SeatSelectorProps {
   seats: SeatItem[];
@@ -14,7 +15,7 @@ export const SeatSelector: React.FC<SeatSelectorProps> = ({
   onSeatToggle,
   maxSelectable
 }) => {
-  // 2. Agrupar los asientos por fila (A, B, C...)
+  // Agrupar los asientos por fila
   const rows = seats.reduce((acc, seat) => {
     if (!acc[seat.row]) acc[seat.row] = [];
     acc[seat.row].push(seat);
@@ -22,46 +23,46 @@ export const SeatSelector: React.FC<SeatSelectorProps> = ({
   }, {} as Record<string, SeatItem[]>);
 
   const sortedRowKeys = Object.keys(rows).sort();
-
-  // Cuántos asientos faltan por seleccionar
   const seatsLeft = maxSelectable - selectedSeatIds.length;
 
   return (
-    <div className="flex flex-col w-full max-w-md">
-      {/* Encabezado: Instrucciones y Contador */}
-      <div className="flex justify-between items-end mb-2 px-2 font-medium">
-        <span>Select your seats</span>
-        <span className={seatsLeft === 0 ? "text-green-600 font-bold" : "text-gray-600"}>
+    <div className="flex flex-col w-full max-w-lg mx-auto font-sans">
+      
+      {/* Encabezado Limpio */}
+      <div className="flex justify-between items-end mb-4 px-2">
+        <h3 className="text-xl font-semibold text-gray-800 tracking-tight">Select your seats</h3>
+        <span className={`text-sm font-medium px-3 py-1 rounded-full transition-colors duration-300 ${
+          seatsLeft === 0 ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
+        }`}>
           {seatsLeft} left
         </span>
       </div>
 
-      {/* Contenedor Principal de la Sala */}
-      <div className="border-4 border-black p-6 rounded-md bg-white shadow-sm flex flex-col items-center">
+      {/* Contenedor Principal (Estilo Tarjeta Moderna) */}
+      <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8 sm:p-10 flex flex-col items-center transition-all">
         
-        {/* Representación visual de la Pantalla */}
-        <div className="w-3/4 h-8 border-t-4 border-black rounded-t-[50%] mb-10 relative">
-          <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-sm text-gray-400 font-semibold tracking-widest">
-            SCREEN
-          </span>
+        {/* Pantalla Rediseñada (Estilo Brillo/Luz) */}
+        <div className="w-full max-w-xs flex flex-col items-center mb-12">
+          <div className="w-full h-1.5 bg-gradient-to-r from-transparent via-indigo-300 to-transparent rounded-full shadow-[0_4px_15px_rgba(99,102,241,0.4)]"></div>
+          <span className="text-[10px] font-bold text-gray-400 tracking-[0.3em] mt-4">SCREEN</span>
         </div>
 
         {/* Cuadrícula de Asientos */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
           {sortedRowKeys.map((rowKey) => (
-            <div key={rowKey} className="flex items-center gap-4">
-              {/* Etiqueta de la Fila (A, B, C...) */}
-              <span className="w-4 font-bold text-lg text-center">{rowKey}</span>
+            <div key={rowKey} className="flex items-center gap-6">
+              
+              {/* Etiqueta de Fila */}
+              <span className="w-4 text-sm font-bold text-gray-400 text-center select-none">
+                {rowKey}
+              </span>
 
-              {/* Botones de Asientos */}
-              <div className="flex gap-2">
-                {/* Parseamos el 'number' a int para ordenamiento numérico seguro */}
+              {/* Fila de Asientos */}
+              <div className="flex gap-3 sm:gap-4">
                 {rows[rowKey].sort((a, b) => parseInt(a.number) - parseInt(b.number)).map((seat) => {
                   
-                  // 3. Nueva lógica de ocupación basada en isFree (1 = Libre, 0 = Ocupado)
                   const occupied = seat.isFree !== 0;
                   const selected = selectedSeatIds.includes(seat.seat_Id);
-                  
                   const disableUnselected = seatsLeft <= 0 && !selected;
                   const disabled = occupied || disableUnselected;
 
@@ -71,19 +72,22 @@ export const SeatSelector: React.FC<SeatSelectorProps> = ({
                       onClick={() => onSeatToggle(seat.seat_Id)}
                       disabled={disabled}
                       aria-label={`Seat ${seat.row}${seat.number}`}
-                      className={`
-                        w-8 h-8 sm:w-10 sm:h-10 border-2 rounded-sm transition-all duration-200
-                        flex items-center justify-center text-xs font-semibold
-                        ${occupied 
-                          ? 'bg-gray-400 border-gray-500 cursor-not-allowed' 
-                          : selected
-                            ? 'bg-blue-600 border-blue-700 text-white shadow-inner scale-95'
-                            : disableUnselected
-                              ? 'bg-white border-gray-300 opacity-50 cursor-not-allowed'
-                              : 'bg-white border-black hover:bg-blue-100 cursor-pointer'
-                        }
-                      `}
-                    />
+                      className="relative flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-md transition-transform duration-200"
+                    >
+                      <MdEventSeat 
+                        className={`
+                          text-3xl sm:text-4xl transition-all duration-300 ease-out
+                          ${occupied 
+                            ? 'text-rose-900 cursor-not-allowed' 
+                            : selected
+                              ? 'text-indigo-600 scale-110 drop-shadow-md cursor-pointer'
+                              : disableUnselected
+                                ? 'text-gray-200 opacity-60 cursor-not-allowed'
+                                : 'text-gray-300 hover:text-indigo-400 hover:scale-105 cursor-pointer'
+                          }
+                        `} 
+                      />
+                    </button>
                   );
                 })}
               </div>
@@ -92,12 +96,22 @@ export const SeatSelector: React.FC<SeatSelectorProps> = ({
         </div>
       </div>
       
-      {/* Leyenda de colores */}
-      <div className="flex justify-center gap-6 mt-4 text-sm font-medium text-gray-600">
-        <div className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-black bg-white rounded-sm"></div> Available</div>
-        <div className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-blue-700 bg-blue-600 rounded-sm"></div> Selected</div>
-        <div className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-gray-500 bg-gray-400 rounded-sm"></div> Occupied</div>
+      {/* Leyenda con Íconos */}
+      <div className="flex justify-center gap-6 mt-6">
+        <div className="flex items-center gap-2">
+          <MdEventSeat className="text-gray-300 text-xl" /> 
+          <span className="text-xs font-semibold text-gray-500">Available</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <MdEventSeat className="text-indigo-600 text-xl" /> 
+          <span className="text-xs font-semibold text-gray-500">Selected</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <MdEventSeat className="text-rose-900 text-xl" /> 
+          <span className="text-xs font-semibold text-gray-500">Occupied</span>
+        </div>
       </div>
+
     </div>
   );
 };

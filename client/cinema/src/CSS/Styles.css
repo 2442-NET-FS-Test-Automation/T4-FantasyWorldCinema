@@ -1,6 +1,7 @@
 .Flex-Home-Background {
     min-height: 105vh;
-    background-image: url(../assets/MedievalCatle.png);
+    /* background-image: url(../assets/MedievalCatle.png); */
+    background-image: url(https://thumbs.dreamstime.com/b/generated-image-403865908.jpg?w=992);
     background-size: cover; 
     background-position: center;
 
