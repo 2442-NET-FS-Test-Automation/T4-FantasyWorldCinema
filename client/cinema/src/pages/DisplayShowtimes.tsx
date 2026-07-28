@@ -18,7 +18,7 @@ export function DisplayShowtimes() {
     const [selectedDate, setSelectedDate] = useState(() => {
         return new Date().toISOString().split("T")[0];
     });
-
+    
     // getting Showtimes from API
     useEffect(() => {
 
@@ -40,12 +40,12 @@ export function DisplayShowtimes() {
         
     }, [])
     
-
+    console.log(items);
     // Filter showtimes by date and group it by movie
     const groupedShowtimes = useMemo(() => {
         const filtered = items.filter((showtime) => {
-            const date = new Date(showtime.showDate).toISOString().split("T")[0];
-            return date === selectedDate;
+            
+            return showtime.showDate === selectedDate;
         });
 
         return filtered.reduce<Record<string, ShowtimeItem[]>>((acc, showtime) => {
@@ -59,12 +59,9 @@ export function DisplayShowtimes() {
     }, [items, selectedDate]);
     
     const availableDates = useMemo(() => {
-        return [...new Set(
-            items.map(showtime =>
-                new Date(showtime.showDate).toISOString().split("T")[0]
-            )
-        )].sort();
+        return [...new Set( items.map(showtime => showtime.showDate ) )].sort();
     }, [items]);
+    
 
     useEffect(() => {
         if (availableDates.length > 0 && !availableDates.includes(selectedDate)) {
@@ -81,6 +78,7 @@ export function DisplayShowtimes() {
                 className="Flex-Background">
                 {(availableDates.length > 0 && fState === "loaded") && <>
                 <Typography.Title level={2}>Choose your Date</Typography.Title>
+
                 <div className="Showtime-Date-Container">
                     {availableDates.map(date => (
                         <Button style={{columnGap: 10}}
@@ -88,7 +86,8 @@ export function DisplayShowtimes() {
                             type={selectedDate === date ? "primary" : "default"}
                             onClick={() => setSelectedDate(date)}
                         >
-                            {new Date(date).toLocaleDateString("es-MX", {
+                            
+                            {new Date(`${date}T00:00:00`).toLocaleDateString("es-MX", {
                                 weekday: "short",
                                 day: "numeric",
                                 month: "short"
@@ -96,6 +95,7 @@ export function DisplayShowtimes() {
                         </Button>
                     ))}
                 </div>
+                
                 {fState === "loaded" &&
                 <Card  className="Movies-Card">
                     <Row gutter={[24, 24]}>
