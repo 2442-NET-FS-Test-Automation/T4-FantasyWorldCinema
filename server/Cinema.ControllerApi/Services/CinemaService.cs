@@ -13,4 +13,6 @@ public class CinemaService : ICinemaService
     }
 
     public Task<IReadOnlyList<Cinemas>> GetCinemasAsync() => _repo.GetCinemasAsync();
+
+    public async Task<IReadOnlyList<Cinemas>> GetCinemasByMovieAsync(int Movie_Id) => await _repo.GetCinemasByMovieAsync(Movie_Id);
 }

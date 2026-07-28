@@ -28,4 +28,14 @@ public class CinemaController : ControllerBase
         IEnumerable<SimpleCinemaDto> mappedItems = _mapper.Map<IEnumerable<SimpleCinemaDto>>(cinemas);
         return Ok(mappedItems);
     }
+
+    [HttpGet("/api/Cinema/{Movie_Id}")]
+    [ResponseCache(Duration = 60)]
+    public async Task<ActionResult<IEnumerable<SimpleCinemaDto>>> GetCinemasByMovie(int Movie_Id)
+    {
+        IReadOnlyList<Cinemas> cinemas = await _service.GetCinemasByMovieAsync(Movie_Id);
+
+        IEnumerable<SimpleCinemaDto> mappedItems = _mapper.Map<IEnumerable<SimpleCinemaDto>>(cinemas);
+        return Ok(mappedItems);
+    }
 }

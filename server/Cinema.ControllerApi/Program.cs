@@ -20,6 +20,10 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Adding Cache Managemento to builder
+builder.Services.AddMemoryCache();
+builder.Services.AddResponseCaching();
+
 // Build Tokens Services
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IArgon2Hasher, Argon2Hasher>();
