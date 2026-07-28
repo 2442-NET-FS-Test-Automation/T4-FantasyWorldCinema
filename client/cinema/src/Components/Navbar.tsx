@@ -37,7 +37,7 @@ export const Navbar = () => {
             
             {user?.role === 'Consumer' && (
               <Link 
-                to="/my-tickets" 
+                to="/user/my-tickets" 
                 className="group relative flex items-center justify-center px-5 h-8 rounded-full text-slate-200 hover:text-white hover:bg-slate-700/80 transition-colors duration-300"
               >
                 <span className="inline-block transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_6px_rgba(255,255,255,0.8)]">

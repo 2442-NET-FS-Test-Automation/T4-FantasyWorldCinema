@@ -8,4 +8,5 @@ public interface ITransactionRepository
     public Task<Transactions?> GetTransactionWithDetailsAsync(int transactionId);
     public Task<Transactions?> GetTransactionAsync(int transactionId);
     public Task SetTransactionStatus(int transactionId); 
+    public Task<IEnumerable<Transactions>?> GetAllTransactionsByUserAsync(int userId);
 }

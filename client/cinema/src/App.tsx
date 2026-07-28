@@ -6,6 +6,7 @@ import { Navbar } from "./Components/Navbar";
 import { ManageCatalog } from "./pages/ManageCatalog";
 import { ProtectedRoute } from "./auth/ProtectedRoute";
 import { ShowtimeDetails } from "./pages/ShowtimeDetails";
+import { MyTickets } from "./pages/MyTickets";
 
 export function AppContent() {
 
@@ -22,9 +23,9 @@ export function AppContent() {
               <Route path="/showtime/:showtimeId" element={<ShowtimeDetails />} />
 
               {/* Protected routes - only CONSUMERS */}
-              {/* <Route element={<ProtectedRoute allowedRoles={["Consumer"]} />}> */}
-              {/* <Route path="/user/:userId/my-tickets" element={<MyTickets />} /> */}
-              {/* </Route> */}
+              <Route element={<ProtectedRoute allowedRoles={["Consumer"]} />}>
+                <Route path="/user/my-tickets" element={<MyTickets />} />
+              </Route>
 
               {/* Protected routes - only ADMINS */}
               <Route element={<ProtectedRoute allowedRoles={["Admin"]} />}>

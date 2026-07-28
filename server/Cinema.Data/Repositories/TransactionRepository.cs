@@ -68,4 +68,20 @@ public class TransactionRepository : ITransactionRepository
             .Where(t => t.Transaction_Id == transactionId)
             .ExecuteUpdateAsync(s => s.SetProperty(t => t.Status, Status.Expired));
     }
+
+    public async Task<IEnumerable<Transactions>?> GetAllTransactionsByUserAsync(int userId)
+    {
+        CinemaDbContext db = await _factory.CreateDbContextAsync();
+
+        return await db.Transactions
+            .Where(t => t.User_Id == userId)
+            .Include(t => t.Showtime)
+                .ThenInclude(s => s.Movie)
+            .Include(t => t.Showtime)
+                .ThenInclude(s => s.Room)
+                    .ThenInclude(r => r.Cinema)
+            .Include(t => t.TransactionSeats)
+                .ThenInclude(ts => ts.Seat)
+            .ToListAsync();
+    }
 }

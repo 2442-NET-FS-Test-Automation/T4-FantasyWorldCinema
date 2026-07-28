@@ -10,6 +10,7 @@ import type { SeatItem, ShowtimeItem } from '../types';
 
 import { Button, Tag, Typography, message, Spin, Divider, ConfigProvider } from 'antd';
 import { PlusCircleFilled, MinusCircleFilled } from '@ant-design/icons';
+import { ProfilePage } from '../Components/ProfilePage';
 
 const { Title, Text } = Typography;
 
@@ -28,6 +29,7 @@ export const ShowtimeDetails = () => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     const [isLoginOpen, setIsLoginOpen] = useState(false);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
     
     const [currentTime, setCurrentTime] = useState<Date>(new Date());
 
@@ -116,9 +118,7 @@ export const ShowtimeDetails = () => {
     const getRemainingTime = () => {
         if (!showtime?.showDate || !showtime?.endTime || !showtime?.startTime) return "--";
 
-        const datePart = typeof showtime.showDate === 'string'
-            ? showtime.showDate
-            : showtime.showDate.toISOString().split('T')[0];
+        const datePart = showtime.showDate;
 
         const startDateTime = new Date(`${datePart}T${showtime.startTime}`);
         const endDateTime = new Date(`${datePart}T${showtime.endTime}`);
@@ -254,16 +254,28 @@ export const ShowtimeDetails = () => {
                             </div>
                         </div>
                         {user ? (
-                            <button
-                                type="button"
-                                onClick={handlePlaceOrder}
-                                disabled={isSubmitting || selectedSeatIds.length !== ticketCount}
-                                className="w-full h-12 cursor-pointer relative flex items-center justify-center rounded-xl text-black bg-[#d4af37] hover:bg-[#e6c24a] transition-all duration-300 font-bold uppercase tracking-wider text-sm shadow-[0_4px_20px_rgba(212,175,55,0.25)] hover:shadow-[0_4px_25px_rgba(212,175,55,0.45)] disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 active:translate-y-0"
-                            >
-                                <span>
-                                    {isSubmitting ? 'Processing...' : 'Confirm and Place Order'}
-                                </span>
-                            </button>
+                            user.role === 'Consumer' ? (
+                                <button
+                                    type="button"
+                                    onClick={handlePlaceOrder}
+                                    disabled={isSubmitting || selectedSeatIds.length !== ticketCount}
+                                    className="w-full h-12 cursor-pointer relative flex items-center justify-center rounded-xl text-black bg-[#d4af37] hover:bg-[#e6c24a] transition-all duration-300 font-bold uppercase tracking-wider text-sm shadow-[0_4px_20px_rgba(212,175,55,0.25)] hover:shadow-[0_4px_25px_rgba(212,175,55,0.45)] disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 active:translate-y-0"
+                                >
+                                    <span>
+                                        {isSubmitting ? 'Processing...' : 'Confirm and Place Order'}
+                                    </span>
+                                </button>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={() => setIsProfileOpen(true)}
+                                    className="w-full h-12 cursor-pointer relative flex items-center justify-center rounded-xl text-black bg-[#E0E0E0] hover:bg-[#ecebeb] transition-all duration-300 font-bold uppercase tracking-wider text-sm shadow-[0_4px_20px_rgba(196,196,196,0.25)] hover:shadow-[0_4px_25px_rgba(196,196,196,0.45)] disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 active:translate-y-0"
+                                >
+                                    <span>
+                                        {'LogIn as Consumer to Continue'}
+                                    </span>
+                                </button>
+                            )
                         ) : (
                             <button
                                 type="button"
@@ -277,6 +289,7 @@ export const ShowtimeDetails = () => {
                         )}
                     </div>
                     <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+                    <ProfilePage isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
                 </div>
             </div>
         </ConfigProvider>
