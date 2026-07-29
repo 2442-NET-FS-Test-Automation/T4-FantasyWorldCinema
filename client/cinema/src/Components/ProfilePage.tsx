@@ -178,7 +178,7 @@ export function ProfilePage({ isOpen, onClose }: ProfilePageProps) {
                     </Button>
                 }
                 placement="right"
-                width={460}
+                size={460}
                 onClose={onClose}
                 open={isOpen}
                 styles={{
