@@ -6,6 +6,7 @@ import { Navbar } from "./Components/Navbar";
 import { ManageCatalog } from "./pages/ManageCatalog";
 import { ProtectedRoute } from "./auth/ProtectedRoute";
 import { ShowtimeDetails } from "./pages/ShowtimeDetails";
+import { Display404 } from "./pages/Display404";
 
 export function AppContent() {
 
@@ -20,6 +21,7 @@ export function AppContent() {
               <Route path="/home" element={<SelectCinema />} />
               <Route path="/cinema/:CinemaId" element={<DisplayShowtimes />} />
               <Route path="/showtime/:showtimeId" element={<ShowtimeDetails />} />
+              <Route path="/404" element={<Display404 />} />
 
               {/* Protected routes - only CONSUMERS */}
               {/* <Route element={<ProtectedRoute allowedRoles={["Consumer"]} />}> */}
@@ -36,7 +38,7 @@ export function AppContent() {
               </Route>
 
               {/* Default redirection Page */}
-              <Route path="*" element={<Navigate to="/" replace />} />
+              <Route path="*" element={<Navigate to="/404" replace />} />
             </Routes>
           </main>
       </BrowserRouter>
