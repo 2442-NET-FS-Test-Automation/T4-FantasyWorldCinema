@@ -37,6 +37,26 @@ public class ShowtimeRepository : IShowtimeRepository
         return newShowtime;
     }
 
+    public async Task<Showtimes> UpdateShowtimeAsync(int showtimeId, int movie_Id, int room_Id, string showdate, 
+        string startTime, string endTime, decimal price)
+    {
+        CinemaDbContext db = await _factory.CreateDbContextAsync();
+        Showtimes? data = await db.Showtimes.FirstOrDefaultAsync(s => s.Showtime_Id == showtimeId);
+        if (data != null)
+        {
+            data.Movie_Id = movie_Id;
+            data.Room_Id = room_Id;
+            data.ShowDate = DateOnly.Parse(showdate);
+            data.StartTime = TimeOnly.Parse(startTime);
+            data.EndTime = TimeOnly.Parse(endTime);
+            data.Price = price;
+
+            await db.SaveChangesAsync();
+        }
+        
+        return data!;
+    }
+
     public async Task<IReadOnlyList<Showtimes>> GetShowtimesByCinemaAsync(int cinema_Id)
     {
         CinemaDbContext db = await _factory.CreateDbContextAsync();

@@ -36,7 +36,17 @@ public class ShowtimeController : ControllerBase
         Showtimes newShowtime = await _service.AddShowtimeAsync(data);
         ShowtimeDto mapped = _mapper.Map<ShowtimeDto>(newShowtime);
 
-        return CreatedAtAction(nameof(GetShowtimeByIdAsync), new { id = newShowtime.Showtime_Id, newShowtime});
+        return CreatedAtAction(nameof(GetShowtimeByIdAsync), new { id = mapped.Showtime_Id, mapped});
+    }
+
+    [HttpPut]
+    [Authorize(Roles = "admin")]
+    public async Task<ActionResult<ShowtimeDto>> PutShowtimeAsync(ShowtimeUpdateDto data)
+    {
+        Showtimes updated = await _service.UpdateShowtimeAsync(data);
+        ShowtimeDto mapped = _mapper.Map<ShowtimeDto>(updated);
+
+        return CreatedAtAction(nameof(GetShowtimeByIdAsync), new { id = mapped.Showtime_Id, mapped});
     }
 
     [HttpGet("Cinema-{cinema_Id}")]
