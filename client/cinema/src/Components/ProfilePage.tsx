@@ -38,7 +38,7 @@ export function ProfilePage({ isOpen, onClose }: ProfilePageProps) {
     const [profileBackup, setProfileBackup] = useState<any>(null);
     const [isEditing, setIsEditing] = useState<boolean>(false);
 
-    // Monitoreamos los campos en tiempo real para detectar cambios reales
+    // We monitor the fields in real time to detect real changes
     const formValues = Form.useWatch([], form);
     const hasChanges = isEditing && profileBackup && (
         formValues?.fullName !== profileBackup.fullName ||
@@ -178,7 +178,7 @@ export function ProfilePage({ isOpen, onClose }: ProfilePageProps) {
                     </Button>
                 }
                 placement="right"
-                width={460}
+                size={460}
                 onClose={onClose}
                 open={isOpen}
                 styles={{
@@ -192,7 +192,7 @@ export function ProfilePage({ isOpen, onClose }: ProfilePageProps) {
                         padding: '20px 24px'
                     },
                     body: {
-                        /* Degradado ambiental suave en el Drawer */
+                        /* Smooth ambient gradient in the Drawer */
                         background: 'radial-gradient(circle at top right, rgba(212, 175, 55, 0.08) 0%, rgba(20, 20, 26, 0.6) 45%, #0f0f12 100%)',
                         padding: '24px'
                     }
@@ -204,7 +204,7 @@ export function ProfilePage({ isOpen, onClose }: ProfilePageProps) {
                     <Spin spinning={loading}>
                         <div className="flex flex-col items-center gap-6 w-full">
                             
-                            {/* --- TARJETA DEL PERFIL --- */}
+                            {/* --- PROFILE CARD --- */}
                             <div className="flex flex-col items-center text-center w-full p-6 rounded-2xl bg-zinc-900/60 backdrop-blur-md border border-white/10 shadow-lg">
                                 <Avatar 
                                     size={88} 
@@ -230,7 +230,7 @@ export function ProfilePage({ isOpen, onClose }: ProfilePageProps) {
                                 </div>
                             </div>
 
-                            {/* --- FORMULARIO DE EDICIÓN --- */}
+                            {/* --- EDIT FORM --- */}
                             <Form 
                                 form={form} 
                                 onFinish={handleFormSubmit} 
@@ -287,7 +287,7 @@ export function ProfilePage({ isOpen, onClose }: ProfilePageProps) {
                                     />
                                 </Form.Item>
 
-                                {/* --- BOTONES DE ACCIÓN --- */}
+                                {/* --- ACTION BUTTONS --- */}
                                 <div className="pt-4 flex items-center gap-3 w-full">
                                     {!isEditing ? (
                                         <button

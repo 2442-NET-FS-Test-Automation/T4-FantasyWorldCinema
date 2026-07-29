@@ -46,7 +46,7 @@ export function CinemaSearchBar({ cinemas }: CinemaSearchBarProps) {
                         optionSelectedBg: 'rgba(212, 175, 55, 0.25)',   
                         optionSelectedColor: '#d4af37',                 
                         
-                        // Hacemos que el ícono sea dorado al pasar el mouse
+                        // We make the icon gold when you hover the mouse over it.
                         colorIcon: '#64748b',
                         colorIconHover: '#d4af37',
                     }
