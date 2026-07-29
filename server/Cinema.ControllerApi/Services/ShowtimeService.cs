@@ -20,7 +20,7 @@ public class ShowtimeService : IShowtimeService
         =>  _repo.AddShowtimeAsync(ns.Movie_Id, ns.Room_Id, ns.Showdate, ns.StartTime, ns.EndTime, ns.Price);
     
 
-    public Task<Showtimes> UpdateShowtimeAsync(ShowtimeUpdateDto us)
+    public Task<Showtimes?> UpdateShowtimeAsync(ShowtimeUpdateDto us)
         => _repo.UpdateShowtimeAsync(us.Showtime_Id, us.Movie_Id, us.Room_Id, us.Showdate, us.StartTime, us.EndTime, us.Price);
 
     public async Task<bool> RemoveShowtimeAsync(int showtime_Id) => await _repo.RemoveShowtimeAsync(showtime_Id);

@@ -22,4 +22,8 @@ public class MoviesService : IMoviesService
     }
 
     public Task<IReadOnlyList<Movies>> GetAllMoviesAsync() => _repo.GetAllMoviesAsync();
+
+    public async Task<Movies?> UpdateMoviesAsync(MoviesDTO data) => await _repo.UpdateMovieAsync(data.Movie_Id,
+        data.Title, data.Genre, data.DurationMinutes, data.Rating, data.Synopsis, data.Poster);
+
 }

@@ -49,4 +49,28 @@ public class MoviesRepository : IMoviesRepository
         CinemaDbContext db = await _factory.CreateDbContextAsync();
         return await db.Movies.ToListAsync();
     }
+
+    public async Task<Movies?> UpdateMovieAsync(int movie_Id, string title, string genre, 
+        int durationMinutes, string rating, string synopsis, string poster)
+    {
+        CinemaDbContext db = await _factory.CreateDbContextAsync();
+
+        Movies? data = await db.Movies.FirstOrDefaultAsync(m => m.Movie_Id == movie_Id);
+        if(data == null) return null;
+
+        Enum.TryParse<Genre>(genre, out Genre newGenre);
+        Enum.TryParse<Rating>(rating, out Rating newRating);
+
+        data.Title = title;
+        data.Genre = newGenre;
+        data.Rating = newRating;
+        data.DurationMinutes = durationMinutes;
+        data.Synopsis = synopsis;
+        data.PosterUrl = poster;
+
+        db.SaveChanges();
+
+        return data;
+
+    }
 }

@@ -40,11 +40,23 @@ public class MoviesController : ControllerBase
 
 
     [HttpPost]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<MoviesDTO>> PostMovieAsync(MovieCreateDto newMovie)
     {
         Movies created = await _service.SetMoviesAsync(newMovie);
         MoviesDTO mapped = _mapper.Map<MoviesDTO>(created);
         return CreatedAtAction( nameof(GetMoviesAsync), new { id = mapped.Movie_Id }, mapped);
+    }
+
+    [HttpPut]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<MoviesDTO>> UpdateMovieAsync(MoviesDTO movie)
+    {
+        Movies? updated = await _service.UpdateMoviesAsync(movie);
+
+        if(updated == null) return NotFound();
+
+        MoviesDTO mapped = _mapper.Map<MoviesDTO>(updated);
+         return CreatedAtAction( nameof(GetMoviesAsync), new { id = mapped.Movie_Id }, mapped);
     }
 }
