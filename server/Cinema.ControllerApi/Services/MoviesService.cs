@@ -26,4 +26,6 @@ public class MoviesService : IMoviesService
     public async Task<Movies?> UpdateMoviesAsync(MoviesDTO data) => await _repo.UpdateMovieAsync(data.Movie_Id,
         data.Title, data.Genre, data.DurationMinutes, data.Rating, data.Synopsis, data.Poster);
 
+    public Task<bool> RemoveMovieAsync(int movie_Id) => _repo.RemoveMovieAsync(movie_Id);
+
 }

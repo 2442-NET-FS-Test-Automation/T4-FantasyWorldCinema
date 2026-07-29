@@ -73,4 +73,16 @@ public class MoviesRepository : IMoviesRepository
         return data;
 
     }
+
+    public async Task<bool> RemoveMovieAsync(int movie_Id)
+    {
+        CinemaDbContext db = await _factory.CreateDbContextAsync();
+
+        Movies? toDelete = await db.Movies.FirstOrDefaultAsync(m => m.Movie_Id == movie_Id);
+        if(toDelete == null) return false;
+
+        db.Movies.Remove(toDelete);
+        await db.SaveChangesAsync();
+        return true; 
+    }
 }

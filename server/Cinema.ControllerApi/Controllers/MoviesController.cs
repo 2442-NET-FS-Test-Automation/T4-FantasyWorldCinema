@@ -59,4 +59,15 @@ public class MoviesController : ControllerBase
         MoviesDTO mapped = _mapper.Map<MoviesDTO>(updated);
          return CreatedAtAction( nameof(GetMoviesAsync), new { id = mapped.Movie_Id }, mapped);
     }
+
+    [HttpDelete]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<bool>> RemoveMovieAsync(int movie_Id)
+    {
+        bool isDeleted = await _service.RemoveMovieAsync(movie_Id);
+
+        if(isDeleted) return NoContent();
+
+        return NotFound();
+    }
 }
