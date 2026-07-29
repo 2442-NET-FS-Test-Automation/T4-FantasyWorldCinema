@@ -12,10 +12,10 @@ export function CreateShowtimeModal({ open, onClose, onSubmit, confirmLoading }:
 
     const handleOk = async () => {
         try {
-            // Valida los campos antes de enviar
+            // Validate the fields before submitting
             const values = await form.validateFields();
             onSubmit(values);
-            form.resetFields(); // Limpia el formulario al tener éxito
+            form.resetFields(); // Clears the form upon success
         } catch (error) {
             console.log("Validation failed:", error);
         }
@@ -35,6 +35,7 @@ export function CreateShowtimeModal({ open, onClose, onSubmit, confirmLoading }:
             confirmLoading={confirmLoading}
             okText="Create"
             cancelText="Cancel"
+            destroyOnHidden
             className="rounded-lg!"
         >
             <Form
@@ -44,9 +45,8 @@ export function CreateShowtimeModal({ open, onClose, onSubmit, confirmLoading }:
                 initialValues={{ room: "Sala 1" }}
                 className="mt-4"
             >
-                {/* Campo: Película asociada */}
                 <Form.Item
-                    name="movie" // Cambio menor: se alinea con showtime.movie
+                    name="movie"
                     label="Select Movie"
                     rules={[{ required: true, message: "Please select a movie" }]}
                 >
@@ -56,7 +56,6 @@ export function CreateShowtimeModal({ open, onClose, onSubmit, confirmLoading }:
                     </Select>
                 </Form.Item>
 
-                {/* Campo: Sala (ROOM) -> Corregido de acuerdo a showtime.room */}
                 <Form.Item
                     name="room"
                     label="Cinema Room / Hall"
@@ -71,7 +70,6 @@ export function CreateShowtimeModal({ open, onClose, onSubmit, confirmLoading }:
                 </Form.Item>
 
                 <div className="grid grid-cols-2 gap-4">
-                    {/* Campo: Fecha de la función (SHOWDATE) */}
                     <Form.Item
                         name="showDate"
                         label="Show Date"
@@ -83,7 +81,6 @@ export function CreateShowtimeModal({ open, onClose, onSubmit, confirmLoading }:
                         />
                     </Form.Item>
 
-                    {/* Campo: Hora de inicio (STARTTIME) -> Corregido de acuerdo a showtime.startTime */}
                     <Form.Item
                         name="startTime"
                         label="Start Time"

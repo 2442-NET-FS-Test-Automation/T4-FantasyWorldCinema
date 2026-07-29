@@ -13,13 +13,13 @@ export function ManageCatalog() {
         if(selectedView === "movies") {
             setIsModalMovieOpen(true);
         } else if(selectedView === "showtimes") {
-            setIsModalShowtimeOpen(true); // SE AGREGA LA LLAMADA AL FORMULARIO
+            setIsModalShowtimeOpen(true); // THE CALL IS ADDED TO THE FORM
         }
     };
 
-    // 2. ESTADOS PARA CONTROLAR EL MODAL
+    // 2. STATES TO CONTROL THE MODAL
     const [isModalMovieOpen, setIsModalMovieOpen] = useState(false);
-    const [isModalShowtimeOpen, setIsModalShowtimeOpen] = useState(false); // SE AGREGA EL ESTADO PARA SHOWTIMES
+    const [isModalShowtimeOpen, setIsModalShowtimeOpen] = useState(false);
     
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -30,7 +30,7 @@ export function ManageCatalog() {
         setTimeout(() => {
             setIsSubmitting(false);
             setIsModalMovieOpen(false);
-            setIsModalShowtimeOpen(false); // SE ASEGURA DE CERRAR CUALQUIER MODAL ACTIVO
+            setIsModalShowtimeOpen(false); // MAKES SURE TO CLOSE ANY ACTIVE MODALS
             message.success("Item created successfully!");
         }, 1500);
     };
@@ -38,7 +38,7 @@ export function ManageCatalog() {
     return (
         <div className="min-h-[calc(100vh-120px)] mt-[120px] p-6 flex flex-col gap-6">
 
-            {/* VISTA 1: ESTADO INICIAL */}
+            {/* VIEW 1: INITIAL STATE */}
             {selectedView === null ? (
                 <Flex vertical align="center" justify="center" className="min-h-[50vh] flex-grow">
                     <Card className="p-6 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] w-full max-w-[400px] text-center">
@@ -70,7 +70,7 @@ export function ManageCatalog() {
                 </Flex>
             ) : (
 
-                /* VISTA 2: ESTADO ACTIVO */
+                /* VIEW 2: ACTIVE STATE */
                 <>
                     <Typography.Title level={3} className='text-white! m-0! mb-1! font-bold leading-tight line-clamp-2'>
                         Catalog Panel
@@ -128,7 +128,7 @@ export function ManageCatalog() {
                         confirmLoading={isSubmitting}
                     />
                     
-                    {/* SE CORRIGEN LOS PROPS DEL COMPONENTE CON SUS ESTADOS CORRESPONDIENTES */}
+                    {/* COMPONENT PROPS ARE CORRECTED WITH THEIR CORRESPONDING STATES */}
                     <CreateShowtimeModal
                         open={isModalShowtimeOpen}
                         onClose={() => setIsModalShowtimeOpen(false)}

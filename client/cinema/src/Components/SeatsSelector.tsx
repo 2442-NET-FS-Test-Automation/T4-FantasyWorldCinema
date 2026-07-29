@@ -15,7 +15,7 @@ export const SeatSelector: React.FC<SeatSelectorProps> = ({
   onSeatToggle,
   maxSelectable
 }) => {
-  // Agrupar los asientos por fila
+  // Group seats by row
   const rows = seats.reduce((acc, seat) => {
     if (!acc[seat.row]) acc[seat.row] = [];
     acc[seat.row].push(seat);
@@ -28,7 +28,7 @@ export const SeatSelector: React.FC<SeatSelectorProps> = ({
   return (
     <div className="flex flex-col w-full max-w-lg mx-auto font-sans">
       
-      {/* Encabezado Adaptado al Tema Oscuro */}
+      {/* Header Adapted to Dark Theme */}
       <div className="flex justify-between items-end mb-4 px-2">
         <h3 className="text-xl font-semibold text-white tracking-tight">Select your seats</h3>
         <span className={`text-sm font-semibold px-3 py-1 rounded-full transition-colors duration-300 ${
@@ -40,26 +40,26 @@ export const SeatSelector: React.FC<SeatSelectorProps> = ({
         </span>
       </div>
 
-      {/* Contenedor Principal (Fondo oscuro con borde dorado sutil) */}
+      {/* Main Container (Dark background with subtle gold border) */}
       <div className="bg-[#1e1e24] rounded-2xl shadow-inner border border-[rgba(212,175,55,0.15)] p-8 sm:p-10 flex flex-col items-center transition-all">
         
-        {/* Pantalla Rediseñada (Brillo Dorado) */}
+        {/* Redesigned Screen (Gold Gloss) */}
         <div className="w-full max-w-xs flex flex-col items-center mb-12">
           <div className="w-full h-1.5 bg-linear-to-r from-transparent via-[#d4af37] to-transparent rounded-full shadow-[0_4px_15px_rgba(212,175,55,0.4)]"></div>
           <span className="text-[10px] font-bold text-[#64748b] tracking-[0.3em] mt-4">SCREEN</span>
         </div>
 
-        {/* Cuadrícula de Asientos */}
+        {/* Seating Grid */}
         <div className="flex flex-col gap-4">
           {sortedRowKeys.map((rowKey) => (
             <div key={rowKey} className="flex items-center gap-6">
               
-              {/* Etiqueta de Fila */}
+              {/* Row Label */}
               <span className="w-4 text-sm font-bold text-[#94a3b8] text-center select-none">
                 {rowKey}
               </span>
 
-              {/* Fila de Asientos */}
+              {/* Row of Seats */}
               <div className="flex gap-3 sm:gap-4">
                 {rows[rowKey].sort((a, b) => parseInt(a.number) - parseInt(b.number)).map((seat) => {
                   
@@ -98,7 +98,7 @@ export const SeatSelector: React.FC<SeatSelectorProps> = ({
         </div>
       </div>
       
-      {/* Leyenda con Íconos (Colores Actualizados) */}
+      {/* Legend with Icons (Updated Colors) */}
       <div className="flex justify-center gap-6 mt-6">
         <div className="flex items-center gap-2">
           <MdEventSeat className="text-[#94a3b8] text-xl" /> 

@@ -1,4 +1,5 @@
-import { Modal, Form, Input, InputNumber, Select } from "antd";
+import { Modal, Form, Input, InputNumber, Select, ConfigProvider, theme } from "antd";
+import { CreateMovie } from "../api/Movies";
 
 interface CreateMovieModalProps {
     open: boolean;
@@ -12,10 +13,12 @@ export function CreateMovieModal({ open, onClose, onSubmit, confirmLoading }: Cr
 
     const handleOk = async () => {
         try {
-            // Valida los campos antes de enviar
             const values = await form.validateFields();
+            console.log(values);
+            
+            await CreateMovie(values);
             onSubmit(values);
-            form.resetFields(); // Limpia el formulario al tener éxito
+            form.resetFields();
         } catch (error) {
             console.log("Validation failed:", error);
         }
@@ -27,92 +30,120 @@ export function CreateMovieModal({ open, onClose, onSubmit, confirmLoading }: Cr
     };
 
     return (
-        <Modal
-            title="Create New Movie"
-            open={open}
-            onOk={handleOk}
-            onCancel={handleCancel}
-            confirmLoading={confirmLoading}
-            okText="Create"
-            cancelText="Cancel"
-            destroyOnClose
-            className="rounded-lg!"
+        // We encapsulate in a local ConfigProvider to force the dark theme and gold accents in the modal
+        <ConfigProvider
+            theme={{
+                algorithm: theme.darkAlgorithm,
+                token: {
+                    colorPrimary: "#d4af37",
+                    colorBgContainer: "#1e1e24",
+                    colorBgElevated: "#121214",
+                    borderRadius: 12,
+                },
+            }}
         >
-            <Form
-                form={form}
-                layout="vertical"
-                name="create_movie_form"
-                initialValues={{ genre: [], rating: "G" }}
-                className="mt-4"
+            <Modal
+                title="Create New Movie"
+                open={open}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                confirmLoading={confirmLoading}
+                okText="Create"
+                cancelText="Cancel"
+                destroyOnHidden
+                okButtonProps={{ htmlType: "button" }} 
+                styles={{
+                    mask: { backdropFilter: "blur(4px)" },
+                }}
+                className="font-sans"
             >
-                {/* Campo: Título */}
-                <Form.Item
-                    name="title"
-                    label="Movie Title"
-                    rules={[{ required: true, message: "Please enter the movie title" }]}
+                <Form
+                    form={form}
+                    layout="vertical"
+                    name="create_movie_form"
+                    // We initialize according to Swagger's scheme (genre is now an empty string, not an array)
+                    initialValues={{ genre: "", rating: "G", durationMinutes: 120 }}
+                    className="mt-4"
+                    onSubmitCapture={(e) => e.preventDefault()} 
                 >
-                    <Input placeholder="e.g. Inception" className="rounded-md!" />
-                </Form.Item>
 
-                <div className="grid grid-cols-2 gap-4">
-                    {/* Campo: Duración */}
                     <Form.Item
-                        name="duration"
-                        label="Duration (minutes)"
-                        rules={[
-                            { required: true, message: "Required" },
-                            { type: "number", min: 1, message: "Must be greater than 0" }
-                        ]}
+                        name="title"
+                        label="Movie Title"
+                        rules={[{ required: true, message: "Please enter the movie title" }]}
                     >
-                        <InputNumber className="w-full! rounded-md!" placeholder="120" />
+                        <Input placeholder="e.g. Inception" className="h-10" />
                     </Form.Item>
 
-                    {/* Campo: Clasificación */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <Form.Item
+                            name="durationMinutes"
+                            label="Duration (minutes)"
+                            rules={[
+                                { required: true, message: "Required" },
+                                { type: "number", min: 1, message: "Must be greater than 0" }
+                            ]}
+                        >
+                            <InputNumber className="w-full! h-10! flex items-center" placeholder="120" />
+                        </Form.Item>
+
+                        <Form.Item
+                            name="rating"
+                            label="Rating"
+                            rules={[{ required: true, message: "Required" }]}
+                        >
+                            <Select className="h-10">
+                                <Select value="G">G (General)</Select>
+                                <Select value="PG">PG</Select>
+                                <Select value="PG-13">PG-13</Select>
+                                <Select value="R">R</Select>
+                                <Select value="NC-17">NC-17 - Adults Only</Select>
+                            </Select>
+                        </Form.Item>
+                    </div>
+
                     <Form.Item
-                        name="rating"
-                        label="Rating"
-                        rules={[{ required: true, message: "Required" }]}
+                        name="genre"
+                        label="Genre"
+                        rules={[{ required: true, message: "Please select a genre" }]}
                     >
-                        <Select className="rounded-md!">
-                            <Select value="G">G (General)</Select>
-                            <Select value="PG">PG</Select>
-                            <Select value="PG-13">PG-13</Select>
-                            <Select value="R">R</Select>
-                            <Select value="R">NC-17 - Adults Only</Select>
+                        <Select placeholder="Select genre" className="h-10">
+                            <Select value="Action">Action</Select>
+                            <Select value="Comedy">Comedy</Select>
+                            <Select value="Drama">Drama</Select>
+                            <Select value="Horror">Horror</Select>
+                            <Select value="Sci-Fi">Sci-Fi</Select>
+                            <Select value="Romance">Romance</Select>
+                            <Select value="Animation">Animation</Select>
+                            <Select value="Fantasy">Fantasy</Select>
                         </Select>
                     </Form.Item>
-                </div>
 
-                {/* Campo: Géneros */}
-                <Form.Item
-                    name="genre"
-                    label="Genres"
-                    rules={[{ required: true, message: "Please select at least one genre"}]}
-                >
-                    <Select placeholder="Select genres" className="rounded-md!">
-                        <Select value="Action">Action</Select>
-                        <Select value="Comedy">Comedy</Select>
-                        <Select value="Drama">Drama</Select>
-                        <Select value="Horror">Horror</Select>
-                        <Select value="Sci-Fi">Sci-Fi</Select>
-                        <Select value="Romance">Romance</Select>
-                        <Select value="Animation">Animation</Select>
-                        <Select value="Fantasy">Fantasy</Select>
-                    </Select>
-                </Form.Item>
+                    <Form.Item
+                        name="synopsis"
+                        label="Synopsis"
+                        rules={[{ required: true, message: "Please enter the movie synopsis" }]}
+                    >
+                        <Input.TextArea
+                            placeholder="Write a brief description of the movie..."
+                            rows={3}
+                            showCount
+                            maxLength={500}
+                        />
+                    </Form.Item>
 
-                {/* Campo: Póster (URL) */}
-                <Form.Item
-                    name="poster"
-                    label="Poster URL"
-                    rules={[
-                        { required: true, message: "Please enter the poster image URL" },
-                        { type: "url", message: "Please enter a valid URL" }
-                    ]}
-                >
-                    <Input placeholder="https://example.com" className="rounded-md!" />
-                </Form.Item>
-            </Form>
-        </Modal>
+                    <Form.Item
+                        name="poster"
+                        label="Poster URL"
+                        rules={[
+                            { required: true, message: "Please enter the poster image URL" },
+                            { type: "url", message: "Please enter a valid URL" }
+                        ]}
+                    >
+                        <Input placeholder="https://example.com" className="h-10" />
+                    </Form.Item>
+                </Form>
+            </Modal>
+        </ConfigProvider>
     );
 }
