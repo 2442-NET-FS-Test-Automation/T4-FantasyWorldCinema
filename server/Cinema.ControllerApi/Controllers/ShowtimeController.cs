@@ -30,13 +30,36 @@ public class ShowtimeController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ShowtimeDto>> PostShowtimeAsync(ShowtimeCreateDto data)
     {
         Showtimes newShowtime = await _service.AddShowtimeAsync(data);
         ShowtimeDto mapped = _mapper.Map<ShowtimeDto>(newShowtime);
 
-        return CreatedAtAction(nameof(GetShowtimeByIdAsync), new { id = newShowtime.Showtime_Id, newShowtime});
+        return CreatedAtAction(nameof(GetShowtimeByIdAsync), new { id = mapped.Showtime_Id, mapped});
+    }
+
+    [HttpPut]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<ShowtimeDto>> PutShowtimeAsync(ShowtimeUpdateDto data)
+    {
+        Showtimes? updated = await _service.UpdateShowtimeAsync(data);
+
+        if(updated == null) return NotFound();
+
+        ShowtimeDto mapped = _mapper.Map<ShowtimeDto>(updated);
+
+        return CreatedAtAction(nameof(GetShowtimeByIdAsync), new { id = mapped.Showtime_Id, mapped});
+    }
+
+    [HttpDelete("{showtime_Id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<bool>> DeleteShowtimeAsync(int showtime_Id){
+        bool isDeleted = await _service.RemoveShowtimeAsync(showtime_Id);
+        if (isDeleted) return NoContent();
+
+        return NotFound();
+        
     }
 
     [HttpGet("Cinema-{cinema_Id}")]
