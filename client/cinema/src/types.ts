@@ -43,3 +43,18 @@ export interface CreateTransactionItem {
     showtimeId: number;
     seatIds: number[];
 }
+
+export interface TransactionItem {
+    transactionId: number;
+    purchasedDate: string;
+    totalAmount: number;
+    status: string;
+    movieTitle: string;
+    showDate: string;
+    startTime: TimeString;
+    EndTime: TimeString;
+    cinemaName: string;
+    roomName: string;
+    purchasedSeats: string[]
+    poster: string;
+}

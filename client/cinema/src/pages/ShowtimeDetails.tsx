@@ -112,7 +112,7 @@ export const ShowtimeDetails = () => {
     }
     
     if (error || !showtime) {
-        return <div className="p-10 text-center text-red-500 font-medium">{error}</div>;
+        return <div className="p-10 pt-20 text-center text-red-500 font-medium">{error}</div>;
     }
 
     const getRemainingTime = () => {

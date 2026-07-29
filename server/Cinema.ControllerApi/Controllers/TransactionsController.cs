@@ -63,7 +63,7 @@ public class TransactionsController : ControllerBase
     /// </summary>
     /// <param name="transactionId"></param>
     /// <returns>Information about the specific transaction.</returns>
-    [HttpGet("{transactionId}", Name = "GetTransactionById")]
+    [HttpGet("{transactionId:int}", Name = "GetTransactionById")]
     public async Task<IActionResult> GetTransactionByIdAsync(int transactionId)
     {
         // 1. Getting user ID from the JWT
@@ -91,5 +91,55 @@ public class TransactionsController : ControllerBase
         return Ok(transactionResult.Data);
     }
 
-    
+    [HttpGet("user/")]
+    public async Task<ActionResult> GetAllTransactionsByUserAsync()
+    { 
+        // 1. Getting user ID from the JWT
+        string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized("Invalid user token claim.");
+        }
+
+        // 2. Sends the request to service and repository layer.
+        ServiceResult<IEnumerable<TransactionResponseDto>> transactionsResult = await _transactionService.GetAllTransactionsByUserAsync(userId);
+
+        // 3. Managging the result.
+        if (!transactionsResult.IsSuccess)
+        {
+            if (transactionsResult.ErrorType == ErrorType.NotFound)
+            {
+                return NotFound(new { message = "No transactions found."});
+            }
+            return BadRequest(new { message = transactionsResult.ErrorMessage});
+        }
+        
+        // 4. Returning 200 OK with DTO
+        return Ok(transactionsResult.Data);
+    }
+
+    [HttpPatch("user/{transactionId}")]
+    public async Task<ActionResult> UpdateTransactionToCompletedAsync(int transactionId)
+    {
+        // 1. Getting user ID from the JWT
+        string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized("Invalid user token claim.");
+        }
+
+        ServiceResult<TransactionResponseDto> serviceResult = await _transactionService.SetPaidTransaction(transactionId, userId);
+
+        // 3. Managging the result.
+        if (!serviceResult.IsSuccess)
+        {
+            if (serviceResult.ErrorType == ErrorType.NotFound)
+            {
+                return NotFound(new { message = "Could not set transaction to completed."});
+            }
+            return BadRequest(new { message = serviceResult.ErrorMessage});
+        }
+
+        return Ok(serviceResult.Data);
+    }
 }

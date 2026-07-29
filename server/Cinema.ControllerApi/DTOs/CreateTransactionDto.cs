@@ -25,6 +25,7 @@ public class TransactionResponseDto
     public TimeOnly EndTime { get; set; }
     public string CinemaName { get; set; }
     public string RoomName { get; set; }
+    public string Poster {get; set;}
 
     // seats details (e.g. ["A-1", "A-2"])
     public List<string> PurchasedSeats { get; set; }

@@ -1,69 +1,103 @@
-import React, { useState, useMemo } from 'react';
-import { ConfigProvider, Input, Select, Typography, Empty } from 'antd';
+import React, { useState, useMemo, useEffect } from 'react';
+import { ConfigProvider, Input, Select, Typography, Empty, message, Spin } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
+import type { TransactionItem } from '../types';
+import { getAllTransactionsByUser } from '../api/Transaction';
+import { TransactionModal } from '../Components/TransactionModal';
 
 const { Title, Text } = Typography;
 
-// 1. Interfaces preparadas para tu Backend
-export interface TransactionItem {
-    transaction_Id: number;
-    movieName: string;
-    poster: string;
-    cinemaName: string;
-    status: 'Pending' | 'Completed' | 'Used' | 'Cancelled' | 'Expired' | 'Failed';
-}
-
-// Datos de prueba para previsualizar el diseño
-const mockTransactions: TransactionItem[] = [
-    { transaction_Id: 1, movieName: "Dune: Part Two", poster: "https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2IGpbRXYS.jpg", cinemaName: "FAWO Guadalajara", status: "Completed" },
-    { transaction_Id: 2, movieName: "Deadpool & Wolverine", poster: "https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg", cinemaName: "FAWO Zapopan", status: "Pending" },
-    { transaction_Id: 3, movieName: "Oppenheimer", poster: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg", cinemaName: "FAWO CDMX", status: "Used" },
-    { transaction_Id: 4, movieName: "Spider-Man: Across the Spider-Verse", poster: "https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg", cinemaName: "FAWO Monterrey", status: "Cancelled" },
-    { transaction_Id: 5, movieName: "The Batman", poster: "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg", cinemaName: "FAWO Guadalajara", status: "Expired" },
-    { transaction_Id: 6, movieName: "Interstellar", poster: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MvrIdQSt.jpg", cinemaName: "FAWO Zapopan", status: "Failed" },
-];
 
 export const MyTickets = () => {
-    // Estados para los filtros
+    
+    const [transactions, setTransactions] = useState<TransactionItem[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState<string | null>(null);
     const [cinemaFilter, setCinemaFilter] = useState<string | null>(null);
 
-    // Estado para el modal futuro
+    
     const [selectedTransaction, setSelectedTransaction] = useState<TransactionItem | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // Diccionario de colores basado en tu boceto, adaptado al tema oscuro
+    useEffect(() => {
+        const fetchDetails = async () => {
+            try {
+                setLoading(true);
+
+                const transactionData = await getAllTransactionsByUser();
+                setTransactions(transactionData);
+            } catch (err) {
+                setError("Transactions couldn't be loaded");
+                message.error("Error connecting the server");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchDetails();
+    }, []);
+
+    
     const getStatusStyle = (status: string) => {
         switch (status) {
-            case 'Pending': return 'bg-[#f97316] text-white shadow-[0_0_10px_rgba(249,115,22,0.5)]'; // Naranja
-            case 'Completed': return 'bg-[#22c55e] text-white shadow-[0_0_10px_rgba(34,197,94,0.5)]'; // Verde
-            case 'Used': return 'bg-[#3b82f6] text-white shadow-[0_0_10px_rgba(59,130,246,0.5)]'; // Azul
-            case 'Cancelled': return 'bg-[#9f1239] text-white shadow-[0_0_10px_rgba(159,18,57,0.5)]'; // Rojo oscuro
-            case 'Expired': return 'bg-[#a855f7] text-white shadow-[0_0_10px_rgba(168,85,247,0.5)]'; // Morado
-            case 'Failed': return 'bg-[#eab308] text-black shadow-[0_0_10px_rgba(234,179,8,0.5)]'; // Amarillo
+            case 'Pending': return 'bg-[#f97316] text-white shadow-[0_0_10px_rgba(249,115,22,0.5)]'; 
+            case 'Completed': return 'bg-[#22c55e] text-white shadow-[0_0_10px_rgba(34,197,94,0.5)]'; 
+            case 'Used': return 'bg-[#3b82f6] text-white shadow-[0_0_10px_rgba(59,130,246,0.5)]'; 
+            case 'Cancelled': return 'bg-[#9f1239] text-white shadow-[0_0_10px_rgba(159,18,57,0.5)]'; 
+            case 'Expired': return 'bg-[#a855f7] text-white shadow-[0_0_10px_rgba(168,85,247,0.5)]'; 
+            case 'Failed': return 'bg-[#eab308] text-black shadow-[0_0_10px_rgba(234,179,8,0.5)]'; 
             default: return 'bg-gray-500 text-white';
         }
     };
 
-    // Lógica de filtrado en tiempo real
+    
     const filteredTransactions = useMemo(() => {
-        return mockTransactions.filter(tx => {
-            const matchSearch = tx.movieName.toLowerCase().includes(searchQuery.toLowerCase());
+        return transactions.filter(tx => {
+            const matchSearch = tx.movieTitle.toLowerCase().includes(searchQuery.toLowerCase());
             const matchStatus = statusFilter ? tx.status === statusFilter : true;
             const matchCinema = cinemaFilter ? tx.cinemaName === cinemaFilter : true;
             return matchSearch && matchStatus && matchCinema;
         });
-    }, [searchQuery, statusFilter, cinemaFilter]);
+    }, [searchQuery, statusFilter, cinemaFilter, transactions]);
 
-    // Extraer cines únicos para el dropdown de filtros
-    const uniqueCinemas = Array.from(new Set(mockTransactions.map(tx => tx.cinemaName)));
+    
+    const uniqueCinemas = Array.from(new Set(transactions.map(tx => tx.cinemaName)));
 
     const handleCardClick = (tx: TransactionItem) => {
         setSelectedTransaction(tx);
         setIsModalOpen(true);
-        // Aquí conectaremos el modal más adelante
+        
         console.log("Abrir modal para:", tx);
+    };
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center min-h-[60vh]">
+                <Spin size="large" tip="Loading..." />
+            </div>
+        );
+    }
+
+    if (error) {
+        return <div className="p-10 pt-20 text-center text-red-500 font-medium">{error}</div>;
+    }
+
+    const handlePaymentSuccess = (transactionId: number) => {
+        setTransactions(prevTransactions => 
+            prevTransactions.map(tx => 
+                tx.transactionId === transactionId 
+                    ? { ...tx, status: 'Completed' } 
+                    : tx
+            )
+        );
+        
+        // Si tienes la transacción seleccionada guardada en el estado, también actualízala
+        if (selectedTransaction?.transactionId === transactionId) {
+            setSelectedTransaction(prev => prev ? { ...prev, status: 'Completed' } : null);
+        }
     };
 
     return (
@@ -143,7 +177,7 @@ export const MyTickets = () => {
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-6 gap-y-10">
                         {filteredTransactions.map((tx) => (
                             <div 
-                                key={tx.transaction_Id} 
+                                key={tx.transactionId} 
                                 className="group flex flex-col gap-3 cursor-pointer"
                                 onClick={() => handleCardClick(tx)}
                             >
@@ -153,7 +187,7 @@ export const MyTickets = () => {
                                     {tx.poster ? (
                                         <img 
                                             src={tx.poster} 
-                                            alt={tx.movieName} 
+                                            alt={tx.movieTitle} 
                                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                         />
                                     ) : (
@@ -174,7 +208,7 @@ export const MyTickets = () => {
                                 {/* NOMBRE DE LA PELÍCULA */}
                                 <div className="text-center px-1">
                                     <Text className="!text-white font-semibold text-sm sm:text-base line-clamp-2 leading-tight transition-colors group-hover:!text-[#d4af37]">
-                                        {tx.movieName}
+                                        {tx.movieTitle}
                                     </Text>
                                     <Text className="!text-[#64748b] text-xs mt-1 block line-clamp-1">
                                         {tx.cinemaName}
@@ -193,6 +227,12 @@ export const MyTickets = () => {
                 )}
 
             </div>
+            <TransactionModal 
+                transaction={selectedTransaction as any} 
+                open={isModalOpen} 
+                onClose={() => setIsModalOpen(false)}
+                onPaymentSuccess={handlePaymentSuccess}
+            />
         </ConfigProvider>
     );
 };

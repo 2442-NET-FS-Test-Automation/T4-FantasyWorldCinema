@@ -19,6 +19,8 @@ public class TransactionProfile : Profile
             // Movie title through Showtime
             .ForMember(dest => dest.MovieTitle, 
                        opt => opt.MapFrom(src => src.Showtime.Movie.Title))
+            .ForMember(dest => dest.Poster,
+                       opt => opt.MapFrom(src => src.Showtime.Movie.PosterUrl))
             
             // Direct data from Showtime
             .ForMember(dest => dest.ShowDate, 
