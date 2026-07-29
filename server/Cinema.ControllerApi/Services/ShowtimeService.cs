@@ -16,7 +16,14 @@ public class ShowtimeService : IShowtimeService
     // Get a list of Showtimes that are available to see on some cinema
     public Task<IReadOnlyList<Showtimes>> GetByCinemaAsync(int cinema_Id) => _repo.GetShowtimesByCinemaAsync(cinema_Id);
 
+    public Task<Showtimes> AddShowtimeAsync(ShowtimeCreateDto ns)
+    {
+        return _repo.AddShowtimeAsync(ns.Movie_Id, ns.Room_Id, ns.Showdate, ns.StartTime, ns.EndTime, ns.Price);
+    }
+
     public Task<Showtimes> GetShowtimeByIdAsync(int Showtime_Id) => _repo.GetShowtimeById(Showtime_Id);
+
+    public Task<IReadOnlyList<Showtimes>> GetAllShowtimesAsync() => _repo.GetAllShowtimesAsync();
 
     /// <summary>
     /// Checks if the showtime exists and if the end of the showtime is later than the present time.
@@ -30,8 +37,7 @@ public class ShowtimeService : IShowtimeService
 
         DateTime endTime = currentShowtime.ShowDate.ToDateTime(currentShowtime.EndTime);
 
-        DateTime nowsTime = DateTime.UtcNow;
 
-        return endTime > nowsTime ? currentShowtime : null;
+        return endTime > DateTime.UtcNow ? currentShowtime : null;
     }
 }
