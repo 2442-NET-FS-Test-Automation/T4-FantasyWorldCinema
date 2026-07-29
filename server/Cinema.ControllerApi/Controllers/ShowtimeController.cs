@@ -49,6 +49,16 @@ public class ShowtimeController : ControllerBase
         return CreatedAtAction(nameof(GetShowtimeByIdAsync), new { id = mapped.Showtime_Id, mapped});
     }
 
+    [HttpDelete("{showtime_Id}")]
+    [Authorize(Roles = "admin")]
+    public async Task<ActionResult<bool>> DeleteShowtimeAsync(int showtime_Id){
+        bool isDeleted = await _service.RemoveShowtimeAsync(showtime_Id);
+        if (isDeleted) return NoContent();
+
+        return NotFound();
+        
+    }
+
     [HttpGet("Cinema-{cinema_Id}")]
     public async Task<ActionResult<IEnumerable<ShowtimeDto>>> GetByCinema(int cinema_Id)
     {

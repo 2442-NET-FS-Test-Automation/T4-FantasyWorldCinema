@@ -22,6 +22,8 @@ public class ShowtimeService : IShowtimeService
 
     public Task<Showtimes> UpdateShowtimeAsync(ShowtimeUpdateDto us)
         => _repo.UpdateShowtimeAsync(us.Showtime_Id, us.Movie_Id, us.Room_Id, us.Showdate, us.StartTime, us.EndTime, us.Price);
+
+    public async Task<bool> RemoveShowtimeAsync(int showtime_Id) => await _repo.RemoveShowtimeAsync(showtime_Id);
     public Task<Showtimes> GetShowtimeByIdAsync(int Showtime_Id) => _repo.GetShowtimeById(Showtime_Id);
 
     public Task<IReadOnlyList<Showtimes>> GetAllShowtimesAsync() => _repo.GetAllShowtimesAsync();

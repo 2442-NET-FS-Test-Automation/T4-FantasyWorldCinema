@@ -57,6 +57,18 @@ public class ShowtimeRepository : IShowtimeRepository
         return data!;
     }
 
+    public async Task<bool> RemoveShowtimeAsync(int showtime_Id)
+    {
+        CinemaDbContext db = await _factory.CreateDbContextAsync();
+        Showtimes? toDelete = db.Showtimes.FirstOrDefault(s => s.Showtime_Id == showtime_Id);
+        if(toDelete == null) return false;
+
+        db.Showtimes.Remove(toDelete);
+        await db.SaveChangesAsync();
+
+        return true;
+    }
+
     public async Task<IReadOnlyList<Showtimes>> GetShowtimesByCinemaAsync(int cinema_Id)
     {
         CinemaDbContext db = await _factory.CreateDbContextAsync();
