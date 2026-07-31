@@ -45,7 +45,7 @@ public class MoviesController : ControllerBase
     {
         Movies created = await _service.SetMoviesAsync(newMovie);
         MoviesDTO mapped = _mapper.Map<MoviesDTO>(created);
-        return CreatedAtAction( nameof(GetMoviesAsync), new { id = mapped.Movie_Id }, mapped);
+        return Created("", mapped);
     }
 
     [HttpPut]

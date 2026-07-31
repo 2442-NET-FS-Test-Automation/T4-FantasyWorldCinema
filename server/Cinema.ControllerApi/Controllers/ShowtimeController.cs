@@ -36,7 +36,7 @@ public class ShowtimeController : ControllerBase
         Showtimes newShowtime = await _service.AddShowtimeAsync(data);
         ShowtimeDto mapped = _mapper.Map<ShowtimeDto>(newShowtime);
 
-        return CreatedAtAction(nameof(GetShowtimeByIdAsync), new { id = mapped.Showtime_Id, mapped});
+        return Created("", mapped);
     }
 
     [HttpPut]

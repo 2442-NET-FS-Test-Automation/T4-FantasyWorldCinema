@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Typography, Card, Flex, Button, message } from "antd";
 import { FileOutlined, CalendarOutlined, PlusOutlined } from "@ant-design/icons";
 import { ManageMovies } from "../Components/ManageMovies";
+import { ManageShowtimes } from "../Components/ManageShowtimes";
 import { CreateMovieModal } from "../Components/CreateMovieModal";
 import { CreateShowtimeModal } from "../Components/CreateShowtimeModal";
 
@@ -115,7 +116,7 @@ export function ManageCatalog() {
                         <Flex gap="xlarge" align="start" className="w-full">
                             <div className="flex-grow min-w-0 p-5 border border-dashed border-[#d9d9d9] rounded-lg text-center">
                                 <Typography.Title level={4} type="secondary">
-                                    {selectedView === "movies" ? (<ManageMovies />) : ("Complete schedule list")}
+                                    {selectedView === "movies" ? (<ManageMovies />) : (<ManageShowtimes/>)}
                                 </Typography.Title>
                             </div>
                         </Flex>
