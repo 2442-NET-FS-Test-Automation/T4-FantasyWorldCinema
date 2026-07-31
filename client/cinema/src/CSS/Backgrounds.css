@@ -29,3 +29,10 @@ body {
         url(signWallpaper.jpg);
     padding: 3%;
 }
+
+#Display404 {
+    background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)),
+    url("../assets/404.png");
+
+}
