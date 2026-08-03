@@ -142,4 +142,27 @@ public class TransactionsController : ControllerBase
 
         return Ok(serviceResult.Data);
     }
+
+    [HttpPatch("user/cancelled/{transactionId}")]
+    public async Task<ActionResult> UpdateTransactionToCancelledAsync(int transactionId)
+    {
+        string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized("Invalid user token claim.");
+        }
+
+        ServiceResult<bool> result = await _transactionService.SetCancelledTransaction(transactionId, userId);
+
+        if (!result.IsSuccess)
+        {
+            if (result.ErrorType == ErrorType.NotFound)
+            {
+                return NotFound(new { message = "Could not set transaction to completed."});
+            }
+            return BadRequest(new { message = result.ErrorMessage});
+        }
+
+        return Ok();
+    }
 }

@@ -28,7 +28,26 @@ export const MyTickets = () => {
                 setLoading(true);
 
                 const transactionData = await getAllTransactionsByUser();
-                setTransactions(transactionData);
+                const statusPriority: Record<string, number> = {
+                    'Pending': 1,   
+                    'Completed': 2, 
+                    'Used': 3,      
+                    'Expired': 4,   
+                    'Cancelled': 5, 
+                    'Failed': 6     
+                };
+
+                const sortedData = transactionData.sort((a: { status: string | number; transactionId: number; }, b: { status: string | number; transactionId: number; }) => {
+                    const priorityA = statusPriority[a.status] || 99;
+                    const priorityB = statusPriority[b.status] || 99;
+                    
+                    if (priorityA === priorityB) {
+                        return b.transactionId - a.transactionId; 
+                    }
+                    
+                    return priorityA - priorityB;
+                });
+                setTransactions(sortedData);
             } catch (err) {
                 setError("Transactions couldn't be loaded");
                 message.error("Error connecting the server");
@@ -94,9 +113,22 @@ export const MyTickets = () => {
             )
         );
         
-        // Si tienes la transacción seleccionada guardada en el estado, también actualízala
         if (selectedTransaction?.transactionId === transactionId) {
             setSelectedTransaction(prev => prev ? { ...prev, status: 'Completed' } : null);
+        }
+    };
+
+    const handleRefundSuccess = (transactionId : number) => {
+        setTransactions(prevTransactions => 
+            prevTransactions.map(tx =>
+                tx.transactionId === transactionId
+                    ? { ...tx, status: 'Cancelled' }
+                    : tx
+            )
+        );
+
+        if (selectedTransaction?.transactionId === transactionId) {
+            setSelectedTransaction(prev => prev ? { ...prev, status: 'Cancelled' } : null);
         }
     };
 
@@ -127,7 +159,6 @@ export const MyTickets = () => {
         >
             <div className="min-h-screen pt-24 pb-12 px-4 md:px-8 lg:px-12 max-w-[1600px] mx-auto font-sans">
                 
-                {/* HEADER Y ÁREA DE FILTROS */}
                 <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 mb-12 border-b border-[rgba(212,175,55,0.2)] pb-6">
                     
                     <Title level={2} className="!text-[#d4af37] !m-0 uppercase tracking-widest whitespace-nowrap">
@@ -172,7 +203,6 @@ export const MyTickets = () => {
                     </div>
                 </div>
 
-                {/* GRID DE TRANSACCIONES */}
                 {filteredTransactions.length > 0 ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-6 gap-y-10">
                         {filteredTransactions.map((tx) => (
@@ -181,7 +211,6 @@ export const MyTickets = () => {
                                 className="group flex flex-col gap-3 cursor-pointer"
                                 onClick={() => handleCardClick(tx)}
                             >
-                                {/* CONTENEDOR DEL PÓSTER */}
                                 <div className="relative w-full aspect-[2/3] rounded-[24px] overflow-hidden bg-[#1e1e24] shadow-lg border border-[rgba(212,175,55,0.15)] transition-all duration-300 group-hover:border-[#d4af37] group-hover:shadow-[0_0_20px_rgba(212,175,55,0.25)] group-hover:-translate-y-1">
                                     
                                     {tx.poster ? (
@@ -194,18 +223,15 @@ export const MyTickets = () => {
                                         <div className="w-full h-full flex items-center justify-center text-[#64748b]">No Poster</div>
                                     )}
 
-                                    {/* ETIQUETA DE ESTADO (Flotante arriba al centro) */}
                                     <div className="absolute top-4 inset-x-0 mx-auto w-max z-10">
                                         <span className={`px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider ${getStatusStyle(tx.status)}`}>
                                             {tx.status}
                                         </span>
                                     </div>
                                     
-                                    {/* Gradiente sutil inferior para estética */}
                                     <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#0f0f12] to-transparent opacity-60" />
                                 </div>
 
-                                {/* NOMBRE DE LA PELÍCULA */}
                                 <div className="text-center px-1">
                                     <Text className="!text-white font-semibold text-sm sm:text-base line-clamp-2 leading-tight transition-colors group-hover:!text-[#d4af37]">
                                         {tx.movieTitle}
@@ -232,6 +258,7 @@ export const MyTickets = () => {
                 open={isModalOpen} 
                 onClose={() => setIsModalOpen(false)}
                 onPaymentSuccess={handlePaymentSuccess}
+                onRefundSuccess={handleRefundSuccess}
             />
         </ConfigProvider>
     );

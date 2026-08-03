@@ -1,45 +1,56 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { Modal, Typography, Button, Divider, Tag, message } from 'antd';
 import { ClockCircleOutlined, CalendarOutlined, EnvironmentOutlined } from '@ant-design/icons';
-// Importa tu función real de la API
-import { payTransaction } from '../api/Transaction';
+import { payTransaction, refundTransaction } from '../api/Transaction';
 import type { TransactionItem } from '../types';
 
 const { Title, Text } = Typography;
 
-// const [transactions, setTransactions] = useState<TransactionItem>();
 
 interface TransactionModalProps {
     transaction: TransactionItem | null;
     open: boolean;
     onClose: () => void;
     onPaymentSuccess: (transactionId: number) => void;
+    onRefundSuccess: (transactionId: number) => void;
 }
 
 export const TransactionModal: React.FC<TransactionModalProps> = ({ 
     transaction, 
     open, 
     onClose,
-    onPaymentSuccess 
+    onPaymentSuccess,
+    onRefundSuccess 
 }) => {
     const [timeLeft, setTimeLeft] = useState(15);
     const [isPaying, setIsPaying] = useState(false);
+    const [isRefunding, setIsRefunding] = useState(false);
 
-    // Lógica del contador de 15 segundos
     useEffect(() => {
         let timer: ReturnType<typeof setInterval>;
         
         if (open && transaction?.status === 'Pending') {
-            setTimeLeft(15);
-            timer = setInterval(() => {
-                setTimeLeft((prev) => {
-                    if (prev <= 1) {
-                        clearInterval(timer);
-                        return 0;
-                    }
-                    return prev - 1;
-                });
-            }, 1000);
+            const rawDate = transaction.purchaseDate; 
+            const cleanDate = rawDate.replace(/\.(\d{3})\d+/, '.$1' + (rawDate.endsWith('Z') ? '' : 'Z'));
+            const purchasedTime = new Date(cleanDate).getTime();
+            console.log(purchasedTime);
+            
+            const expirationTime = purchasedTime + (15 * 1000); 
+            
+            const updateTimer = () => {
+                const currentTime = Date.now();
+                const difference = Math.floor((expirationTime - currentTime) / 1000);
+                
+                if (difference <= 0) {
+                    setTimeLeft(0);
+                    clearInterval(timer);
+                } else {
+                    setTimeLeft(difference);
+                }
+            };
+            updateTimer(); 
+            
+            timer = setInterval(updateTimer, 1000);
         }
 
         return () => {
@@ -52,15 +63,15 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
         
         setIsPaying(true);
         try {
-            // Simulamos la llamada a tu API
+            
             await payTransaction(transaction.transactionId);
             
-            // Simulador de espera para el efecto visual
+            
             await new Promise(resolve => setTimeout(resolve, 1000));
             
             message.success("Payment successful!");
-            onPaymentSuccess(transaction.transactionId); // Actualiza el front sin recargar
-            onClose(); // Cerramos el modal tras pagar
+            onPaymentSuccess(transaction.transactionId); 
+            onClose(); 
         } catch (error) {
             message.error("Payment failed. Please try again.");
         } finally {
@@ -68,9 +79,24 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
         }
     };
 
-    const handleRefundRequest = () => {
-        // Implementación pendiente
+    const handleRefundRequest = async () => {
+        
         message.info("Refund request feature coming soon.");
+        if (!transaction) return;
+
+        setIsRefunding(true);
+        try{
+            await refundTransaction(transaction.transactionId);
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            message.success("Refund duccesful!");
+            onRefundSuccess(transaction.transactionId);
+            onClose();
+        } catch (error) {
+            message.error("Refund failed. Please try again.")
+        } finally {
+            setIsRefunding(false);
+        }
     };
 
     if (!transaction) return null;
@@ -83,14 +109,13 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             width={850}
             centered
             destroyOnClose
-            // Eliminamos el padding por defecto para que la imagen toque los bordes
+            
             bodyStyle={{ padding: 0, overflow: 'hidden', backgroundColor: '#1e1e24', borderRadius: '16px' }}
             style={{ padding: 0, backgroundColor: 'transparent', borderRadius: '16px', border: '1px solid rgba(212,175,55,0.2)' }}
             closeIcon={<span className="text-white hover:text-[#d4af37] text-xl bg-black/50 rounded-full w-8 h-8 flex items-center justify-center transition-colors">✕</span>}
         >
             <div className="flex flex-col md:flex-row min-h-[500px]">
                 
-                {/* COLUMNA IZQUIERDA: Imagen (1/3) */}
                 <div className="w-full md:w-1/3 h-[250px] md:h-auto relative bg-[#0f0f12]">
                     {transaction.poster ? (
                         <img 
@@ -101,11 +126,9 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-[#64748b]">No Poster</div>
                     )}
-                    {/* Sombra de degradado para fusionar la imagen con el fondo derecho */}
                     <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-transparent via-transparent to-[#1e1e24] opacity-90"></div>
                 </div>
 
-                {/* COLUMNA DERECHA: Información (2/3) */}
                 <div className="w-full md:w-2/3 p-6 md:p-8 flex flex-col justify-between font-sans text-white">
                     
                     <div>
@@ -125,7 +148,6 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
 
                         <Divider className="border-[rgba(212,175,55,0.15)] my-5" />
 
-                        {/* Detalles de la función */}
                         <div className="grid grid-cols-2 gap-y-4 gap-x-6 mb-6">
                             <div>
                                 <Text className="block text-[#64748b] text-xs uppercase tracking-wider mb-1">Cinema & Room</Text>
@@ -141,12 +163,11 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                                     <CalendarOutlined className="text-[#d4af37] mr-1" /> {transaction.showDate}
                                 </Text>
                                 <Text className="block text-[#94a3b8] text-sm ml-5">
-                                    {transaction.startTime}-{transaction.EndTime}
+                                    {transaction.startTime} - {transaction.endTime}
                                 </Text>
                             </div>
                         </div>
 
-                        {/* Asientos */}
                         <div className="mb-6">
                             <Text className="block text-[#64748b] text-xs uppercase tracking-wider mb-2">Selected Seats ({transaction.purchasedSeats.length})</Text>
                             <div className="flex flex-wrap gap-2">
@@ -159,7 +180,6 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                         </div>
                     </div>
 
-                    {/* SECCIÓN INFERIOR: Total y Botones de Acción */}
                     <div className="mt-4 pt-6 border-t border-[rgba(212,175,55,0.15)] flex justify-between items-center bg-[#1e1e24]">
                         
                         <div>
@@ -190,6 +210,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                                 <Button 
                                     type="default" 
                                     size="large"
+                                    loading={isRefunding}
                                     onClick={handleRefundRequest}
                                     className="!bg-transparent hover:!bg-[#9f1239] !text-[#9f1239] hover:!text-white border border-[#9f1239] hover:border-[#9f1239] font-bold tracking-wider px-6 h-12 transition-all duration-300"
                                 >

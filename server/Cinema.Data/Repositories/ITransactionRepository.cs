@@ -11,4 +11,5 @@ public interface ITransactionRepository
     public Task<IEnumerable<Transactions>?> GetAllTransactionsByUserAsync(int userId);
 
     public Task<Transactions?> SetPaidTransaction(int transactionId, int userId);
+    public Task<bool> SetCancelledTransaction(int transactionId, int userId);
 }

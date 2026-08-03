@@ -16,3 +16,8 @@ export const payTransaction = async (transactionId : number) => {
     const response = await api.patch(`/Transactions/user/${transactionId}`);
     return response.data;
 }
+
+export const refundTransaction = async (transactionId : number) => {
+    const response = await api.patch(`/Transactions/user/cancelled/${transactionId}`);
+    return response.status;
+}

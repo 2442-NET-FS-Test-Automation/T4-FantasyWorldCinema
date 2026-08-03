@@ -11,4 +11,5 @@ public interface ITransactionService
     public Task ValidateAndExpireTransactionsAsync(int transactionId);
     public Task <ServiceResult<IEnumerable<TransactionResponseDto>>> GetAllTransactionsByUserAsync(int userId);
     public Task<ServiceResult<TransactionResponseDto>> SetPaidTransaction(int transactionId, int userId);
+    public Task<ServiceResult<bool>> SetCancelledTransaction(int transactionId, int userId);
 }

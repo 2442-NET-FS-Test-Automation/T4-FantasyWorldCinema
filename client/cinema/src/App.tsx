@@ -8,6 +8,8 @@ import { ProtectedRoute } from "./auth/ProtectedRoute";
 import { ShowtimeDetails } from "./pages/ShowtimeDetails";
 import { MyTickets } from "./pages/MyTickets";
 import { Display404 } from "./pages/Display404";
+import "./CSS/Styles.css";
+import "./CSS/Backgrounds.css";
 
 export function AppContent() {
 

@@ -203,4 +203,25 @@ public class TransactionService : ITransactionService
             Data = responseDto
         };
     }
+
+    public async Task<ServiceResult<bool>> SetCancelledTransaction(int transactionId, int userId)
+    {
+        bool cancellationMade = await _transactionRepository.SetCancelledTransaction(transactionId, userId);
+
+        if (cancellationMade == false)
+        {
+            return new ServiceResult<bool>
+            {
+                IsSuccess = false,
+                ErrorType = ErrorType.NotFound
+            };
+        }
+        else
+        {
+            return new ServiceResult<bool>
+            {
+                IsSuccess = true,
+            };
+        }
+    }
 }

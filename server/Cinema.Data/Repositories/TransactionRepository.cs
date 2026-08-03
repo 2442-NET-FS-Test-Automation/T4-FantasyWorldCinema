@@ -122,4 +122,26 @@ public class TransactionRepository : ITransactionRepository
             return null;
         }
     }
+
+    public async Task<bool> SetCancelledTransaction(int transactionId, int userId)
+    {
+        await using CinemaDbContext db = await _factory.CreateDbContextAsync();
+
+        Transactions? transaction = await db.Transactions
+                                    .Where(t => t.Status == Status.Completed)
+                                    .FirstOrDefaultAsync(t => t.Transaction_Id == transactionId);
+
+        if (transaction is null || transaction.User_Id != userId) return false;
+        try
+        {
+            transaction.Status = Status.Cancelled;
+            await db.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+
+    }
 }

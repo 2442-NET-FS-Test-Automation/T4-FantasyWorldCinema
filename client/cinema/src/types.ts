@@ -67,13 +67,13 @@ export interface CreateTransactionItem {
 
 export interface TransactionItem {
     transactionId: number;
-    purchasedDate: string;
+    purchaseDate: string;
     totalAmount: number;
     status: string;
     movieTitle: string;
     showDate: string;
     startTime: TimeString;
-    EndTime: TimeString;
+    endTime: TimeString;
     cinemaName: string;
     roomName: string;
     purchasedSeats: string[]
