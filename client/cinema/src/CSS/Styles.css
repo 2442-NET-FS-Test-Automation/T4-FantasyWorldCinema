@@ -89,6 +89,14 @@
     scrollbar-width: none;
 }
 
+.Text404 {
+    color: #ffffff!;
+    font-size:80px;
+    padding-left: 50rem;
+    font-family: 'Bringbold Nineties';
+    font: bolder;
+}
+
 
 @media (min-width: 768px) {
     .Flex-Home-Background {

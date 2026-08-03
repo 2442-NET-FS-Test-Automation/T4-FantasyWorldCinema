@@ -20,6 +20,17 @@ export interface ShowtimeItem {
     price: number;
 }
 
+export interface CreateShowtimeItem {
+    movie_Id: number;
+    poster: string;
+    rating: string;
+    room_Id: number;
+    showDate: string;
+    startTime: string;
+    endTime: string;
+    price: number;
+}
+
 export interface MovieItem {
     movie_Id: number;
     title: string;
@@ -29,6 +40,16 @@ export interface MovieItem {
     durationMinutes: number;
     poster: string;
 }
+
+export interface CreateMovieItem {
+    title: string;
+    genre: string;
+    rating: string,
+    synopsis: string,
+    durationMinutes: number;
+    poster: string;
+}
+
 
 export type FetchState = "idle" | "loading" | "loaded" | "failed";
 

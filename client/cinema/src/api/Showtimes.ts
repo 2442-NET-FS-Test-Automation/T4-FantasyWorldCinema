@@ -16,3 +16,8 @@ export const GetSeatsByShowtimeId = async (showtimeId: number, roomId: number): 
     const response = await api.get<SeatItem[]>(`/Seats/${showtimeId}?Room_id=${roomId}`);
     return response.data;
 };
+
+export const GetAllShowtimes = async (): Promise<ShowtimeItem[]> => {
+    const response = await api.get<ShowtimeItem[]>(`/Showtime`)
+    return response.data;
+};

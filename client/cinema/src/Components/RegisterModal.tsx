@@ -11,7 +11,7 @@ export function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
   const { register, login, status, error } = useAuth();
   const [messageApi, contextHolder] = message.useMessage();
 
-  // CORRECCIÓN LÓGICA: Recibe los datos validados nativamente de Ant Design
+  // LOGICAL CORRECTION: Receives natively validated data from Ant Design
   const handleFormSubmit = async (values: any) => {
     const success = await register(
       values.fullName,
@@ -49,7 +49,7 @@ export function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
     <ConfigProvider
       theme={{
         token: {
-          // Mismo esquema de tipografía limpia por defecto y colores oscuros / dorados del Login
+          // Same clean typography scheme by default and dark/gold colors as the Login
           fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
           colorPrimary: '#d4af37',
           colorBgElevated: '#0f0f12',
@@ -77,7 +77,7 @@ export function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
         onCancel={onClose}
         footer={null}
         centered
-        width={440} // Consistencia visual en dimensiones con el modal de Login
+        width={440}
         styles={{
           mask: {
             backdropFilter: 'blur(8px)',
@@ -94,7 +94,6 @@ export function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
         <Flex vertical id="LoginRegister">
           {contextHolder}
 
-          {/* Título: Tipografía de fantasía de la app compartida */}
           <Typography.Title 
             level={2} 
             className='auth-title text-center !mb-1'
@@ -224,7 +223,7 @@ export function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
               />
             </Form.Item>
 
-            {/* Botón Principal: Copia exacta del estilo dorado interactivo */}
+            {/* Main Button: Exact copy of the interactive gold style */}
             <div className="w-full mt-8">
               <button
                 type="submit"
