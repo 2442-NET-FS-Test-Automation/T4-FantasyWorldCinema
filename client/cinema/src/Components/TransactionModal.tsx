@@ -119,8 +119,8 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                             </Tag>
                         </div>
 
-                        <Text className="text-[#94a3b8] text-xs">
-                            Purchased on: {new Date(transaction.purchasedDate).toLocaleDateString()}
+                        <Text className="text-[#94a3b8] text-xs font-bold">
+                            Purchased on: {transaction.showDate.split("T"[0])}
                         </Text>
 
                         <Divider className="border-[rgba(212,175,55,0.15)] my-5" />
@@ -141,7 +141,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                                     <CalendarOutlined className="text-[#d4af37] mr-1" /> {transaction.showDate}
                                 </Text>
                                 <Text className="block text-[#94a3b8] text-sm ml-5">
-                                    {transaction.startTime} - {transaction.EndTime}
+                                    {transaction.startTime}-{transaction.EndTime}
                                 </Text>
                             </div>
                         </div>
