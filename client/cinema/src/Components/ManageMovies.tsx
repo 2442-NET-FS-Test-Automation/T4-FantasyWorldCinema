@@ -1,7 +1,7 @@
-import { Table, Button, Space, Tag, Typography, Spin, Input } from "antd";
+import { Table, Button, Space, Tag, Typography, Spin, Input,Popconfirm, message } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-import { GetAllMovies } from "../api/Movies";
+import { GetAllMovies, DeleteMovie, UpdateMovie } from "../api/Movies";
 import type { MovieItem, FetchState } from "../types";
 
 // We define the data structure for the movies
@@ -39,6 +39,16 @@ export function ManageMovies() {
         return () => { active = false; };
     }, []);
 
+    const handleDelete = async (keyId: string) => {
+        const idNumber = Number(keyId);
+        try {
+            await DeleteMovie(idNumber);
+            setMovies((prev) => prev.filter(m => m.movie_Id !== idNumber));
+            message.success("Movie deleted successfully");
+        } catch {
+            message.error("Could not delete the movie.");
+        }
+    };
 
     // CONNECTION: We transform the API data into the table format
     const dataSource: MovieRecord[] = movies.map((movie) => ({
@@ -161,13 +171,22 @@ export function ManageMovies() {
                         onClick={() => console.log("Editar Película ID:", record.key)}
                         className="text-blue-600! hover:bg-blue-50!"
                     />
-                    <Button
-                        type="text"
-                        danger
-                        icon={<DeleteOutlined />}
-                        onClick={() => console.log("Eliminar Película ID:", record.key)}
-                        className="hover:bg-red-50!"
-                    />
+                    {/* Delete Config */}
+                    <Popconfirm
+                        title="Delete the movie"
+                        description="Are you sure you want to delete this movie?"
+                        onConfirm={() => handleDelete(record.key)}
+                        okText="Yes"
+                        cancelText="No"
+                        placement="left"
+                    >
+                        <Button
+                            type="text"
+                            danger
+                            icon={<DeleteOutlined />}
+                            className="hover:bg-red-50!"
+                        />
+                    </Popconfirm>
                 </Space>
             )
         }
