@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Cinema.ControllerApi\Cinema.ControllerApi.csproj" />
+    <ProjectReference Include="..\..\Cinema.ControllerApi\Cinema.ControllerApi.csproj" />
   </ItemGroup>
 
 </Project>
