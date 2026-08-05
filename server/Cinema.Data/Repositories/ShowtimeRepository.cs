@@ -15,7 +15,10 @@ public class ShowtimeRepository : IShowtimeRepository
     public async Task<IReadOnlyList<Showtimes>> GetAllShowtimesAsync()
     {
         CinemaDbContext db = await _factory.CreateDbContextAsync();
-        return await db.Showtimes.ToListAsync();
+        return await db.Showtimes
+            .Include(m => m.Movie)
+            .Include(r => r.Room)
+            .ToListAsync();
     }
 
     public async Task<Showtimes> AddShowtimeAsync(int movie_Id, int room_Id, string showdate, string startTime, string endTime, decimal price)
