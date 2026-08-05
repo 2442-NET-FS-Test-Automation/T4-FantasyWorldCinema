@@ -1,21 +1,17 @@
 import { Table, Button, Space, Tag, Typography, Spin, Input,Popconfirm, message } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-import { GetAllMovies, DeleteMovie, UpdateMovie } from "../api/Movies";
+import { GetAllMovies, DeleteMovie } from "../api/Movies";
 import type { MovieItem, FetchState } from "../types";
 
-// We define the data structure for the movies
-interface MovieRecord {
-    key: string;
-    title: string;
-    poster: string;
-    genre: string[];
-    duration: number;
-    rating: string;
+
+interface ManageMoviesProps {
+    // accepts the table row (transformed) object
+    onEditAction: (movie: any) => void;
+    refreshTrigger: number;
 }
 
-
-export function ManageMovies() {
+export function ManageMovies({onEditAction, refreshTrigger}: ManageMoviesProps) {
 
     const [movies, setMovies] = useState<MovieItem[]>([]);
     const [movieState, setMovieState] = useState<FetchState>("idle");
@@ -37,7 +33,7 @@ export function ManageMovies() {
                 if (active) setMovieState("failed");
             });
         return () => { active = false; };
-    }, []);
+    }, [refreshTrigger]);
 
     const handleDelete = async (keyId: string) => {
         const idNumber = Number(keyId);
@@ -51,13 +47,14 @@ export function ManageMovies() {
     };
 
     // CONNECTION: We transform the API data into the table format
-    const dataSource: MovieRecord[] = movies.map((movie) => ({
-        key: String(movie.movie_Id || Math.random()),
+    const dataSource = movies.map((movie) => ({
+        key: String(movie.movie_Id),
         title: movie.title,
         poster: movie.poster,
         genre: Array.isArray(movie.genre) ? movie.genre : [movie.genre],
         duration: movie.durationMinutes,
-        rating: movie.rating
+        rating: movie.rating,
+        synopsis: movie.synopsis
     }));
 
     // PREVIOUS LOCAL FILTERING FOR TITLE AND DURATION
@@ -112,7 +109,7 @@ export function ManageMovies() {
             key: "genre",
             className: "align-top",
             filters: genreFilters,
-            onFilter: (value: any, record: MovieRecord) => record.genre.includes(value as string),
+            onFilter: (value: any, record: any) => record.genre.includes(value as string),
             filterSearch: true,
             render: (genres: string[]) => (
                 <>
@@ -151,7 +148,7 @@ export function ManageMovies() {
             key: "rating",
             className: "align-top",
             filters: ratingFilters,
-            onFilter: (value: any, record: MovieRecord) => record.rating === value,
+            onFilter: (value: any, record: any) => record.rating === value,
             render: (rating: string) => (
                 <Tag color={rating === "R" ? "volcano" : "green"} className="font-bold!">
                     {rating}
@@ -163,12 +160,12 @@ export function ManageMovies() {
             key: "actions",
             width: 120,
             className: "align-top",
-            render: (_: any, record: MovieRecord) => (
+            render: (_: any, record: any) => (
                 <Space size="middle">
                     <Button
                         type="text"
                         icon={<EditOutlined />}
-                        onClick={() => console.log("Editar Película ID:", record.key)}
+                        onClick={() => onEditAction(record)}
                         className="text-blue-600! hover:bg-blue-50!"
                     />
                     {/* Delete Config */}

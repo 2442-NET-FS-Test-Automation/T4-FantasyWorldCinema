@@ -57,7 +57,7 @@ public class MoviesController : ControllerBase
         if(updated == null) return NotFound();
 
         MoviesDTO mapped = _mapper.Map<MoviesDTO>(updated);
-         return CreatedAtAction( nameof(GetMoviesAsync), new { id = mapped.Movie_Id }, mapped);
+        return Ok(mapped);
     }
 
     [HttpDelete]

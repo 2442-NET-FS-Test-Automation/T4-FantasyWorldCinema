@@ -5,36 +5,66 @@ import { ManageMovies } from "../Components/ManageMovies";
 import { ManageShowtimes } from "../Components/ManageShowtimes";
 import { CreateMovieModal } from "../Components/CreateMovieModal";
 import { CreateShowtimeModal } from "../Components/CreateShowtimeModal";
+import type { MovieItem } from "../types";
 
 export function ManageCatalog() {
     const [selectedView, setSelectedView] = useState<"movies" | "showtimes" | null>(null);
 
     const handleCreateClick = () => {
         console.log(`Open Form to create: ${selectedView}`);
-        if(selectedView === "movies") {
-            setIsModalMovieOpen(true);
-        } else if(selectedView === "showtimes") {
-            setIsModalShowtimeOpen(true); // THE CALL IS ADDED TO THE FORM
+        if (selectedView === "movies") {
+            handleOpenCreateMovie();
+        } else if (selectedView === "showtimes") {
+            setIsModalShowtimeOpen(true);
         }
     };
 
     // 2. STATES TO CONTROL THE MODAL
     const [isModalMovieOpen, setIsModalMovieOpen] = useState(false);
     const [isModalShowtimeOpen, setIsModalShowtimeOpen] = useState(false);
-    
+    const [editingMovie, setEditingMovie] = useState<MovieItem | undefined>(undefined);
+
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleCreateMovieSubmit = async (values: any) => {
+    const [movieRefreshTrigger, setMovieRefreshTrigger] = useState(0);
+
+    const handleOpenCreateMovie = () => {
+        setEditingMovie(undefined);
+        setIsModalMovieOpen(true);
+    };
+
+    const handleOpenEditMovie = (movie: MovieItem) => {
+        setEditingMovie(movie);
+        setIsModalMovieOpen(true);
+    };
+
+    const handleCloseMovieModal = () => {
+        setIsModalMovieOpen(false);
+        setEditingMovie(undefined);
+    };
+
+    const handleMovieSubmit = (/* submittedData: any */) => {
+        if (editingMovie) {
+            message.success("Movie updated successfully!");
+        } else {
+            message.success("Movie created successfully!");
+        }
+        setMovieRefreshTrigger((prev) => prev + 1);
+
+        handleCloseMovieModal();
+    };
+
+    const handleCreateShowtimeSubmit = async (values: any) => {
         setIsSubmitting(true);
         console.log("Datos listos para enviar al backend:", values);
 
         setTimeout(() => {
             setIsSubmitting(false);
-            setIsModalMovieOpen(false);
-            setIsModalShowtimeOpen(false); // MAKES SURE TO CLOSE ANY ACTIVE MODALS
-            message.success("Item created successfully!");
+            setIsModalShowtimeOpen(false);
+            message.success("Showtime created successfully!");
         }, 1500);
     };
+
 
     return (
         <div className="min-h-[calc(100vh-120px)] mt-[120px] p-6 flex flex-col gap-6">
@@ -116,7 +146,11 @@ export function ManageCatalog() {
                         <Flex gap="xlarge" align="start" className="w-full">
                             <div className="flex-grow min-w-0 p-5 border border-dashed border-[#d9d9d9] rounded-lg text-center">
                                 <Typography.Title level={4} type="secondary">
-                                    {selectedView === "movies" ? (<ManageMovies />) : (<ManageShowtimes/>)}
+                                    {selectedView === "movies" ? (
+                                        <ManageMovies onEditAction={handleOpenEditMovie} refreshTrigger={movieRefreshTrigger} />
+                                    ) : (
+                                        <ManageShowtimes />
+                                    )}
                                 </Typography.Title>
                             </div>
                         </Flex>
@@ -124,16 +158,17 @@ export function ManageCatalog() {
 
                     <CreateMovieModal
                         open={isModalMovieOpen}
-                        onClose={() => setIsModalMovieOpen(false)}
-                        onSubmit={handleCreateMovieSubmit}
+                        onClose={handleCloseMovieModal}
+                        onSubmit={handleMovieSubmit}
                         confirmLoading={isSubmitting}
+                        moviedata={editingMovie}
                     />
-                    
+
                     {/* COMPONENT PROPS ARE CORRECTED WITH THEIR CORRESPONDING STATES */}
                     <CreateShowtimeModal
                         open={isModalShowtimeOpen}
                         onClose={() => setIsModalShowtimeOpen(false)}
-                        onSubmit={handleCreateMovieSubmit}
+                        onSubmit={handleCreateShowtimeSubmit}
                         confirmLoading={isSubmitting}
                     />
                 </>
