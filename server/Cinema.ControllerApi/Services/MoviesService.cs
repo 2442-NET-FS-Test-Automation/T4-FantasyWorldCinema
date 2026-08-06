@@ -15,16 +15,27 @@ public class MoviesService : IMoviesService
 
     public async Task<IReadOnlyList<Movies>> GetMoviesAsync() => await _repo.GetMoviesAsync();
 
-    public Task<Movies> SetMoviesAsync(MovieCreateDto nm)
+    public async Task<Movies?> SetMoviesAsync(MovieCreateDto data)
     {
-        return _repo.SetMoviesAsync(nm.Title, nm.Genre, nm.DurationMinutes,
-        nm.Rating, nm.Synopsis, nm.Poster);
+        if(data.Title.Length <= 0) return null;
+        if(!Enum.TryParse<Genre>(data.Genre, out Genre newGenre)) return null;
+        if(!Enum.TryParse<Rating>(data.Rating, out Rating newRating)) return null;
+
+        return  await _repo.SetMoviesAsync(data.Title, newGenre, data.DurationMinutes,
+        newRating, data.Synopsis, data.Poster);
     }
 
     public Task<IReadOnlyList<Movies>> GetAllMoviesAsync() => _repo.GetAllMoviesAsync();
 
-    public async Task<Movies?> UpdateMoviesAsync(MoviesDTO data) => await _repo.UpdateMovieAsync(data.Movie_Id,
-        data.Title, data.Genre, data.DurationMinutes, data.Rating, data.Synopsis, data.Poster);
+    public async Task<Movies?> UpdateMoviesAsync(MoviesDTO data)
+    {
+        if(data.Title.Length <= 0) return null;
+        if(!Enum.TryParse<Genre>(data.Genre, out Genre newGenre)) return null;
+        if(!Enum.TryParse<Rating>(data.Rating, out Rating newRating)) return null;
+
+        return await _repo.UpdateMovieAsync(data.Movie_Id, data.Title, newGenre, 
+            data.DurationMinutes, newRating, data.Synopsis, data.Poster);
+    }
 
     public Task<bool> RemoveMovieAsync(int movie_Id) => _repo.RemoveMovieAsync(movie_Id);
 
