@@ -10,6 +10,7 @@ import { MyTickets } from "./pages/MyTickets";
 import { Display404 } from "./pages/Display404";
 import "./CSS/Styles.css";
 import "./CSS/Backgrounds.css";
+import { AdminReports } from "./views/AdminReports";
 
 export function AppContent() {
 
@@ -34,10 +35,10 @@ export function AppContent() {
               {/* Protected routes - only ADMINS */}
               <Route element={<ProtectedRoute allowedRoles={["Admin"]} />}>
                 <Route path="/admin/catalog" element={<ManageCatalog />} />
-                  {/* 
-                  <Route path="/manage-catalog/movies" element={<ManageMovies />} />
-                  <Route path="/manage-catalog/showtimes" element={<ManageShowtimes />} />
-                  <Route path="/reports" element={<Reports />} /> */}
+                  
+                  {/* <Route path="/manage-catalog/movies" element={<ManageMovies />} />
+                  <Route path="/manage-catalog/showtimes" element={<ManageShowtimes />} /> */}
+                  <Route path="/admin/reports" element={<AdminReports />} />
               </Route>
 
               {/* Default redirection Page */}

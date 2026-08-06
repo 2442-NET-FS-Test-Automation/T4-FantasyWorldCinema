@@ -1,9 +1,11 @@
 using AutoMapper;
 using Cinema.ControllerApi.DTOs;
 using Cinema.ControllerApi.Services;
+using Cinema.Data.DTOs;
 using Cinema.Data.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Microsoft.Extensions.Caching.Memory;
 
 [ApiController]
@@ -37,5 +39,29 @@ public class CinemaController : ControllerBase
 
         IEnumerable<SimpleCinemaDto> mappedItems = _mapper.Map<IEnumerable<SimpleCinemaDto>>(cinemas);
         return Ok(mappedItems);
+    }
+
+    [HttpGet("cinemas-withUsed")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetCinemasWithUsedAsync()
+    {
+        string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized("Invalid user token claim.");
+        }
+
+        ServiceResult<IEnumerable<CinemasWithUsedDto>> result = await _service.GetCinemasWithUsedTransactions();
+
+        if (!result.IsSuccess)
+        {
+            if (result.ErrorType == ErrorType.NotFound)
+            {
+                return NotFound(new { message = "No cinemas found."});
+            }
+            return BadRequest(new { message = result.ErrorMessage});
+        }
+        
+        return Ok(result.Data);
     }
 }

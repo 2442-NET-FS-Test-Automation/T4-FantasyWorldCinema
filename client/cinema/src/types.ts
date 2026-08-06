@@ -79,3 +79,32 @@ export interface TransactionItem {
     purchasedSeats: string[]
     poster: string;
 }
+
+// Reports
+export interface MovieRevenueDto {
+    movieTitle: string;
+    totalRevenue: number;
+    ticketsSold: number;
+}
+
+export interface CinemaRevenueDto {
+    cinemaId: number;
+    cinemaName: string;
+    totalRevenue: number;
+    totalTransactions: number;
+}
+
+export interface OccupancyRateDto {
+    movieTitle: string;
+    cinemaName: string;
+    showDate: string;
+    totalCapacity: number;
+    soldSeats: number;
+    occupancyPercentage: number;
+}
+
+export interface TransactionStatusSummaryDto {
+    status: string;
+    count: number;
+    totalAmountInvolved: number;
+}
