@@ -49,6 +49,9 @@ builder.Services.AddScoped<IReportsRepository, ReportsRepository>();
 builder.Services.AddScoped<IReportsService, ReportsService>();
 
 
+builder.Services.AddScoped<IRoomsRepository, RoomsRepository>();
+builder.Services.AddScoped<IRoomsService, RoomsService>();
+
 // Hangfire services
 builder.Services.AddHangfire(config => config
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
