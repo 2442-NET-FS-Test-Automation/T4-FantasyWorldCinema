@@ -87,4 +87,15 @@ public class ReportsService : IReportsService
             Data = statusSummary
         };
     }
+
+    public async Task<ServiceResult<int>> GetTotalTicketsSold(DateTime startDate, DateTime endDate)
+    {
+        int result = await _reportsRepository.GetTotalTicketsSold(startDate, endDate);
+
+        return new ServiceResult<int>
+        {
+            IsSuccess = true,
+            Data = result
+        };
+    }
 }

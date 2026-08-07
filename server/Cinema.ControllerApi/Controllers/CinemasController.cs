@@ -43,7 +43,7 @@ public class CinemaController : ControllerBase
 
     [HttpGet("cinemas-withUsed")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> GetCinemasWithUsedAsync()
+    public async Task<IActionResult> GetCinemasWithUsedAsync([FromQuery] RequestGenericReportDto requestDto)
     {
         string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (!int.TryParse(userIdClaim, out int userId))
@@ -51,7 +51,7 @@ public class CinemaController : ControllerBase
             return Unauthorized("Invalid user token claim.");
         }
 
-        ServiceResult<IEnumerable<CinemasWithUsedDto>> result = await _service.GetCinemasWithUsedTransactions();
+        ServiceResult<IEnumerable<CinemasWithUsedDto>> result = await _service.GetCinemasWithUsedTransactions(requestDto.StartDate, requestDto.EndDate);
 
         if (!result.IsSuccess)
         {
@@ -62,6 +62,21 @@ public class CinemaController : ControllerBase
             return BadRequest(new { message = result.ErrorMessage});
         }
         
+        return Ok(result.Data);
+    }
+
+    [HttpGet("cinemas-withActiveShowtimes")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetCinemasWithActiveShowtimes([FromQuery] RequestGenericReportDto requestDto)
+    {
+        string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized("Invalid user token claim.");
+        }
+
+        ServiceResult<int> result = await _service.GetCinemasWithActiveShowtimes(requestDto.StartDate, requestDto.EndDate);
+
         return Ok(result.Data);
     }
 }

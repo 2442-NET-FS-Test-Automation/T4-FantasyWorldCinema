@@ -97,6 +97,10 @@
     font: bolder;
 }
 
+.ant-select-item-option-selected.ant-select-item-option-active {
+  background-color: #4d4a00 !important;
+}
+
 
 @media (min-width: 768px) {
     .Flex-Home-Background {

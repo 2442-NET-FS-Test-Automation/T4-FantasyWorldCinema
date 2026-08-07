@@ -151,4 +151,17 @@ public class ReportsRepository : IReportsRepository
 
         return result;
     }
+
+    public async Task<int> GetTotalTicketsSold(DateTime startDate, DateTime endDate)
+    {
+        await using CinemaDbContext db = await _factory.CreateDbContextAsync();
+
+        return await db.TransactionSeats
+            .Where(t => t.Transaction.PurchaseDate >= startDate &&
+                        t.Transaction.PurchaseDate <= endDate &&
+                        (t.Transaction.Status == Status.Completed || t.Transaction.Status == Status.Used))
+            .Select(x => x.TransactionSeat_Id)
+            .Distinct()
+            .CountAsync();
+    }
 }

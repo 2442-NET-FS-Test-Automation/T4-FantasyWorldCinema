@@ -17,9 +17,9 @@ public class CinemaService : ICinemaService
 
     public async Task<IReadOnlyList<Cinemas>> GetCinemasByMovieAsync(int Movie_Id) => await _repo.GetCinemasByMovieAsync(Movie_Id);
 
-    public async Task<ServiceResult<IEnumerable<CinemasWithUsedDto>>> GetCinemasWithUsedTransactions()
+    public async Task<ServiceResult<IEnumerable<CinemasWithUsedDto>>> GetCinemasWithUsedTransactions(DateTime startDate, DateTime endDate)
     {
-        IEnumerable<CinemasWithUsedDto> cinemas = await _repo.GetCinemasWithUsedTransactions();
+        IEnumerable<CinemasWithUsedDto> cinemas = await _repo.GetCinemasWithUsedTransactions(startDate, endDate);
         if (!cinemas.Any())
         {
             return new ServiceResult<IEnumerable<CinemasWithUsedDto>>
@@ -34,5 +34,19 @@ public class CinemaService : ICinemaService
             IsSuccess = true,
             Data = cinemas
         };
+    }
+
+    public async Task<ServiceResult<int>> GetCinemasWithActiveShowtimes(DateTime startDate, DateTime endDate)
+    {
+        DateOnly utcToday = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        int result = await _repo.GetCinemasWithActiveShowtimes(startDate, endDate);
+
+        return new ServiceResult<int>
+        {
+            IsSuccess = true,
+            Data = result
+        };
+
     }
 }

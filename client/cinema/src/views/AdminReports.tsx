@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type SetStateAction } from 'react';
 import { ConfigProvider, Typography, DatePicker, Table, Spin, Card, Statistic, Tag, Alert, Select, InputNumber } from 'antd';
-import { DollarOutlined, BookOutlined, BankOutlined, CalendarOutlined, BarChartOutlined } from '@ant-design/icons';
+import { DollarOutlined, BookOutlined, BankOutlined, CalendarOutlined, BarChartOutlined,
+    UpOutlined, DownOutlined
+ } from '@ant-design/icons';
 import { 
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
     PieChart, Pie, Cell, Legend
@@ -9,11 +11,13 @@ import dayjs from 'dayjs';
 
 import { 
     getTopMoviesReport, getCinemaPerformanceReport, 
-    getOccupancyRatesReport, getTransactionStatusReport 
+    getOccupancyRatesReport, getTransactionStatusReport , getTotalTicketsSold
 } from '../api/Reports';
 
-import { getCinemasWithUsed } from '../api/Cinema';
+import { getCinemasWithUsed, getCinemasWithActiveShowtimes } from '../api/Cinema';
 import type { MovieRevenueDto, CinemaRevenueDto, OccupancyRateDto, TransactionStatusSummaryDto, CinemaItem } from '../types';
+
+import '../CSS/Styles.css';
 
 const { Title, Text } = Typography;
 
@@ -29,11 +33,16 @@ const STATUS_COLORS: Record<string, string> = {
 export const AdminReports = () => {
     const [startDate, setStartDate] = useState<dayjs.Dayjs>(dayjs().subtract(30, 'days'));
     const [endDate, setEndDate] = useState<dayjs.Dayjs>(dayjs());
+
+    const [activeDateFilter, setActiveDateFilter] = useState('last month'); // O el valor por defecto que prefieras
     
     // Nuevos estados para los parámetros
     const [selectedCinemaId, setSelectedCinemaId] = useState<number | null>(null);
     const [movieLimit, setMovieLimit] = useState<number>(5);
-    const [activeCinemas, setActiveCinemas] = useState<{data: CinemaItem[], loading: boolean, error: boolean}>({ data: [], loading: true, error: false });
+    const [validCinemas, setValidCinemas] = useState<{data: CinemaItem[], loading: boolean, error: boolean}>({ data: [], loading: true, error: false });
+    const [activeCinemas, setActiveCinemas] = useState<{data: number, loading: boolean}>({data: 0, loading: true});
+    const [totalTickets, setTotalTickets] = useState<{data: number, loading: boolean}>({data: 0, loading: true});
+
 
     const [moviesData, setMoviesData] = useState<{data: MovieRevenueDto[], loading: boolean, error: boolean}>({ data: [], loading: true, error: false });
     const [cinemasData, setCinemasData] = useState<{data: CinemaRevenueDto[], loading: boolean, error: boolean}>({ data: [], loading: true, error: false });
@@ -110,21 +119,88 @@ export const AdminReports = () => {
 
     // 4. Fetch Active Cinemas (Se ejecuta solo una vez al montar)
     useEffect(() => {
-        const fetchActiveCinemas = async () => {
-            setActiveCinemas(prev => ({ ...prev, loading: true, error: false }));
+        if (!startDate || !endDate) return;
+        const start = startDate.format('YYYY-MM-DD');
+        const end = endDate.format('YYYY-MM-DD');
+
+        const fetchValidCinemas = async () => {
+            setValidCinemas(prev => ({ ...prev, loading: true, error: false }));
             try {
-                const res = await getCinemasWithUsed();
-                setActiveCinemas({ data: res, loading: false, error: false });
+                const res = await getCinemasWithUsed(start, end);
+                setValidCinemas({ data: res, loading: false, error: false });
             } catch {
-                setActiveCinemas(prev => ({ ...prev, loading: false, error: true }));
+                setValidCinemas(prev => ({ ...prev, loading: false, error: true }));
+            }
+        };
+
+        fetchValidCinemas();
+    }, [startDate, endDate]);
+
+    useEffect(() => {
+        if (!startDate || !endDate) return;
+        const start = startDate.format('YYYY-MM-DD');
+        const end = endDate.format('YYYY-MM-DD');
+
+        const fetchTotalTickets = async () => {
+            setTotalTickets({ data: 0, loading: true });
+            try {
+                const res = await getTotalTicketsSold(start, end);
+                setTotalTickets({ data: res, loading: false });
+            } catch {
+                setTotalTickets({ data: 0, loading: false });
+            }
+        };
+
+        fetchTotalTickets();
+    }, [startDate, endDate]);
+    
+    useEffect(() => {
+        if (!startDate || !endDate) return;
+        const start = startDate.format('YYYY-MM-DD');
+        const end = endDate.format('YYYY-MM-DD');
+
+        const fetchActiveCinemas = async () => {
+            setActiveCinemas({ data: 0, loading: true })
+            try {
+                const res = await getCinemasWithActiveShowtimes(start, end);
+                setActiveCinemas({ data: res, loading: false });
+            } catch {
+                setActiveCinemas({ data: 0, loading: false });
             }
         };
 
         fetchActiveCinemas();
-    }, []); // <-- El arreglo vacío significa "ejecutar solo una vez"
+    }, [startDate, endDate]);
+
+    const handleFilterChange = (filter: SetStateAction<string>) => {
+        // 1. Actualizas el estado visual de los botones
+        setActiveDateFilter(filter);
+
+        // 2. Actualizas los otros estados dependiendo del valor
+        switch (filter) {
+            case 'last day':
+                setStartDate(dayjs().subtract(1, 'day'));
+                setEndDate(dayjs());
+                break;
+            case 'last week':
+                setStartDate(dayjs().subtract(1, 'week'));
+                setEndDate(dayjs());
+                break;
+            case 'last month':
+                setStartDate(dayjs().subtract(1, 'month'));
+                setEndDate(dayjs());
+                break;
+            case 'custom dates':
+                // Opcional: limpiar las fechas o dejarlas como estaban
+                // setStartDate(null);
+                // setEndDate(null);
+                break;
+            default:
+                break;
+        }
+    };
 
     const totalGlobalRevenue = cinemasData.data.reduce((acc, curr) => acc + curr.totalRevenue, 0);
-    const totalGlobalTickets = moviesData.data.reduce((acc, curr) => acc + curr.ticketsSold, 0);
 
     const cinemaColumns = [
         { title: 'Cinema Name', dataIndex: 'cinemaName', key: 'cinemaName', render: (text: string) => <Text className="text-white! font-semibold">{text}</Text> },
@@ -142,7 +218,7 @@ export const AdminReports = () => {
         { title: 'Movie', dataIndex: 'movieTitle', key: 'movieTitle' },
         { title: 'Date', dataIndex: 'showDate', key: 'showDate', render: (date: string) => new Date(date).toLocaleDateString() },
         { title: 'Capacity', dataIndex: 'totalCapacity', key: 'totalCapacity', align: 'center' as const },
-        { title: 'Sold', dataIndex: 'soldSeats', key: 'soldSeats', align: 'center' as const },
+        { title: 'Used', dataIndex: 'soldSeats', key: 'soldSeats', align: 'center' as const },
         { 
             title: 'Occupancy', 
             dataIndex: 'occupancyPercentage', 
@@ -155,7 +231,7 @@ export const AdminReports = () => {
             )
         },
     ];
-    console.log(selectedCinemaId);
+
     return (
         <ConfigProvider
             theme={{
@@ -190,6 +266,8 @@ export const AdminReports = () => {
                     Select: {
                         colorBgContainer: '#0f0f12',
                         selectorBg: '#0f0f12',
+                        // optionSelectedBg: 'green',
+                        // optionActiveBg: 'blue',
                     },
                     InputNumber: {
                         colorBgContainer: '#0f0f12',
@@ -208,25 +286,48 @@ export const AdminReports = () => {
                         <Text className="text-[#94a3b8]!">Business Intelligence & Operations</Text>
                     </div>
 
-                    <div className="flex items-center gap-4 bg-[#1e1e24] p-2 rounded-xl border border-[rgba(212,175,55,0.2)] shadow-lg">
-                        <DatePicker 
-                            value={startDate}
-                            onChange={(date) => date && setStartDate(date)}
-                            className="border-none! shadow-none! bg-transparent! w-35"
-                            allowClear={false}
-                            format="MMM DD, YYYY"
-                            suffixIcon={<CalendarOutlined style={{ color: '#ffffff' }} />}
-                            
-                        />
-                        <Text className="text-[#64748b]!">-</Text>
-                        <DatePicker 
-                            value={endDate}
-                            onChange={(date) => date && setEndDate(date)}
-                            className="border-none! shadow-none! bg-transparent! w-35"
-                            allowClear={false}
-                            format="MMM DD, YYYY"
-                            suffixIcon={<CalendarOutlined style={{ color: '#ffffff' }} />}
-                        />
+                    {/* Contenedor derecho para los controles de fecha */}
+                    <div className="flex flex-col items-end gap-3">
+                        
+                        {/* Lista de botones */}
+                        <div className="flex items-center gap-1 bg-[#1e1e24] p-1.5 rounded-xl border border-[rgba(212,175,55,0.2)] shadow-lg">
+                            {['last day', 'last week', 'last month', 'custom dates'].map((filter) => (
+                                <button
+                                    key={filter}
+                                    onClick={() => handleFilterChange(filter)}
+                                    className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 capitalize cursor-pointer ${
+                                        activeDateFilter === filter
+                                            ? 'bg-[#d4af37] text-black shadow-md' // Estilo activo (dorado)
+                                            : 'text-[#94a3b8] hover:text-[#d4af37] hover:bg-[rgba(212,175,55,0.1)]' // Estilo inactivo
+                                    }`}
+                                >
+                                    {filter}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* DatePickers - Solo visibles si el filtro es 'custom dates' */}
+                        {activeDateFilter === 'custom dates' && (
+                            <div className="flex items-center gap-4 bg-[#1e1e24] p-2 rounded-xl border border-[rgba(212,175,55,0.2)] shadow-lg animate-fade-in">
+                                <DatePicker 
+                                    value={startDate}
+                                    onChange={(date) => date && setStartDate(date)}
+                                    className="border-none! shadow-none! bg-transparent! w-35"
+                                    allowClear={false}
+                                    format="MMM DD, YYYY"
+                                    suffixIcon={<CalendarOutlined style={{ color: '#ffffff' }} />}
+                                />
+                                <Text className="text-[#64748b]!">-</Text>
+                                <DatePicker 
+                                    value={endDate}
+                                    onChange={(date) => date && setEndDate(date)}
+                                    className="border-none! shadow-none! bg-transparent! w-35"
+                                    allowClear={false}
+                                    format="MMM DD, YYYY"
+                                    suffixIcon={<CalendarOutlined style={{ color: '#ffffff' }} />}
+                                />
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -238,13 +339,13 @@ export const AdminReports = () => {
                             )}
                         </Card>
                         <Card bordered className="shadow-lg hover:-translate-y-1 transition-transform duration-300">
-                            {moviesData.loading ? <Spin /> : moviesData.error ? <Text className="text-red-500!">Data Unavailable</Text> : (
-                                <Statistic title={<span className="text-[#64748b] uppercase tracking-wider text-xs font-bold">Tickets Sold</span>} value={totalGlobalTickets} prefix={<BookOutlined className="text-[#d4af37]" />} valueStyle={{ color: '#ffffff', fontSize: '2rem', fontWeight: 'bold' }} />
+                            {totalTickets.loading ? <Spin /> : (
+                                <Statistic title={<span className="text-[#64748b] uppercase tracking-wider text-xs font-bold">Tickets Sold</span>} value={totalTickets.data} prefix={<BookOutlined className="text-[#d4af37]" />} valueStyle={{ color: '#ffffff', fontSize: '2rem', fontWeight: 'bold' }} />
                             )}
                         </Card>
                         <Card bordered className="shadow-lg hover:-translate-y-1 transition-transform duration-300">
-                            {cinemasData.loading ? <Spin /> : cinemasData.error ? <Text className="text-red-500!">Data Unavailable</Text> : (
-                                <Statistic title={<span className="text-[#64748b] uppercase tracking-wider text-xs font-bold">Active Cinemas</span>} value={cinemasData.data.length} prefix={<BankOutlined className="text-[#d4af37]" />} valueStyle={{ color: '#ffffff', fontSize: '2rem', fontWeight: 'bold' }} />
+                            {totalTickets.loading ? <Spin /> : (
+                                <Statistic title={<span className="text-[#64748b] uppercase tracking-wider text-xs font-bold">Active Cinemas</span>} value={activeCinemas.data} prefix={<BankOutlined className="text-[#d4af37]" />} valueStyle={{ color: '#ffffff', fontSize: '2rem', fontWeight: 'bold' }} />
                             )}
                         </Card>
                     </div>
@@ -265,15 +366,15 @@ export const AdminReports = () => {
                                         onChange={(val) => val && setMovieLimit(val)}
                                         className="w-15"
                                         controls={{
-                                            upIcon:'#52c41a',
-                                            downIcon: '#ff4d4f'
+                                        upIcon: <UpOutlined style={{ color: '#ffffff' }} />,
+                                        downIcon: <DownOutlined style={{ color: '#ffffff' }} />
                                         }}
                                     />
                                 </div>
                             </div>
                             <div className="h-87.5 w-full flex items-center justify-center">
                                 {moviesData.loading ? <Spin size="large" /> : moviesData.error ? (
-                                    <Alert message="Failed to load Box Office Performance" type="error" showIcon className="bg-red-950 border-red-800 text-red-200" />
+                                    <Alert title="No Data Available" type="error" showIcon className="w-1/2 mx-auto! text-black! font-bold" />
                                 ) : (
                                     <ResponsiveContainer width="100%" height="100%">
                                         <BarChart data={moviesData.data} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
@@ -294,7 +395,7 @@ export const AdminReports = () => {
                             </Title>
                             <div className="h-87.5 w-full flex items-center justify-center">
                                 {transactionsData.loading ? <Spin size="large" /> : transactionsData.error ? (
-                                    <Alert message="Failed to load Transaction Statuses" type="error" showIcon className="bg-red-950 border-red-800 text-red-200" />
+                                    <Alert title="No Data Available" type="error" showIcon className="w-1/2 mx-auto! text-black! font-bold" />
                                 ) : (
                                     <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
@@ -318,40 +419,60 @@ export const AdminReports = () => {
                                 Cinema Revenue
                             </Title>
                             {cinemasData.loading ? <Spin className="py-10" /> : cinemasData.error ? (
-                                <Alert message="Failed to load Cinema Revenues" type="error" showIcon className="bg-red-950 border-red-800 text-red-200" />
+                                <Table 
+                                    dataSource={undefined} columns={cinemaColumns}  className="custom-dark-table" 
+                                    locale={{
+                                        emptyText: <Alert title="No Data Available" type="error" showIcon className="w-1/2 mx-auto! text-black! font-bold" />
+                                    }}
+                                />
                             ) : (
                                 <Table dataSource={cinemasData.data} columns={cinemaColumns} rowKey="cinemaId" pagination={{ pageSize: 5, position: ['bottomCenter'] }} className="custom-dark-table" />
                             )}
                         </div>
 
-                        {/* Ocupación con selector de Cine */}
                         <div className="bg-[#1e1e24] p-6 rounded-2xl border border-[rgba(212,175,55,0.2)] shadow-lg overflow-hidden flex flex-col justify-center">
                             <div className="flex justify-between items-center mb-6">
                                 <Title level={4} className="text-[#d4af37]! m-0! uppercase tracking-widest text-sm flex items-center gap-2">
-                                    <CalendarOutlined /> Daily Occupancy Rates
+                                    <CalendarOutlined /> Showtimes Occupancy Rates
                                 </Title>
                                 <Select 
                                     value={selectedCinemaId}
                                     onChange={(value) => setSelectedCinemaId(value)}
                                     placeholder="Select Cinema"
                                     className="w-45"
-                                    loading={activeCinemas.loading} // <-- Muestra un spinner nativo
-                                    disabled={activeCinemas.loading || activeCinemas.error}
+                                    loading={validCinemas.loading}
+                                    disabled={validCinemas.loading || validCinemas.error}
                                     options={[
                                         { value: null, label: 'All Cinemas' },
-                                        ...activeCinemas.data.map(cinema => ({
+                                        ...validCinemas.data.map(cinema => ({
                                             value: cinema.cinema_Id ?? (cinema as any).cinemaId,
                                             label: cinema.cinemaName
                                         }))
                                     ]}
+                                    styles={{
+                                        popup: {
+                                            list: {
+                                                color: 'white'
+                                            }
+                                        },
+                                        content: {
+                                            color: 'white'
+                                        }
+                                    }}
                                 />
                             </div>
                             
-                            {/* Quitamos la alerta de "Please select a cinema" para que la tabla se muestre siempre */}
                             {occupancyData.loading ? (
                                 <Spin className="py-10" /> 
-                            ) : occupancyData.error ? (
-                                <Alert message="Failed to load Occupancy Rates" type="error" showIcon className="bg-red-950 border-red-800 text-red-200" />
+                            ) : occupancyData.data === null || occupancyData.error ? (
+                                <Table
+                                    dataSource={undefined}
+                                    locale={{ 
+                                        emptyText: <Alert title="No Data Available" type="error" showIcon className="w-1/2 mx-auto! text-black! font-bold" />
+                                    }}
+                                    columns={occupancyColumns}
+                                    className='custom-dark-table'
+                                />
                             ) : (
                                 <Table 
                                     dataSource={occupancyData.data} 

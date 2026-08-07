@@ -35,3 +35,8 @@ export const getTransactionStatusReport = async (startDate: string, endDate: str
     if (response.status !== 200) throw new Error("Error fetching transaction status");
     return response.data;
 };
+
+export const getTotalTicketsSold = async (startDate: string, endDate: string): Promise<any> => {
+    const response = await api.get(`Reports/total-tickets-sold?startDate${startDate}&endDate=${endDate}`);
+    return response.data;
+}

@@ -33,12 +33,14 @@ public class CinemaRepository : ICinemaRepository
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<CinemasWithUsedDto>> GetCinemasWithUsedTransactions()
+    public async Task<IEnumerable<CinemasWithUsedDto>> GetCinemasWithUsedTransactions(DateTime startDate, DateTime endDate)
     {
         await using CinemaDbContext db = await _factory.CreateDbContextAsync();
 
         var rawData = await db.Transactions
-            .Where(t => t.Status == Status.Used)
+            .Where(t => t.Showtime.ShowDate >= DateOnly.FromDateTime(startDate) &&
+                        t.Showtime.ShowDate <= DateOnly.FromDateTime(endDate) &&
+                        t.Status == Status.Used)
             .Select(t => new
             {
                 t.Showtime.Room.Cinema.Cinema_Id,
@@ -53,5 +55,17 @@ public class CinemaRepository : ICinemaRepository
         ));
 
         return result;
+    }
+
+    public async Task<int> GetCinemasWithActiveShowtimes(DateTime startDate, DateTime endDate)
+    {
+        await using CinemaDbContext db = await _factory.CreateDbContextAsync();
+
+        return await db.Showtimes
+            .Where(s => s.ShowDate >= DateOnly.FromDateTime(startDate) &&
+                        s.ShowDate <= DateOnly.FromDateTime(endDate))
+            .Select(s => s.Room.Cinema.Cinema_Id)
+            .Distinct()
+            .CountAsync();
     }
 }
