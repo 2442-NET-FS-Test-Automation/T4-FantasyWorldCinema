@@ -7,6 +7,13 @@ export interface CinemaItem {
     cinemaCity: string;
 }
 
+export interface RoomItem {
+    room_Id: number;
+    cinema_Id: number;
+    roomName: string;
+    capacity: number;
+}
+
 export interface ShowtimeItem {
     showtime_Id: number;
     movie: string;
@@ -21,9 +28,9 @@ export interface ShowtimeItem {
 }
 
 export interface CreateShowtimeItem {
+    showtime_Id?: number;
     movie_Id: number;
-    poster: string;
-    rating: string;
+    cinema_Id?: number;
     room_Id: number;
     showDate: string;
     startTime: string;

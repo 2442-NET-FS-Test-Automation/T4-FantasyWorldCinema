@@ -5,28 +5,30 @@ import { ManageMovies } from "../Components/ManageMovies";
 import { ManageShowtimes } from "../Components/ManageShowtimes";
 import { CreateMovieModal } from "../Components/CreateMovieModal";
 import { CreateShowtimeModal } from "../Components/CreateShowtimeModal";
-import type { MovieItem } from "../types";
+import type { MovieItem, CreateShowtimeItem } from "../types";
 
 export function ManageCatalog() {
     const [selectedView, setSelectedView] = useState<"movies" | "showtimes" | null>(null);
 
     const handleCreateClick = () => {
-        console.log(`Open Form to create: ${selectedView}`);
         if (selectedView === "movies") {
             handleOpenCreateMovie();
         } else if (selectedView === "showtimes") {
-            setIsModalShowtimeOpen(true);
+            handleOpenCreateShowtime();
         }
     };
 
     // 2. STATES TO CONTROL THE MODAL
     const [isModalMovieOpen, setIsModalMovieOpen] = useState(false);
-    const [isModalShowtimeOpen, setIsModalShowtimeOpen] = useState(false);
     const [editingMovie, setEditingMovie] = useState<MovieItem | undefined>(undefined);
-
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    
+    const [isModalShowtimeOpen, setIsModalShowtimeOpen] = useState(false);
+    const [editingShowtime, setEditingShowtime] = useState<CreateShowtimeItem | undefined>(undefined);
 
     const [movieRefreshTrigger, setMovieRefreshTrigger] = useState(0);
+    const [showtimeRefreshTrigger, setShowtimeRefreshTrigger] = useState(0);
+    
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleOpenCreateMovie = () => {
         setEditingMovie(undefined);
@@ -54,15 +56,30 @@ export function ManageCatalog() {
         handleCloseMovieModal();
     };
 
-    const handleCreateShowtimeSubmit = async (values: any) => {
-        setIsSubmitting(true);
-        console.log("Datos listos para enviar al backend:", values);
+    const handleOpenCreateShowtime = () => {
+        setEditingShowtime(undefined);
+        setIsModalShowtimeOpen(true);
+    };
 
-        setTimeout(() => {
-            setIsSubmitting(false);
-            setIsModalShowtimeOpen(false);
+    const handleOpenEditShowtime = (showtime: CreateShowtimeItem) => {
+        setEditingShowtime(showtime);
+        setIsModalShowtimeOpen(true);
+    };
+
+    const handleCloseShowtimeModal = () => {
+        setIsModalShowtimeOpen(false);
+        setEditingShowtime(undefined);
+    };
+
+    const handleCreateShowtimeSubmit = (/* submittedData: any */) => {
+        if (editingShowtime) {
+            message.success("Showtime updated successfully!");
+        } else {
             message.success("Showtime created successfully!");
-        }, 1500);
+        }
+        setShowtimeRefreshTrigger((prev) => prev + 1);
+
+        handleCloseShowtimeModal();
     };
 
 
@@ -149,7 +166,7 @@ export function ManageCatalog() {
                                     {selectedView === "movies" ? (
                                         <ManageMovies onEditAction={handleOpenEditMovie} refreshTrigger={movieRefreshTrigger} />
                                     ) : (
-                                        <ManageShowtimes />
+                                        <ManageShowtimes onEditAction={handleOpenEditShowtime} refreshTrigger={showtimeRefreshTrigger} />
                                     )}
                                 </Typography.Title>
                             </div>
@@ -167,9 +184,10 @@ export function ManageCatalog() {
                     {/* COMPONENT PROPS ARE CORRECTED WITH THEIR CORRESPONDING STATES */}
                     <CreateShowtimeModal
                         open={isModalShowtimeOpen}
-                        onClose={() => setIsModalShowtimeOpen(false)}
+                        onClose={handleCloseShowtimeModal}
                         onSubmit={handleCreateShowtimeSubmit}
                         confirmLoading={isSubmitting}
+                        showtimedata={editingShowtime}
                     />
                 </>
             )}

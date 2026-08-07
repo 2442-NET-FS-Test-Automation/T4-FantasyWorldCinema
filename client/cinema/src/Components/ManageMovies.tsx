@@ -49,10 +49,12 @@ export function ManageMovies({onEditAction, refreshTrigger}: ManageMoviesProps) 
     // CONNECTION: We transform the API data into the table format
     const dataSource = movies.map((movie) => ({
         key: String(movie.movie_Id),
+        movie_Id: movie.movie_Id,
         title: movie.title,
         poster: movie.poster,
-        genre: Array.isArray(movie.genre) ? movie.genre : [movie.genre],
+        genre: [movie.genre],
         duration: movie.durationMinutes,
+        durationMinutes: movie.durationMinutes,
         rating: movie.rating,
         synopsis: movie.synopsis
     }));

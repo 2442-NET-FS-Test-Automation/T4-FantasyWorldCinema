@@ -49,7 +49,7 @@ public class ShowtimeController : ControllerBase
 
         ShowtimeDto mapped = _mapper.Map<ShowtimeDto>(updated);
 
-        return CreatedAtAction(nameof(GetShowtimeByIdAsync), new { id = mapped.Showtime_Id, mapped});
+        return Ok(mapped);
     }
 
     [HttpDelete("{showtime_Id}")]

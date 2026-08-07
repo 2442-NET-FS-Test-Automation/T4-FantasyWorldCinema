@@ -1,24 +1,17 @@
-import { Table, Button, Space, Tag, Typography, Spin, Input } from "antd";
+import { Table, Button, Space, Tag, Typography, Spin, Input, message, Popconfirm } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
-import { GetAllShowtimes } from "../api/Showtimes";
+import { useEffect, useState, useMemo } from "react";
+import { GetAllShowtimes, DeleteShowtime } from "../api/Showtimes";
 import type { ShowtimeItem, FetchState } from "../types";
 
-// Definimos la estructura de datos para los horarios
-interface ShowtimeRecord {
-    key: string;
-    movie: string;
-    room: string;
-    showDate: string;
-    startTime: string;
-    rating: string;
+interface ManageShowtimesProps {
+    refreshTrigger: number;
+    onEditAction: (showtime: any) => void;
 }
 
-export function ManageShowtimes() {
+export function ManageShowtimes({refreshTrigger, onEditAction} : ManageShowtimesProps) {
     const [showtimes, setShowtimes] = useState<ShowtimeItem[]>([]);
     const [showtimeState, setShowtimeState] = useState<FetchState>("idle");
-
-    // STATES FOR DIRECT TEXT FILTERS (Siguiendo tu misma lógica)
     const [movieSearch, setMovieSearch] = useState("");
     const [roomSearch, setRoomSearch] = useState("");
 
@@ -31,47 +24,63 @@ export function ManageShowtimes() {
                 setShowtimes(data);
                 setShowtimeState("loaded");
             })
-            .catch(() => {
-                if (active) setShowtimeState("failed");
-            });
+            .catch(() => { if (active) setShowtimeState("failed"); });
         return () => { active = false; };
-    }, []);
+    }, [refreshTrigger]);
 
-    // CONNECTION: We transform the API data into the table format
-    const dataSource: ShowtimeRecord[] = showtimes.map((showtime) => ({
-        key: String(showtime.showtime_Id || Math.random()),
-        movie: showtime.movie,
-        room: showtime.room,
-        showDate: showtime.showDate,
-        startTime: showtime.startTime,
-        rating: showtime.rating || "TBA"
-    }));
+    /* 1. Filtering data taken from the API */
+    const filteredDataSource = useMemo(() => {
+        const m = movieSearch.toLowerCase();
+        const r = roomSearch.toLowerCase();
+        return showtimes.filter((st) =>
+            (st.movie || "").toLowerCase().includes(m) &&
+            (st.room || "").toLowerCase().includes(r)
+        );
+    }, [showtimes, movieSearch, roomSearch]);
 
-    // PREVIOUS LOCAL FILTERING FOR MOVIE AND ROOM
-    const filteredDataSource = dataSource.filter((showtime) => {
-        const movieText = showtime.movie || "";
-        const roomText = showtime.room || "";
-        
-        const matchesMovie = movieText.toLowerCase().includes(movieSearch.toLowerCase());
-        const matchesRoom = roomText.toLowerCase().includes(roomSearch.toLowerCase());
-        return matchesMovie && matchesRoom;
-    });
+    /* 2. Dynamic Generation of filters over real Data */
+    const dateFilters = useMemo(() => {
+        const uniqueDates = Array.from(new Set(filteredDataSource.map(item => item.showDate)));
+        return uniqueDates.map(date => {
+            const d = new Date(date);
+            return { text: isNaN(d.getTime()) ? date : date.split("T")[0], value: date };
+        });
+    }, [filteredDataSource]);
 
-    // DYNAMIC GENERATION OF FILTERS OBTAINED FROM FILTERED DATA (Misma lógica de mapeo)
-    // Filters for Show Dates (removes duplicates)
-    const uniqueDates = Array.from(new Set(filteredDataSource.map(item => item.showDate)));
-    const dateFilters = uniqueDates.map(date => {
-        const d = new Date(date);
-        const formatted = isNaN(d.getTime()) ? date : date.split("T")[0];
-        return { text: formatted, value: date };
-    });
+    const ratingFilters = useMemo(() => {
+        const uniqueRatings = Array.from(new Set(filteredDataSource.map(item => item.rating || "TBA")));
+        return uniqueRatings.map(rating => ({ text: rating, value: rating }));
+    }, [filteredDataSource]);
 
-    // Filters for Ratings (removes duplicates)
-    const uniqueRatings = Array.from(new Set(filteredDataSource.map(item => item.rating)));
-    const ratingFilters = uniqueRatings.map(rating => ({ text: rating, value: rating }));
+    const handleDelete = async (showtime_Id: any) => {
+        const idNumber = Number(showtime_Id);
+        try {
+            await DeleteShowtime(idNumber);
+            setShowtimes((prev) => prev.filter(s => s.showtime_Id !== idNumber));
+            message.success("Movie deleted successfully");
+        } catch {
+            message.error("Could not delete the movie.");
+        }
+    };
 
-    // Table column configuration
-    const columns = [
+    /* 3. Table column configuration */
+    const columns = useMemo(() => [
+        {
+            title: "Poster",
+            dataIndex: "poster",
+            key: "poster",
+            className: "align-top",
+            render: (poster: string, record: any) => (
+                <img
+                    src={poster}
+                    alt={record.movie}
+                    className="w-12 h-16 object-cover rounded"
+                    onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://placehold.co';
+                    }}
+                />
+            ),
+        },
         {
             title: (
                 <div className="flex flex-col gap-1">
@@ -119,7 +128,7 @@ export function ManageShowtimes() {
             key: "showDate",
             className: "align-top",
             filters: dateFilters,
-            onFilter: (value: any, record: ShowtimeRecord) => record.showDate === value,
+            onFilter: (value: any, record: ShowtimeItem) => record.showDate === value,
             filterSearch: true,
             render: (date: string) => {
                 const d = new Date(date);
@@ -139,7 +148,7 @@ export function ManageShowtimes() {
             key: "rating",
             className: "align-top",
             filters: ratingFilters,
-            onFilter: (value: any, record: ShowtimeRecord) => record.rating === value,
+            onFilter: (value: any, record: ShowtimeItem) => record.rating === value,
             render: (rating: string) => (
                 <Tag color={rating === "R" ? "volcano" : "green"} className="font-bold!">
                     {rating}
@@ -151,25 +160,34 @@ export function ManageShowtimes() {
             key: "actions",
             width: 120,
             className: "align-top",
-            render: (_: any, record: ShowtimeRecord) => (
+            render: (_: any, record: ShowtimeItem) => (
                 <Space size="middle">
                     <Button
                         type="text"
                         icon={<EditOutlined />}
-                        onClick={() => console.log("Editar Horario ID:", record.key)}
+                        onClick={() => onEditAction(record)}
                         className="text-blue-600! hover:bg-blue-50!"
                     />
-                    <Button
-                        type="text"
-                        danger
-                        icon={<DeleteOutlined />}
-                        onClick={() => console.log("Eliminar Horario ID:", record.key)}
-                        className="hover:bg-red-50!"
-                    />
+                    <Popconfirm
+                        title="Delete Showtime"
+                        description="Are you sure you want to delete this showtime?"
+                        onConfirm={() => handleDelete(record.showtime_Id)}
+                        okText="Yes"
+                        cancelText="No"
+                        okButtonProps={{ danger: true }}
+                    >
+                        <Button
+                            type="text"
+                            danger
+                            icon={<DeleteOutlined />}
+                            className="hover:bg-red-50!"
+                        />
+                    </Popconfirm>
                 </Space>
             )
         }
-    ];
+    ], [movieSearch, roomSearch, dateFilters, ratingFilters]);
+
 
     return (
         <div className="w-full">
@@ -193,6 +211,7 @@ export function ManageShowtimes() {
             {/* STATE MANAGEMENT: SUCCESS */}
             {showtimeState === "loaded" && (
                 <Table
+                    rowKey={"showtime_Id"}
                     dataSource={filteredDataSource} // We pass the data already filtered by text
                     columns={columns}
                     pagination={{ pageSize: 5 }}

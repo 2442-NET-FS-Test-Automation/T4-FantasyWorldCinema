@@ -20,13 +20,16 @@ export function CreateMovieModal({ open, onClose, onSubmit, confirmLoading, movi
     useEffect(() => {
         if (open) {
             if (isEditing) {
+                const genreValue = Array.isArray(moviedata.genre) ? moviedata.genre[0] : moviedata.genre;
+                const durationValue = moviedata.durationMinutes ?? (moviedata as any).duration;
+
                 form.setFieldsValue({
                     title: moviedata.title,
                     synopsis: moviedata.synopsis,
                     poster: moviedata.poster,
                     rating: moviedata.rating,
-                    genre: moviedata.genre,
-                    durationMinutes: moviedata.durationMinutes || (moviedata as any).duration
+                    genre: genreValue,
+                    durationMinutes: durationValue
                 });
             }
             else {
@@ -41,10 +44,9 @@ export function CreateMovieModal({ open, onClose, onSubmit, confirmLoading, movi
             const values = await form.validateFields();
             
             if (isEditing) {
-                console.log(moviedata, values);
-                
+                const movieId = moviedata.movie_Id ?? Number((moviedata as any).key);
                 const updatedInfo: MovieItem = {
-                    movie_Id: Number((moviedata as any).key),
+                    movie_Id: movieId,
                     title: values.title,
                     genre: values.genre,
                     rating: values.rating,
@@ -52,7 +54,6 @@ export function CreateMovieModal({ open, onClose, onSubmit, confirmLoading, movi
                     durationMinutes: Number(values.durationMinutes),
                     poster: values.poster
                 };
-                console.log(values, updatedInfo);
                 await UpdateMovie(updatedInfo);
                 onSubmit({ ...moviedata, ...values, duration: Number(values.durationMinutes) });
             }
