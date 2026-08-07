@@ -122,4 +122,17 @@ public class ReportsController : ControllerBase
         ServiceResult<int> result = await _reportsService.GetTotalTicketsSold(requestDto.StartDate, requestDto.EndDate);
         return Ok(result.Data);
     }
+    
+    [HttpGet("total-revenue")]
+    public async Task<IActionResult> GetTotalRevenue([FromQuery] RequestGenericReportDto requestDto)
+    {
+        string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized("Invalid user token claim.");
+        }
+
+        ServiceResult<decimal> result = await _reportsService.GetTotalRevenue(requestDto.StartDate, requestDto.EndDate);
+        return Ok(result.Data);
+    }
 }

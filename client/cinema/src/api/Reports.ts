@@ -37,6 +37,11 @@ export const getTransactionStatusReport = async (startDate: string, endDate: str
 };
 
 export const getTotalTicketsSold = async (startDate: string, endDate: string): Promise<any> => {
-    const response = await api.get(`Reports/total-tickets-sold?startDate${startDate}&endDate=${endDate}`);
+    const response = await api.get(`Reports/total-tickets-sold?startDate=${startDate}&endDate=${endDate}`);
+    return response.data;
+}
+
+export const getTotalRevenue = async (startDate: string, endDate: string): Promise<any> => {
+    const response = await api.get(`Reports/total-revenue?startDate=${startDate}&endDate=${endDate}`);
     return response.data;
 }

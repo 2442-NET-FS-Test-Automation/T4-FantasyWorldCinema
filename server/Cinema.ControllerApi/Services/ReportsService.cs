@@ -98,4 +98,15 @@ public class ReportsService : IReportsService
             Data = result
         };
     }
+    
+    public async Task<ServiceResult<decimal>> GetTotalRevenue(DateTime startDate, DateTime endDate)
+    {
+        decimal result = await _reportsRepository.GetTotalRevenue(startDate, endDate);
+
+        return new ServiceResult<decimal>
+        {
+            IsSuccess = true,
+            Data = result
+        };
+    }
 }

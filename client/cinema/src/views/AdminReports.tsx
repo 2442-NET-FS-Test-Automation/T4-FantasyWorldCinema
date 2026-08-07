@@ -11,7 +11,8 @@ import dayjs from 'dayjs';
 
 import { 
     getTopMoviesReport, getCinemaPerformanceReport, 
-    getOccupancyRatesReport, getTransactionStatusReport , getTotalTicketsSold
+    getOccupancyRatesReport, getTransactionStatusReport, 
+    getTotalTicketsSold, getTotalRevenue
 } from '../api/Reports';
 
 import { getCinemasWithUsed, getCinemasWithActiveShowtimes } from '../api/Cinema';
@@ -34,22 +35,20 @@ export const AdminReports = () => {
     const [startDate, setStartDate] = useState<dayjs.Dayjs>(dayjs().subtract(30, 'days'));
     const [endDate, setEndDate] = useState<dayjs.Dayjs>(dayjs());
 
-    const [activeDateFilter, setActiveDateFilter] = useState('last month'); // O el valor por defecto que prefieras
+    const [activeDateFilter, setActiveDateFilter] = useState('last month');
     
-    // Nuevos estados para los parámetros
     const [selectedCinemaId, setSelectedCinemaId] = useState<number | null>(null);
     const [movieLimit, setMovieLimit] = useState<number>(5);
     const [validCinemas, setValidCinemas] = useState<{data: CinemaItem[], loading: boolean, error: boolean}>({ data: [], loading: true, error: false });
     const [activeCinemas, setActiveCinemas] = useState<{data: number, loading: boolean}>({data: 0, loading: true});
     const [totalTickets, setTotalTickets] = useState<{data: number, loading: boolean}>({data: 0, loading: true});
-
+    const [totalRevenue, setTotalRevenue] = useState<{data: number, loading: boolean}>({data: 0, loading: true});
 
     const [moviesData, setMoviesData] = useState<{data: MovieRevenueDto[], loading: boolean, error: boolean}>({ data: [], loading: true, error: false });
     const [cinemasData, setCinemasData] = useState<{data: CinemaRevenueDto[], loading: boolean, error: boolean}>({ data: [], loading: true, error: false });
     const [occupancyData, setOccupancyData] = useState<{data: OccupancyRateDto[], loading: boolean, error: boolean}>({ data: [], loading: true, error: false });
     const [transactionsData, setTransactionsData] = useState<{data: TransactionStatusSummaryDto[], loading: boolean, error: boolean}>({ data: [], loading: true, error: false });
 
-    // 1. Fetch Cinemas & Transactions (solo dependen de las fechas)
     useEffect(() => {
         if (!startDate || !endDate) return;
         const start = startDate.format('YYYY-MM-DD');
@@ -79,7 +78,6 @@ export const AdminReports = () => {
         fetchTransactions();
     }, [startDate, endDate]);
 
-    // 2. Fetch Top Movies (depende de fechas y del límite)
     useEffect(() => {
         if (!startDate || !endDate) return;
         const start = startDate.format('YYYY-MM-DD');
@@ -98,7 +96,6 @@ export const AdminReports = () => {
         fetchMovies();
     }, [startDate, endDate, movieLimit]);
 
-    // 3. Fetch Occupancy (depende de fechas y del cine seleccionado)
     useEffect(() => {
         if (!startDate || !endDate) return;
         const start = startDate.format('YYYY-MM-DD');
@@ -117,7 +114,6 @@ export const AdminReports = () => {
         fetchOccupancy();
     }, [startDate, endDate, selectedCinemaId]);
 
-    // 4. Fetch Active Cinemas (Se ejecuta solo una vez al montar)
     useEffect(() => {
         if (!startDate || !endDate) return;
         const start = startDate.format('YYYY-MM-DD');
@@ -171,12 +167,28 @@ export const AdminReports = () => {
 
         fetchActiveCinemas();
     }, [startDate, endDate]);
+    
+    useEffect(() => {
+        if (!startDate || !endDate) return;
+        const start = startDate.format('YYYY-MM-DD');
+        const end = endDate.format('YYYY-MM-DD');
+
+        const fetchTotalRevenue = async () => {
+            setTotalRevenue({ data: 0, loading: true })
+            try {
+                const res = await getTotalRevenue(start, end);
+                setTotalRevenue({ data: res, loading: false });
+            } catch {
+                setTotalRevenue({ data: 0, loading: false });
+            }
+        };
+
+        fetchTotalRevenue();
+    }, [startDate, endDate]);
 
     const handleFilterChange = (filter: SetStateAction<string>) => {
-        // 1. Actualizas el estado visual de los botones
         setActiveDateFilter(filter);
 
-        // 2. Actualizas los otros estados dependiendo del valor
         switch (filter) {
             case 'last day':
                 setStartDate(dayjs().subtract(1, 'day'));
@@ -191,16 +203,11 @@ export const AdminReports = () => {
                 setEndDate(dayjs());
                 break;
             case 'custom dates':
-                // Opcional: limpiar las fechas o dejarlas como estaban
-                // setStartDate(null);
-                // setEndDate(null);
                 break;
             default:
                 break;
         }
     };
-
-    const totalGlobalRevenue = cinemasData.data.reduce((acc, curr) => acc + curr.totalRevenue, 0);
 
     const cinemaColumns = [
         { title: 'Cinema Name', dataIndex: 'cinemaName', key: 'cinemaName', render: (text: string) => <Text className="text-white! font-semibold">{text}</Text> },
@@ -253,6 +260,7 @@ export const AdminReports = () => {
                         headerColor: '#d4af37',
                         borderColor: 'rgba(212, 175, 55, 0.15)',
                         rowHoverBg: 'rgba(212, 175, 55, 0.05)',
+                        colorTextDescription: '#ffffff'
                     },
                     Card: {
                         colorBgContainer: '#1e1e24',
@@ -266,8 +274,6 @@ export const AdminReports = () => {
                     Select: {
                         colorBgContainer: '#0f0f12',
                         selectorBg: '#0f0f12',
-                        // optionSelectedBg: 'green',
-                        // optionActiveBg: 'blue',
                     },
                     InputNumber: {
                         colorBgContainer: '#0f0f12',
@@ -286,10 +292,8 @@ export const AdminReports = () => {
                         <Text className="text-[#94a3b8]!">Business Intelligence & Operations</Text>
                     </div>
 
-                    {/* Contenedor derecho para los controles de fecha */}
                     <div className="flex flex-col items-end gap-3">
                         
-                        {/* Lista de botones */}
                         <div className="flex items-center gap-1 bg-[#1e1e24] p-1.5 rounded-xl border border-[rgba(212,175,55,0.2)] shadow-lg">
                             {['last day', 'last week', 'last month', 'custom dates'].map((filter) => (
                                 <button
@@ -297,8 +301,8 @@ export const AdminReports = () => {
                                     onClick={() => handleFilterChange(filter)}
                                     className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 capitalize cursor-pointer ${
                                         activeDateFilter === filter
-                                            ? 'bg-[#d4af37] text-black shadow-md' // Estilo activo (dorado)
-                                            : 'text-[#94a3b8] hover:text-[#d4af37] hover:bg-[rgba(212,175,55,0.1)]' // Estilo inactivo
+                                            ? 'bg-[#d4af37] text-black shadow-md' 
+                                            : 'text-[#94a3b8] hover:text-[#d4af37] hover:bg-[rgba(212,175,55,0.1)]'
                                     }`}
                                 >
                                     {filter}
@@ -306,7 +310,6 @@ export const AdminReports = () => {
                             ))}
                         </div>
 
-                        {/* DatePickers - Solo visibles si el filtro es 'custom dates' */}
                         {activeDateFilter === 'custom dates' && (
                             <div className="flex items-center gap-4 bg-[#1e1e24] p-2 rounded-xl border border-[rgba(212,175,55,0.2)] shadow-lg animate-fade-in">
                                 <DatePicker 
@@ -334,8 +337,8 @@ export const AdminReports = () => {
                 <div className="flex flex-col gap-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <Card bordered className="shadow-lg hover:-translate-y-1 transition-transform duration-300">
-                            {cinemasData.loading ? <Spin /> : cinemasData.error ? <Text className="text-red-500!">Data Unavailable</Text> : (
-                                <Statistic title={<span className="text-[#64748b] uppercase tracking-wider text-xs font-bold">Total Revenue</span>} value={totalGlobalRevenue} precision={2} prefix={<DollarOutlined className="text-[#d4af37]" />} valueStyle={{ color: '#ffffff', fontSize: '2rem', fontWeight: 'bold' }} />
+                            {totalRevenue.loading ? <Spin /> : (
+                                <Statistic title={<span className="text-[#64748b] uppercase tracking-wider text-xs font-bold">Total Revenue</span>} value={totalRevenue.data} precision={2} prefix={<DollarOutlined className="text-[#d4af37]" />} valueStyle={{ color: '#ffffff', fontSize: '2rem', fontWeight: 'bold' }} />
                             )}
                         </Card>
                         <Card bordered className="shadow-lg hover:-translate-y-1 transition-transform duration-300">
@@ -351,7 +354,6 @@ export const AdminReports = () => {
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        {/* Box Office con selector de límite */}
                         <div className="bg-[#1e1e24] p-6 rounded-2xl border border-[rgba(212,175,55,0.2)] shadow-lg">
                             <div className="flex justify-between items-center mb-6">
                                 <Title level={4} className="text-[#d4af37]! m-0! uppercase tracking-widest text-sm flex items-center gap-2">

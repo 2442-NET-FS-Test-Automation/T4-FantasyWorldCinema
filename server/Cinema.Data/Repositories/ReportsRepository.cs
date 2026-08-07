@@ -43,8 +43,8 @@ public class ReportsRepository : IReportsRepository
 
         var rawData = await db.Transactions
             .AsNoTracking()
-            .Where(t => t.PurchaseDate >= startDate &&
-                        t.PurchaseDate <= endDate &&
+            .Where(t => t.Showtime.ShowDate >= DateOnly.FromDateTime(startDate) &&
+                        t.Showtime.ShowDate <= DateOnly.FromDateTime(endDate) &&
                         t.Status == Status.Used &&
                         (!cinemaId.HasValue || t.Showtime.Room.Cinema.Cinema_Id == cinemaId))
             .SelectMany(t => t.TransactionSeats.Select(ts => new
@@ -163,5 +163,20 @@ public class ReportsRepository : IReportsRepository
             .Select(x => x.TransactionSeat_Id)
             .Distinct()
             .CountAsync();
+    }
+
+    public async Task<decimal> GetTotalRevenue(DateTime startDate, DateTime endDate)
+    {
+        await using CinemaDbContext db = await _factory.CreateDbContextAsync();
+
+        var rawData = await db.Transactions
+            .Where(t => t.PurchaseDate >= startDate &&
+                        t.PurchaseDate <= endDate &&
+                        (t.Status == Status.Completed || t.Status == Status.Used))
+            .Select(x => x.TotalAmount)
+            .ToListAsync();
+
+        var result = rawData.Sum();
+        return result;
     }
 }

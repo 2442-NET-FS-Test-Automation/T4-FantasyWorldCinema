@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { GetAllShowtimes } from "../api/Showtimes";
 import type { ShowtimeItem, FetchState } from "../types";
 
-// Definimos la estructura de datos para los horarios
 interface ShowtimeRecord {
     key: string;
     movie: string;
@@ -18,7 +17,6 @@ export function ManageShowtimes() {
     const [showtimes, setShowtimes] = useState<ShowtimeItem[]>([]);
     const [showtimeState, setShowtimeState] = useState<FetchState>("idle");
 
-    // STATES FOR DIRECT TEXT FILTERS (Siguiendo tu misma lógica)
     const [movieSearch, setMovieSearch] = useState("");
     const [roomSearch, setRoomSearch] = useState("");
 
@@ -37,7 +35,6 @@ export function ManageShowtimes() {
         return () => { active = false; };
     }, []);
 
-    // CONNECTION: We transform the API data into the table format
     const dataSource: ShowtimeRecord[] = showtimes.map((showtime) => ({
         key: String(showtime.showtime_Id || Math.random()),
         movie: showtime.movie,
@@ -47,7 +44,6 @@ export function ManageShowtimes() {
         rating: showtime.rating || "TBA"
     }));
 
-    // PREVIOUS LOCAL FILTERING FOR MOVIE AND ROOM
     const filteredDataSource = dataSource.filter((showtime) => {
         const movieText = showtime.movie || "";
         const roomText = showtime.room || "";
@@ -193,7 +189,7 @@ export function ManageShowtimes() {
             {/* STATE MANAGEMENT: SUCCESS */}
             {showtimeState === "loaded" && (
                 <Table
-                    dataSource={filteredDataSource} // We pass the data already filtered by text
+                    dataSource={filteredDataSource}
                     columns={columns}
                     pagination={{ pageSize: 5 }}
                     className="border border-gray-100 rounded-lg overflow-hidden shadow-sm"

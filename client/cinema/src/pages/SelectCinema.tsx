@@ -20,14 +20,12 @@ export function SelectCinema() {
     const [selectedMovie, setSelectedMovie] = useState<MovieItem | null>(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
     
-    // NUEVO: Referencia para saber si el usuario está arrastrando el carrusel
     const isDragging = useRef(false);
 
     const carouselRef = useRef<any>(null);
     const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const handleMovieClick = (movie: MovieItem) => {
-        // Bloquea el clic si el carrusel se estaba moviendo
         if (isDragging.current) return; 
         
         setSelectedMovie(movie);
@@ -35,20 +33,15 @@ export function SelectCinema() {
     };
 
     const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-        // Ignorar si el usuario está haciendo scroll vertical hacia abajo en la página
         if (Math.abs(e.deltaX) < Math.abs(e.deltaY)) return;
 
-        // Si no hay un cooldown activo, ejecutamos el movimiento
         if (!scrollTimeout.current) {
             if (e.deltaX > 15) {
-                // Deslizó a la derecha
                 carouselRef.current?.next();
             } else if (e.deltaX < -15) {
-                // Deslizó a la izquierda
                 carouselRef.current?.prev();
             }
             
-            // Ponemos un cooldown igual a la velocidad de animación del carrusel (400ms)
             scrollTimeout.current = setTimeout(() => {
                 scrollTimeout.current = null;
             }, 150); 
@@ -115,7 +108,6 @@ export function SelectCinema() {
         >
             <div className="min-h-screen flex flex-col items-center pt-16 pb-12 px-4 md:px-8">
                 
-                {/* HERO SECTION */}
                 <div className="w-full max-w-4xl flex flex-col items-center text-center mt-10 mb-20">
                     <div className="w-20 h-20 bg-[rgba(212,175,55,0.1)] rounded-full flex items-center justify-center mb-6 border border-[rgba(212,175,55,0.2)] shadow-[0_0_30px_rgba(212,175,55,0.15)]">
                         <EnvironmentOutlined className="text-4xl text-[#d4af37]" />
@@ -136,7 +128,6 @@ export function SelectCinema() {
                     </div>
                 </div>
 
-                {/* MOVIES SECTION */}
                 <div className="w-full max-w-[1400px] mx-auto mt-12 overflow-hidden">
                     <div className="flex justify-between items-center mb-8 px-4 border-b border-[rgba(212,175,55,0.2)] pb-4">
                         <Title level={3} className="!text-[#d4af37] !m-0 uppercase tracking-widest">
@@ -163,7 +154,6 @@ export function SelectCinema() {
                                 waitForAnimate={false}      
                                 slidesToShow={4}         
                                 className="pb-4"
-                                // NUEVO: Control de estado de arrastre para evitar clics fantasma
                                 beforeChange={() => { isDragging.current = true; }}
                                 afterChange={() => { isDragging.current = false; }}
                                 responsive={[
@@ -184,7 +174,6 @@ export function SelectCinema() {
                 </div>
             </div>
 
-            {/* NUEVO: El Drawer se renderiza UNA sola vez fuera del ciclo */}
             <MovieDrawer
                 movie={selectedMovie}
                 open={drawerOpen}

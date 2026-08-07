@@ -12,5 +12,6 @@ public interface IReportsService
 
     public Task<ServiceResult<IEnumerable<TransactionStatusSummaryDto>>> GetTransactionStatusSummaryAsync(DateTime startDate, DateTime endDate);
     public Task<ServiceResult<int>> GetTotalTicketsSold(DateTime startDate, DateTime endDate);
+    public Task<ServiceResult<decimal>> GetTotalRevenue(DateTime startDate, DateTime endDate);
 
 }

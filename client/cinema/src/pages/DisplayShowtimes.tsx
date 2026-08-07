@@ -19,7 +19,6 @@ export function DisplayShowtimes() {
         return new Date().toISOString().split("T")[0];
     });
     
-    // Obtener Showtimes desde la API
     useEffect(() => {
         let active = true;
         setFState("loading");
@@ -35,7 +34,6 @@ export function DisplayShowtimes() {
         return () => { active = false; };
     }, [Cinema_Id]);
     
-    // Filtrar showtimes por fecha y agruparlos por película
     const groupedShowtimes = useMemo(() => {
         const filtered = items.filter((showtime) => showtime.showDate === selectedDate);
 
@@ -48,7 +46,6 @@ export function DisplayShowtimes() {
         }, {});
     }, [items, selectedDate]);
     
-    // Fechas disponibles
     const availableDates = useMemo(() => {
         return [...new Set(items.map(showtime => showtime.showDate))].sort();
     }, [items]);
@@ -72,7 +69,6 @@ export function DisplayShowtimes() {
         >
             <div className="min-h-screen pt-24 pb-12 px-4 md:px-8 lg:px-12 max-w-[1600px] mx-auto font-sans flex flex-col items-center w-full">
                 
-                {/* ESTADOS DE CARGA Y ERROR */}
                 {fState === "loading" && (
                     <div className="flex flex-col items-center justify-center py-32">
                         <Spin size="large" />
@@ -87,11 +83,9 @@ export function DisplayShowtimes() {
                     </div>
                 )}
 
-                {/* CONTENIDO PRINCIPAL */}
                 {fState === "loaded" && (
                     <div className="w-full">
                         
-                        {/* SELECTOR DE FECHAS */}
                         <div className="mb-10 w-full flex flex-col items-center border-b border-[rgba(212,175,55,0.2)] pb-8">
                             <Title level={2} className="!text-[#d4af37] !m-0 uppercase tracking-widest flex items-center gap-3">
                                 <CalendarOutlined /> Choose your Date
@@ -122,7 +116,6 @@ export function DisplayShowtimes() {
                             )}
                         </div>
                         
-                        {/* GRID DE PELÍCULAS Y HORARIOS */}
                         {availableDates.length > 0 && Object.keys(groupedShowtimes).length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                                 {Object.entries(groupedShowtimes).map(([movie, showtimes]) => (

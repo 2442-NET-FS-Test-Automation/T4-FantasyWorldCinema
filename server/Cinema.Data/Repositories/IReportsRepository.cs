@@ -40,4 +40,5 @@ public interface IReportsRepository
         CancellationToken cancellationToken = default);
 
     public Task<int> GetTotalTicketsSold(DateTime startDate, DateTime endDate);
+    public Task<decimal> GetTotalRevenue(DateTime startDate, DateTime endDate);
 }

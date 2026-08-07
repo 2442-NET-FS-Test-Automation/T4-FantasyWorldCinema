@@ -3,7 +3,7 @@ import { ClockCircleOutlined, TagOutlined, RightOutlined } from "@ant-design/ico
 import type { CinemaItem, FetchState, MovieItem } from "../types";
 import { useEffect, useState } from "react";
 import { getCinemasByMovie } from "../api/Cinema";
-import { useNavigate } from "react-router-dom"; // Asegúrate de que sea react-router-dom
+import { useNavigate } from "react-router-dom";
 
 interface MovieDrawerProps {
     movie: MovieItem | null;
@@ -41,7 +41,6 @@ export function MovieDrawer({ movie, open, onClose }: MovieDrawerProps) {
             onClose={onClose}
             width={450}
             placement="right"
-            // Configuración del tema oscuro e inyección directa a las partes del Drawer
             styles={{
                 mask: { backdropFilter: 'blur(6px)', backgroundColor: 'rgba(0, 0, 0, 0.7)' },
                 content: { backgroundColor: '#0f0f12', borderLeft: '1px solid rgba(212, 175, 55, 0.2)' },
