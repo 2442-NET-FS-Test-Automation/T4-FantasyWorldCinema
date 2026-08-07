@@ -59,7 +59,6 @@ public class ShowtimeController : ControllerBase
         if (isDeleted) return NoContent();
 
         return NotFound();
-        
     }
 
     [HttpGet("Cinema-{cinema_Id}")]

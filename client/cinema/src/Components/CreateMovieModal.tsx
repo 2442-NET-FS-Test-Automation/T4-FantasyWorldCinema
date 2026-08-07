@@ -1,23 +1,66 @@
 import { Modal, Form, Input, InputNumber, Select, ConfigProvider, theme } from "antd";
-import { CreateMovie } from "../api/Movies";
+import { CreateMovie, UpdateMovie } from "../api/Movies";
+import { useEffect } from "react";
+import type { MovieItem } from "../types";
 
 interface CreateMovieModalProps {
     open: boolean;
     onClose: () => void;
     onSubmit: (values: any) => void;
     confirmLoading: boolean;
+    moviedata?: MovieItem;
 }
 
-export function CreateMovieModal({ open, onClose, onSubmit, confirmLoading }: CreateMovieModalProps) {
+const DEFAULT_VALUES = { genre: "", rating: "G", durationMinutes: 120 };
+
+export function CreateMovieModal({ open, onClose, onSubmit, confirmLoading, moviedata }: CreateMovieModalProps) {
     const [form] = Form.useForm();
+    const isEditing = !!moviedata;
+
+    useEffect(() => {
+        if (open) {
+            if (isEditing) {
+                form.setFieldsValue({
+                    title: moviedata.title,
+                    synopsis: moviedata.synopsis,
+                    poster: moviedata.poster,
+                    rating: moviedata.rating,
+                    genre: moviedata.genre,
+                    durationMinutes: moviedata.durationMinutes || (moviedata as any).duration
+                });
+            }
+            else {
+                form.setFieldsValue(DEFAULT_VALUES);
+            }
+        }
+    }, [open, moviedata, isEditing, form]);
+
 
     const handleOk = async () => {
         try {
             const values = await form.validateFields();
-            console.log(values);
             
-            await CreateMovie(values);
-            onSubmit(values);
+            if (isEditing) {
+                console.log(moviedata, values);
+                
+                const updatedInfo: MovieItem = {
+                    movie_Id: Number((moviedata as any).key),
+                    title: values.title,
+                    genre: values.genre,
+                    rating: values.rating,
+                    synopsis: values.synopsis,
+                    durationMinutes: Number(values.durationMinutes),
+                    poster: values.poster
+                };
+                console.log(values, updatedInfo);
+                await UpdateMovie(updatedInfo);
+                onSubmit({ ...moviedata, ...values, duration: Number(values.durationMinutes) });
+            }
+            else { 
+                await CreateMovie(values);
+                onSubmit(values);
+            }
+
             form.resetFields();
         } catch (error) {
             console.log("Validation failed:", error);
@@ -43,15 +86,15 @@ export function CreateMovieModal({ open, onClose, onSubmit, confirmLoading }: Cr
             }}
         >
             <Modal
-                title="Create New Movie"
+                title={isEditing ? "Edit Movie" : "Create New Movie"}
                 open={open}
                 onOk={handleOk}
                 onCancel={handleCancel}
                 confirmLoading={confirmLoading}
-                okText="Create"
+                okText={isEditing ? "Save Changes" : "Create"}
                 cancelText="Cancel"
                 destroyOnHidden
-                okButtonProps={{ htmlType: "button" }} 
+                okButtonProps={{ htmlType: "button" }}
                 styles={{
                     mask: { backdropFilter: "blur(4px)" },
                 }}
@@ -60,11 +103,11 @@ export function CreateMovieModal({ open, onClose, onSubmit, confirmLoading }: Cr
                 <Form
                     form={form}
                     layout="vertical"
-                    name="create_movie_form"
+                    name="movie_form"
                     // We initialize according to Swagger's scheme (genre is now an empty string, not an array)
-                    initialValues={{ genre: "", rating: "G", durationMinutes: 120 }}
+                    initialValues={DEFAULT_VALUES}
                     className="mt-4"
-                    onSubmitCapture={(e) => e.preventDefault()} 
+                    onSubmitCapture={(e) => e.preventDefault()}
                 >
 
                     <Form.Item
@@ -92,13 +135,16 @@ export function CreateMovieModal({ open, onClose, onSubmit, confirmLoading }: Cr
                             label="Rating"
                             rules={[{ required: true, message: "Required" }]}
                         >
-                            <Select className="h-10">
-                                <Select value="G">G (General)</Select>
-                                <Select value="PG">PG</Select>
-                                <Select value="PG-13">PG-13</Select>
-                                <Select value="R">R</Select>
-                                <Select value="NC-17">NC-17 - Adults Only</Select>
-                            </Select>
+                            <Select
+                                className="h-10"
+                                options={[
+                                    { value: "G", label: "G (General)" },
+                                    { value: "PG", label: "PG" },
+                                    { value: "PG13", label: "PG-13" },
+                                    { value: "R", label: "R" },
+                                    { value: "NC17", label: "NC-17 - Adults Only" },
+                                ]}
+                            />
                         </Form.Item>
                     </div>
 
@@ -107,16 +153,20 @@ export function CreateMovieModal({ open, onClose, onSubmit, confirmLoading }: Cr
                         label="Genre"
                         rules={[{ required: true, message: "Please select a genre" }]}
                     >
-                        <Select placeholder="Select genre" className="h-10">
-                            <Select value="Action">Action</Select>
-                            <Select value="Comedy">Comedy</Select>
-                            <Select value="Drama">Drama</Select>
-                            <Select value="Horror">Horror</Select>
-                            <Select value="Sci-Fi">Sci-Fi</Select>
-                            <Select value="Romance">Romance</Select>
-                            <Select value="Animation">Animation</Select>
-                            <Select value="Fantasy">Fantasy</Select>
-                        </Select>
+                        <Select
+                            placeholder="Select genre"
+                            className="h-10"
+                            options={[
+                                { value: "Action", label: "Action" },
+                                { value: "Comedy", label: "Comedy" },
+                                { value: "Drama", label: "Drama" },
+                                { value: "Horror", label: "Horror" },
+                                { value: "Sci-Fi", label: "Sci-Fi" },
+                                { value: "Romance", label: "Romance" },
+                                { value: "Animation", label: "Animation" },
+                                { value: "Fantasy", label: "Fantasy" },
+                            ]}
+                        />
                     </Form.Item>
 
                     <Form.Item
