@@ -9,4 +9,7 @@ public interface ITransactionService
     public Task<ServiceResult<TransactionResponseDto>> CreateAsync(int userId, CreateTransactionDto requestDto);
     public Task<ServiceResult<TransactionResponseDto>> GetTransactionByIdAsync(int transactionId, int userId);
     public Task ValidateAndExpireTransactionsAsync(int transactionId);
+    public Task <ServiceResult<IEnumerable<TransactionResponseDto>>> GetAllTransactionsByUserAsync(int userId);
+    public Task<ServiceResult<TransactionResponseDto>> SetPaidTransaction(int transactionId, int userId);
+    public Task<ServiceResult<bool>> SetCancelledTransaction(int transactionId, int userId);
 }
