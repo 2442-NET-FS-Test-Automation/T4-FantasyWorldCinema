@@ -1,9 +1,11 @@
 using AutoMapper;
 using Cinema.ControllerApi.DTOs;
 using Cinema.ControllerApi.Services;
+using Cinema.Data.DTOs;
 using Cinema.Data.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Microsoft.Extensions.Caching.Memory;
 
 [ApiController]
@@ -37,5 +39,44 @@ public class CinemaController : ControllerBase
 
         IEnumerable<SimpleCinemaDto> mappedItems = _mapper.Map<IEnumerable<SimpleCinemaDto>>(cinemas);
         return Ok(mappedItems);
+    }
+
+    [HttpGet("cinemas-withUsed")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetCinemasWithUsedAsync([FromQuery] RequestGenericReportDto requestDto)
+    {
+        string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized("Invalid user token claim.");
+        }
+
+        ServiceResult<IEnumerable<CinemasWithUsedDto>> result = await _service.GetCinemasWithUsedTransactions(requestDto.StartDate, requestDto.EndDate);
+
+        if (!result.IsSuccess)
+        {
+            if (result.ErrorType == ErrorType.NotFound)
+            {
+                return NotFound(new { message = "No cinemas found."});
+            }
+            return BadRequest(new { message = result.ErrorMessage});
+        }
+        
+        return Ok(result.Data);
+    }
+
+    [HttpGet("cinemas-withActiveShowtimes")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetCinemasWithActiveShowtimes([FromQuery] RequestGenericReportDto requestDto)
+    {
+        string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized("Invalid user token claim.");
+        }
+
+        ServiceResult<int> result = await _service.GetCinemasWithActiveShowtimes(requestDto.StartDate, requestDto.EndDate);
+
+        return Ok(result.Data);
     }
 }

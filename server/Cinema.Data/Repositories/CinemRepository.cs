@@ -1,3 +1,4 @@
+using Cinema.Data.DTOs;
 using Cinema.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,5 +31,41 @@ public class CinemaRepository : ICinemaRepository
         return await db.Cinemas
             .Where(c => Cinemas_Ids.Contains(c.Cinema_Id))
             .ToListAsync();
+    }
+
+    public async Task<IEnumerable<CinemasWithUsedDto>> GetCinemasWithUsedTransactions(DateTime startDate, DateTime endDate)
+    {
+        await using CinemaDbContext db = await _factory.CreateDbContextAsync();
+
+        var rawData = await db.Transactions
+            .Where(t => t.Showtime.ShowDate >= DateOnly.FromDateTime(startDate) &&
+                        t.Showtime.ShowDate <= DateOnly.FromDateTime(endDate) &&
+                        t.Status == Status.Used)
+            .Select(t => new
+            {
+                t.Showtime.Room.Cinema.Cinema_Id,
+                t.Showtime.Room.Cinema.CinemaName
+            })
+            .Distinct()
+            .ToListAsync();
+
+        var result = rawData.Select(x => new CinemasWithUsedDto(
+            x.Cinema_Id,
+            x.CinemaName
+        ));
+
+        return result;
+    }
+
+    public async Task<int> GetCinemasWithActiveShowtimes(DateTime startDate, DateTime endDate)
+    {
+        await using CinemaDbContext db = await _factory.CreateDbContextAsync();
+
+        return await db.Showtimes
+            .Where(s => s.ShowDate >= DateOnly.FromDateTime(startDate) &&
+                        s.ShowDate <= DateOnly.FromDateTime(endDate))
+            .Select(s => s.Room.Cinema.Cinema_Id)
+            .Distinct()
+            .CountAsync();
     }
 }

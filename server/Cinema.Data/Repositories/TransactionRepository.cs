@@ -19,7 +19,7 @@ public class TransactionRepository : ITransactionRepository
     /// <returns>The transaction</returns>
     public async Task<Transactions> CreateTransactionAsync(Transactions transactions)
     {
-        CinemaDbContext db = await _factory.CreateDbContextAsync();
+        await using CinemaDbContext db = await _factory.CreateDbContextAsync();
 
         await db.Transactions.AddAsync(transactions);
         await db.SaveChangesAsync();
@@ -34,7 +34,7 @@ public class TransactionRepository : ITransactionRepository
     /// <returns>The transaction entity with other entities attached.</returns>
     public async Task<Transactions?> GetTransactionWithDetailsAsync(int transactionId)
     {
-        CinemaDbContext db = await _factory.CreateDbContextAsync();
+        await using CinemaDbContext db = await _factory.CreateDbContextAsync();
 
         return await db.Transactions
             .Include(t => t.Showtime)
@@ -54,18 +54,94 @@ public class TransactionRepository : ITransactionRepository
     /// <returns>A transaction</returns>
     public async Task<Transactions?> GetTransactionAsync(int transactionId)
     {
-        CinemaDbContext db = await _factory.CreateDbContextAsync();
+        await using CinemaDbContext db = await _factory.CreateDbContextAsync();
 
         return await db.Transactions
             .FindAsync(transactionId);
     }
 
-    public async Task SetTransactionStatus(int transactionId)
+    /// <summary>
+    /// Updates transaction status.
+    /// </summary>
+    /// <param name="transactionId"></param>
+    /// <returns></returns>
+    public async Task SetTransactionStatus(int transactionId, byte[] currentRowVersion)
     {
-        CinemaDbContext db = await _factory.CreateDbContextAsync();
+        await using CinemaDbContext db = await _factory.CreateDbContextAsync();
 
         await db.Transactions
-            .Where(t => t.Transaction_Id == transactionId)
+            .Where(t => t.Transaction_Id == transactionId && t.RowVersion == currentRowVersion)
             .ExecuteUpdateAsync(s => s.SetProperty(t => t.Status, Status.Expired));
+    }
+
+    /// <summary>
+    /// Retrieves all transactions of an user and it eagerly loads related movie, room, cinema, and seats.
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns>An enumerbale of transactions</returns>
+    public async Task<IEnumerable<Transactions>?> GetAllTransactionsByUserAsync(int userId)
+    {
+        await using CinemaDbContext db = await _factory.CreateDbContextAsync();
+
+        return await db.Transactions
+            .Where(t => t.User_Id == userId)
+            .Include(t => t.Showtime)
+                .ThenInclude(s => s.Movie)
+            .Include(t => t.Showtime)
+                .ThenInclude(s => s.Room)
+                    .ThenInclude(r => r.Cinema)
+            .Include(t => t.TransactionSeats)
+                .ThenInclude(ts => ts.Seat)
+            .AsSplitQuery()
+            .ToListAsync();
+    }
+
+    public async Task<Transactions?> SetPaidTransaction(int transactionId, int userId)
+    {
+        await using CinemaDbContext db = await _factory.CreateDbContextAsync();
+
+        Transactions? transaction = await db.Transactions
+                                        .Where(t => t.Status == Status.Pending)
+                                        .Include(t => t.Showtime)
+                                            .ThenInclude(s => s.Movie)
+                                        .Include(t => t.Showtime)
+                                            .ThenInclude(s => s.Room)
+                                                .ThenInclude(r => r.Cinema)
+                                        .Include(t => t.TransactionSeats)
+                                            .ThenInclude(ts => ts.Seat)
+                                        .FirstOrDefaultAsync(t => t.Transaction_Id == transactionId);
+
+        if (transaction is null || transaction.User_Id != userId) return null;
+        try
+        {
+            transaction.Status = Status.Completed;
+            await db.SaveChangesAsync();
+            return transaction;
+        } catch (DbUpdateConcurrencyException)
+        {
+            return null;
+        }
+    }
+
+    public async Task<bool> SetCancelledTransaction(int transactionId, int userId)
+    {
+        await using CinemaDbContext db = await _factory.CreateDbContextAsync();
+
+        Transactions? transaction = await db.Transactions
+                                    .Where(t => t.Status == Status.Completed)
+                                    .FirstOrDefaultAsync(t => t.Transaction_Id == transactionId);
+
+        if (transaction is null || transaction.User_Id != userId) return false;
+        try
+        {
+            transaction.Status = Status.Cancelled;
+            await db.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+
     }
 }

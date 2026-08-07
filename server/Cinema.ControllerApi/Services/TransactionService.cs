@@ -155,8 +155,73 @@ public class TransactionService : ITransactionService
         if (transaction.Status == Status.Pending)
         {
             Log.Information("Transaction #{TransactionId} exceeded the 15 second Pending time limit. It is updated to expired.", transactionId);
-            await _transactionRepository.SetTransactionStatus(transactionId);
+            await _transactionRepository.SetTransactionStatus(transactionId, transaction.RowVersion);
         }
 
+    }
+
+    public async Task<ServiceResult<IEnumerable<TransactionResponseDto>>> GetAllTransactionsByUserAsync(int userId)
+    {
+        IEnumerable<Transactions>? transactions = await _transactionRepository.GetAllTransactionsByUserAsync(userId);
+
+        if (transactions is null)
+        {
+            return new ServiceResult<IEnumerable<TransactionResponseDto>>
+            {
+                IsSuccess = false,
+                ErrorType = ErrorType.NotFound
+            };
+        }
+
+        ICollection<TransactionResponseDto> transactionResponses = transactions.Select(_mapper.Map<TransactionResponseDto>).ToList();
+
+        return new ServiceResult<IEnumerable<TransactionResponseDto>>
+        {
+            IsSuccess = true,
+            Data = transactionResponses
+        };
+    }
+
+    public async Task<ServiceResult<TransactionResponseDto>> SetPaidTransaction(int transactionId, int userId)
+    {
+        Transactions? transaction = await _transactionRepository.SetPaidTransaction(transactionId, userId);
+
+        if (transaction is null)
+        {
+            return new ServiceResult<TransactionResponseDto>
+            {
+                IsSuccess = false,
+                ErrorType = ErrorType.NotFound
+            };
+        }
+
+        TransactionResponseDto responseDto = _mapper.Map<TransactionResponseDto>(transaction);
+
+        return new ServiceResult<TransactionResponseDto>
+        {
+            IsSuccess = true,
+            Data = responseDto
+        };
+    }
+
+    public async Task<ServiceResult<bool>> SetCancelledTransaction(int transactionId, int userId)
+    {
+        bool cancellationMade = await _transactionRepository.SetCancelledTransaction(transactionId, userId);
+
+        if (cancellationMade == false)
+        {
+            return new ServiceResult<bool>
+            {
+                IsSuccess = false,
+                ErrorType = ErrorType.NotFound
+            };
+        }
+        else
+        {
+            return new ServiceResult<bool>
+            {
+                IsSuccess = true,
+            };
+        }
     }
 }
