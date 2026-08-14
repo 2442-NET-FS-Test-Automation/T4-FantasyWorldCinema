@@ -11,5 +11,5 @@ public interface IShowtimeRepository
         string startTime, string endTime, decimal price);
     public Task<bool> RemoveShowtimeAsync(int showtime_Id);
     public Task<IReadOnlyList<Showtimes>> GetShowtimesByCinemaAsync(int cinema_Id);
-    public Task<Showtimes> GetShowtimeById(int Showtime_Id);
+    public Task<Showtimes?> GetShowtimeById(int Showtime_Id);
 }

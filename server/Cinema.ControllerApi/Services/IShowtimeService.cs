@@ -10,6 +10,6 @@ public interface IShowtimeService
     public Task<Showtimes?> UpdateShowtimeAsync(ShowtimeUpdateDto ns);
     public Task<bool> RemoveShowtimeAsync(int showtime_Id);
     public Task<IReadOnlyList<Showtimes>> GetAllShowtimesAsync();
-    public Task<Showtimes> GetShowtimeByIdAsync(int Showtime_Id);
+    public Task<Showtimes?> GetShowtimeByIdAsync(int Showtime_Id);
     public Task<Showtimes?> IsShowtimeValid(int showtimeId);
 }

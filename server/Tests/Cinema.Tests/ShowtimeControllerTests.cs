@@ -41,7 +41,9 @@ public class ShowtimeControllerTests : IClassFixture<MapperFixture>
         return new() {Showtime_Id = showtime_Id, Movie = new Movies {Title = movie, PosterUrl = poster, Rating = rating}, 
             Room = new Rooms{Room_Id = room_Id, RoomName = room}, ShowDate = showDate, StartTime = startTime,
             EndTime = endTime, Price = price};
-    } 
+    }
+
+    private Showtimes GetById(int id) => myShowtimes[id];
         
     
     [Fact]
@@ -64,6 +66,45 @@ public class ShowtimeControllerTests : IClassFixture<MapperFixture>
 
         returnedItems.Should().HaveCount(5);
         returnedItems.Should().BeEqualTo(_mapper.Map<IEnumerable<ShowtimeDto>>(myShowtimes.Values.ToList()));
+    }
+
+    [Fact]
+    public async Task GetShowtimeById_ReturnsOkWithCorrectInfo()
+    {
+        // Arrange
+        _service.Setup(s => s.GetShowtimeByIdAsync(1))
+            .ReturnsAsync(myShowtimes[1]);
+        
+        ShowtimeController sut = CreateSut();
+
+        // Act
+        var result = await sut.GetShowtimeByIdAsync(1);
+
+        // Assert
+        var ok = result.Result.Should().BeOfType<OkObjectResult>().Subject;
+        ok.StatusCode.Should().Be(200);
+
+        var item = ok.Value.Should().BeAssignableTo<ShowtimeDto>().Subject;
+
+        item.Movie.Should().Be("Mulan");
+        item.Should().BeEquivalentTo(_mapper.Map<ShowtimeDto>(myShowtimes[1]));
+    }
+
+    [Fact]
+    public async Task GetShowtimeById_ReturnsNotFoundWinthIncorrectInfo()
+    {
+        // Arrange
+        _service.Setup(s => s.GetShowtimeByIdAsync(4))
+            .ReturnsAsync((Showtimes?)null);
+        
+        ShowtimeController sut = CreateSut();
+
+        // Act
+        var result = await sut.GetShowtimeByIdAsync(4);
+
+        // Assert
+        var ok = result.Result.Should().BeOfType<NotFoundObjectResult>().Subject;
+        ok.StatusCode.Should().Be(404);
     }
 
 }
