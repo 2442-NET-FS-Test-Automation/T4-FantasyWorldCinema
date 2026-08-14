@@ -43,7 +43,10 @@ public class MoviesController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<MoviesDTO>> PostMovieAsync(MovieCreateDto newMovie)
     {
-        Movies created = await _service.SetMoviesAsync(newMovie);
+        Movies? created = await _service.SetMoviesAsync(newMovie);
+
+        if(created is null) return BadRequest();
+
         MoviesDTO mapped = _mapper.Map<MoviesDTO>(created);
         return Created("", mapped);
     }
@@ -54,7 +57,7 @@ public class MoviesController : ControllerBase
     {
         Movies? updated = await _service.UpdateMoviesAsync(movie);
 
-        if(updated == null) return NotFound();
+        if(updated == null) return BadRequest();
 
         MoviesDTO mapped = _mapper.Map<MoviesDTO>(updated);
         return Ok(mapped);

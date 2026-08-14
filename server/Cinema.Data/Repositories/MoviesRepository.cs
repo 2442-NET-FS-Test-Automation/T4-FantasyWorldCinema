@@ -23,18 +23,16 @@ public class MoviesRepository : IMoviesRepository
             .ToListAsync();
     }
 
-    public async Task<Movies> SetMoviesAsync(string title, string genre, 
-        int durationMinutes, string rating, string synopsis, string poster)
+    public async Task<Movies> SetMoviesAsync(string title, Genre genre, 
+        int durationMinutes, Rating rating, string synopsis, string poster)
     {
         CinemaDbContext db = await _factory.CreateDbContextAsync();
-        Enum.TryParse<Genre>(genre, out Genre newGenre);
-        Enum.TryParse<Rating>(rating, out Rating newRating);
         Movies newMovie = new Movies
         {
             Title = title,
-            Genre = newGenre,
+            Genre = genre,
             DurationMinutes = durationMinutes,
-            Rating = newRating,
+            Rating = rating,
             Synopsis = synopsis,
             PosterUrl = poster
         };
@@ -50,20 +48,17 @@ public class MoviesRepository : IMoviesRepository
         return await db.Movies.ToListAsync();
     }
 
-    public async Task<Movies?> UpdateMovieAsync(int movie_Id, string title, string genre, 
-        int durationMinutes, string rating, string synopsis, string poster)
+    public async Task<Movies?> UpdateMovieAsync(int movie_Id, string title, Genre genre, 
+        int durationMinutes, Rating rating, string synopsis, string poster)
     {
         CinemaDbContext db = await _factory.CreateDbContextAsync();
 
         Movies? data = await db.Movies.FirstOrDefaultAsync(m => m.Movie_Id == movie_Id);
         if(data == null) return null;
 
-        Enum.TryParse<Genre>(genre, out Genre newGenre);
-        Enum.TryParse<Rating>(rating, out Rating newRating);
-
         data.Title = title;
-        data.Genre = newGenre;
-        data.Rating = newRating;
+        data.Genre = genre;
+        data.Rating = rating;
         data.DurationMinutes = durationMinutes;
         data.Synopsis = synopsis;
         data.PosterUrl = poster;

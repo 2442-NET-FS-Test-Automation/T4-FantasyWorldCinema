@@ -1,12 +1,9 @@
 using AutoMapper;
 using FluentAssertions;
-using Cinema.ControllerApi.Mapping;
 using Cinema.ControllerApi.Services;
 using Cinema.Data.Entities;
 using Cinema.Tests.Unit.Fixtures;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging.Abstractions;
 using Cinema.ControllerApi.DTOs;
 using Moq;
 
@@ -23,15 +20,15 @@ public class ShowtimeControllerTests : IClassFixture<MapperFixture>
         _mapper = mapper.Mapper;
 
         // Seed showtimes data
-        myShowtimes.Add(1, Item(1, "Mulan", "URL-X", Rating.G, "General", 1, new DateOnly(2026, 08, 12),
+        myShowtimes.Add(1, Item(1, "Mulan", "URL-X", Rating.G, "General", 1, new DateOnly(2026, 08, 20),
             new TimeOnly(20,45), new TimeOnly(23,0), 4.9m));
-        myShowtimes.Add(2, Item(2, "Dune", "URL-X", Rating.R, "General", 1, new DateOnly(2026, 08, 12),
+        myShowtimes.Add(2, Item(2, "Dune", "URL-X", Rating.R, "General", 2, new DateOnly(2026, 08, 20),
             new TimeOnly(20,45), new TimeOnly(23,0), 4.9m));
-        myShowtimes.Add(3, Item(3, "X-Men", "URL-X", Rating.R, "General", 1, new DateOnly(2026, 08, 12),
+        myShowtimes.Add(3, Item(3, "X-Men", "URL-X", Rating.R, "General", 3, new DateOnly(2026, 08, 20),
             new TimeOnly(20,45), new TimeOnly(23,0), 4.9m));
-        myShowtimes.Add(4, Item(4, "Minions", "URL-X", Rating.G, "General", 1, new DateOnly(2026, 08, 12),
+        myShowtimes.Add(4, Item(4, "Minions", "URL-X", Rating.G, "General", 1, new DateOnly(2026, 08, 1),
             new TimeOnly(20,45), new TimeOnly(23,0), 4.9m));
-        myShowtimes.Add(5, Item(5, "Spider Man", "URL-X", Rating.PG13, "General", 1, new DateOnly(2026, 08, 12),
+        myShowtimes.Add(5, Item(5, "Spider Man", "URL-X", Rating.PG13, "General", 2, new DateOnly(2026, 08, 2),
             new TimeOnly(20,45), new TimeOnly(23,0), 4.9m));
     }
 
@@ -68,4 +65,5 @@ public class ShowtimeControllerTests : IClassFixture<MapperFixture>
         returnedItems.Should().HaveCount(5);
         returnedItems.Should().BeEqualTo(_mapper.Map<IEnumerable<ShowtimeDto>>(myShowtimes.Values.ToList()));
     }
+
 }
