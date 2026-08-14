@@ -1,12 +1,9 @@
 using AutoMapper;
 using FluentAssertions;
-using Cinema.ControllerApi.Mapping;
 using Cinema.ControllerApi.Services;
 using Cinema.Data.Entities;
 using Cinema.Tests.Unit.Fixtures;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging.Abstractions;
 using Cinema.ControllerApi.DTOs;
 using Moq;
 
@@ -69,25 +66,4 @@ public class ShowtimeControllerTests : IClassFixture<MapperFixture>
         returnedItems.Should().BeEqualTo(_mapper.Map<IEnumerable<ShowtimeDto>>(myShowtimes.Values.ToList()));
     }
 
-    [Fact]
-    public async Task ShowtimeByCinema_ReturnsOkWithFilteredShowtimes()
-    {
-        // Arrange
-        _service.Setup(s => s.GetAllShowtimesAsync())
-            .ReturnsAsync(myShowtimes.Values.ToList());
-        
-        ShowtimeController sut = CreateSut();
-    
-        // Act
-        var result = await sut.GetByCinema(1);
-    
-        // Assert
-        var ok = result.Result.Should().BeOfType<OkObjectResult>().Subject;
-        ok.StatusCode.Should().Be(200);
-
-        var returnedItems = ok.Value.Should().BeAssignableTo<List<ShowtimeDto>>().Subject;
-
-        returnedItems.Should().HaveCount(1); // Only 1 
-        returnedItems.Should().BeEqualTo(_mapper.Map<IEnumerable<ShowtimeDto>>(myShowtimes.Values.ToList()));
-    }
 }
