@@ -20,7 +20,12 @@ public class MoviesControllerTests: IClassFixture<MapperFixture>
     {
         _mapper = mapper.Mapper;
 
-        myMovies.Add(1, Item())
+        myMovies.Add(1, Item(1, "Minions", Genre.Animation, 150, Rating.G, "Minions synopsis", 
+            "some URL"));
+        myMovies.Add(2, Item(2, "SHREK", Genre.Animation, 120, Rating.PG, "Minions synopsis", 
+            "some URL"));
+        myMovies.Add(3, Item(3, "Titanic", Genre.Comedy, 180, Rating.PG13, "Minions synopsis", 
+            "some URL"));
         
     }
     private MoviesController CreateSut() => 
@@ -35,6 +40,28 @@ public class MoviesControllerTests: IClassFixture<MapperFixture>
             DurationMinutes = durationMinutes, Rating = rating,
             Synopsis = synopsis, PosterUrl = posterUrl
         };
+    }
+
+    [Fact]
+    public async Task MoviesGet_ReturnsOkWithMappedDtos()
+    {
+        // Arrange
+        _service.Setup(s => s.GetAllMoviesAsync())
+            .ReturnsAsync(myMovies.Values.ToList());
+        
+        MoviesController sut = CreateSut();
+
+        // Act
+        var result = await sut.GetAllMoviesAsync();
+
+        // Assert
+        var ok = result.Result.Should().BeOfType<OkObjectResult>().Subject;
+        ok.StatusCode.Should().Be(200);
+
+         var returnedItems = ok.Value.Should().BeAssignableTo<List<MoviesDTO>>().Subject;
+
+         returnedItems.Should().HaveCount(3);
+         returnedItems.Should().BeEqualTo(_mapper.Map<IEnumerable<MoviesDTO>>(myMovies.Values.ToList()));
     }
 
 

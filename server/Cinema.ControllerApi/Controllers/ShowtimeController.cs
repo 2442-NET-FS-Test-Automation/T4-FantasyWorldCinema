@@ -71,7 +71,7 @@ public class ShowtimeController : ControllerBase
     }
 
     [HttpGet("{showtimeId}")]
-    public async Task<IActionResult> GetShowtimeByIdAsync(int showtimeId)
+    public async Task<ActionResult<ShowtimeDto>> GetShowtimeByIdAsync(int showtimeId)
     {
         Showtimes? showtime = await _service.GetShowtimeByIdAsync(showtimeId);
 

@@ -83,13 +83,12 @@ public class ShowtimeRepository : IShowtimeRepository
             .ToListAsync();
     }
 
-    public async Task<Showtimes> GetShowtimeById(int Showtime_Id)
+    public async Task<Showtimes?> GetShowtimeById(int Showtime_Id)
     {
         CinemaDbContext db = await _factory.CreateDbContextAsync();
         return await db.Showtimes
             .Include(s => s.Movie)
             .Include(s => s.Room)
-            .Where(s => s.Showtime_Id == Showtime_Id)
-            .FirstAsync();
+            .FirstOrDefaultAsync(s => s.Showtime_Id == Showtime_Id);
     }
 }
