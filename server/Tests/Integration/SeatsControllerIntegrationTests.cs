@@ -23,7 +23,7 @@ public class SeatsControllerIntegrationTests
     private void SeedTestData(CinemaDbContext db, int testId, out int showtimeId, out int roomId, string mode)
     {
         // Add Room
-        var room = new Rooms { RoomName = $"Test Room {testId}" };
+        var room = new Rooms { RoomName = $"Test Room {testId}"};
         db.Rooms.Add(room);
         db.SaveChanges();
         roomId = room.Room_Id;
