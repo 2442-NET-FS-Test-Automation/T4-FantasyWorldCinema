@@ -10,7 +10,7 @@ using Xunit;
 namespace Cinema.Tests.Integration;
 
 public class CustomWebApplicationFactory<TProgram>
-    : WebApplicationFactory<TProgram> where TProgram : class
+    :  WebApplicationFactory<TProgram> where TProgram : class 
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -49,6 +49,25 @@ public class CustomWebApplicationFactory<TProgram>
         builder.UseEnvironment("Development");
     }
 
+    public void ResetDatabase()
+    {
+        using var scope = Services.CreateScope();
+
+        var factory = scope.ServiceProvider
+            .GetRequiredService<IDbContextFactory<CinemaDbContext>>();
+
+        using var db = factory.CreateDbContext();
+
+        db.TransactionSeats.RemoveRange(db.TransactionSeats);
+        db.Transactions.RemoveRange(db.Transactions);
+        db.Showtimes.RemoveRange(db.Showtimes);
+        db.Seats.RemoveRange(db.Seats);
+        db.Rooms.RemoveRange(db.Rooms);
+        db.Movies.RemoveRange(db.Movies);
+
+        db.SaveChanges();
+    }
+
     protected override IHost CreateHost(IHostBuilder builder)
     {
         var host = base.CreateHost(builder);
@@ -67,6 +86,7 @@ public class CustomWebApplicationFactory<TProgram>
 
         return host;
     }
+
 }
 
 [CollectionDefinition("Cinema API")]
