@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/Cinema.Tests/Cinema.Tests.csproj" />
+    <Project Path="Tests/Integration/Integration.csproj" />
+  </Folder>
   <Project Path="Cinema.ControllerApi/Cinema.ControllerApi.csproj" />
   <Project Path="Cinema.Data/Cinema.Data.csproj" />
 </Solution>
