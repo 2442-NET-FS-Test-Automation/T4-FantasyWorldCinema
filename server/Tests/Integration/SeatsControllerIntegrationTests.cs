@@ -9,7 +9,7 @@ using Xunit;
 namespace Cinema.Tests.Integration;
 
 [Collection("Cinema API")]
-public class SeatsControllerIntegrationTests
+public class SeatsControllerIntegrationTests : IDisposable
 {
     private readonly CustomWebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
@@ -20,10 +20,15 @@ public class SeatsControllerIntegrationTests
         _client = factory.CreateClient();
     }
 
+    public void Dispose()
+    {
+        _factory.ResetDatabase();
+    }
+
     private void SeedTestData(CinemaDbContext db, int testId, out int showtimeId, out int roomId, string mode)
     {
         // Add Room
-        var room = new Rooms { RoomName = $"Test Room {testId}" };
+        var room = new Rooms { RoomName = $"Test Room {testId}"};
         db.Rooms.Add(room);
         db.SaveChanges();
         roomId = room.Room_Id;
