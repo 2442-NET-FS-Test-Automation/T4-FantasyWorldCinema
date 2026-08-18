@@ -1,9 +1,10 @@
-using System.Data.Common;
+using Cinema.Data.Entities;
 using Cinema.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Xunit;
 
 namespace Cinema.Tests.Integration;
@@ -32,6 +33,25 @@ public class CustomWebApplicationFactory<TProgram>
         });
 
         builder.UseEnvironment("Development");
+    }
+
+    protected override IHost CreateHost(IHostBuilder builder)
+    {
+        var host = base.CreateHost(builder);
+
+        using var scope = host.Services.CreateScope();
+        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<CinemaDbContext>>();
+        using var db = factory.CreateDbContext();
+
+        db.Database.EnsureCreated();
+        
+        if (db.Showtimes.Any())
+        {
+            db.Showtimes.RemoveRange(db.Showtimes);
+            db.SaveChanges();
+        }
+
+        return host;
     }
 }
 
