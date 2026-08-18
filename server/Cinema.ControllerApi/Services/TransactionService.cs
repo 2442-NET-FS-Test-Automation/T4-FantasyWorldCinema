@@ -70,7 +70,8 @@ public class TransactionService : ITransactionService
         {
             TransactionSeats transactionSeat = new()
             {
-                Seat_Id = seatId
+                Seat_Id = seatId,
+                RowVersion = new byte[8]
             };
 
             tranSeats.Add(transactionSeat);
@@ -84,7 +85,8 @@ public class TransactionService : ITransactionService
             PurchaseDate = DateTime.UtcNow,
             TotalAmount = showtime.Price * requestDto.SeatIds.Count,
             Status = Status.Pending,
-            TransactionSeats = tranSeats
+            TransactionSeats = tranSeats,
+            RowVersion = new byte[8]
         };
 
         // 5. Delegate the transaction saving to the repository

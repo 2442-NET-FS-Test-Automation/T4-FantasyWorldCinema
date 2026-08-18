@@ -91,4 +91,43 @@ public class TransactionServiceTests
         result.ErrorType.Should().Be(ErrorType.BadRequest);
         result.ErrorMessage.Should().Be("Selected seats are not valid.");
     }
+    [Fact]
+    public async Task TC14_CreateAsync_HappyPath_ReturnsSuccessAndPendingStatus()
+    {
+        // Arrange
+        int userId = 14;
+        var requestDto = new CreateTransactionDto 
+        { 
+            ShowtimeId = 1, 
+            SeatIds = new List<int> { 1, 2 } 
+        };
+        var showtime = new Showtimes { Showtime_Id = 1, Price = 10m };
+
+        _mockShowtimeService.Setup(s => s.IsShowtimeValid(requestDto.ShowtimeId))
+            .ReturnsAsync(showtime);
+
+        _mockSeatsRepo.Setup(r => r.AreSeatsOccupiedAsync(requestDto.ShowtimeId, requestDto.SeatIds))
+            .ReturnsAsync(false);
+
+        var savedEntity = new Transactions { Transaction_Id = 123, Status = Status.Pending };
+        _mockTransactionRepo.Setup(r => r.CreateTransactionAsync(It.IsAny<Transactions>()))
+            .ReturnsAsync(savedEntity);
+
+        var createdTransaction = new Transactions { Transaction_Id = 123, Status = Status.Pending };
+        _mockTransactionRepo.Setup(r => r.GetTransactionWithDetailsAsync(savedEntity.Transaction_Id))
+            .ReturnsAsync(createdTransaction);
+
+        var responseDto = new TransactionResponseDto { TransactionId = 123, Status = "Pending" };
+        _mockMapper.Setup(m => m.Map<TransactionResponseDto>(createdTransaction))
+            .Returns(responseDto);
+
+        // Act
+        var result = await _sut.CreateAsync(userId, requestDto);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Data.Should().NotBeNull();
+        result.Data!.TransactionId.Should().Be(123);
+        result.Data.Status.Should().Be("Pending");
+    }
 }

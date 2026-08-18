@@ -44,6 +44,13 @@ public class CustomWebApplicationFactory<TProgram>
             db.Database.EnsureCreated();
 
 
+            // Mock Hangfire IBackgroundJobClient
+            var hangfireDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(Hangfire.IBackgroundJobClient));
+            if (hangfireDescriptor != null)
+            {
+                services.Remove(hangfireDescriptor);
+            }
+            services.AddSingleton(new Moq.Mock<Hangfire.IBackgroundJobClient>().Object);
         });
 
         builder.UseEnvironment("Development");
