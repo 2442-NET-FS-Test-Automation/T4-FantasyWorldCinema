@@ -56,6 +56,10 @@ public class AuthController : ControllerBase
             /* Lets manage declared errors */
             return BadRequest(new { message = ex.Message });
         }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
         catch (Exception)
         {
             /* Catch unexpected errors from system */
