@@ -30,6 +30,14 @@ public class CustomWebApplicationFactory<TProgram>
             {
                 options.UseInMemoryDatabase("InMemoryDbForTesting");
             });
+
+            // Mock Hangfire IBackgroundJobClient
+            var hangfireDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(Hangfire.IBackgroundJobClient));
+            if (hangfireDescriptor != null)
+            {
+                services.Remove(hangfireDescriptor);
+            }
+            services.AddSingleton(new Moq.Mock<Hangfire.IBackgroundJobClient>().Object);
         });
 
         builder.UseEnvironment("Development");
