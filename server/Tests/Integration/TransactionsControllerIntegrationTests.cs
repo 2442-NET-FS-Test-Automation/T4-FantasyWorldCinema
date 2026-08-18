@@ -42,8 +42,13 @@ public class TransactionsControllerIntegrationTests
 
     private void SeedTestData(CinemaDbContext db, int testId, out int showtimeId, out int roomId, out int seatA1Id, out int seatA2Id)
     {
+        // Add Cinema
+        var cinema = new Cinemas { CinemaName = $"Test Cinema {testId}", City = City.Tijuana, Address = "Test Address" };
+        db.Cinemas.Add(cinema);
+        db.SaveChanges();
+
         // Add Room
-        var room = new Rooms { RoomName = $"Test Room {testId}" };
+        var room = new Rooms { RoomName = $"Test Room {testId}", Cinema_Id = cinema.Cinema_Id };
         db.Rooms.Add(room);
         db.SaveChanges();
         roomId = room.Room_Id;
@@ -153,5 +158,40 @@ public class TransactionsControllerIntegrationTests
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var content = await response.Content.ReadAsStringAsync();
         content.Should().Contain("Selected seats are not valid.");
+    }
+    [Fact]
+    public async Task TC14_CreateTransaction_HappyPath_Returns201Created()
+    {
+        // Arrange
+        int userId = 14;
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CinemaDbContext>();
+        
+        SeedTestData(db, userId, out int showtimeId, out int roomId, out int seatA1Id, out int seatA2Id);
+
+        var token = GetToken(userId);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var requestDto = new CreateTransactionDto
+        {
+            ShowtimeId = showtimeId,
+            SeatIds = new List<int> { seatA1Id, seatA2Id } // Attempting to book A1 and A2
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/transactions", requestDto);
+
+        // Assert
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Failed with {response.StatusCode}. Body: {errorBody}");
+        }
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var createdTransaction = await response.Content.ReadFromJsonAsync<TransactionResponseDto>();
+        createdTransaction.Should().NotBeNull();
+        createdTransaction!.Status.Should().Be("Pending");
+        createdTransaction.PurchasedSeats.Should().HaveCount(2);
     }
 }
