@@ -3,17 +3,18 @@ using Cinema.ControllerApi.DTOs;
 using Cinema.Data;
 using Cinema.Data.Entities;
 using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Cinema.Tests.Integration;
 
 [Collection("Cinema API")]
-public class MoviesIntegrationTests : IDisposable
+public class ShowtimesIntegrationTests : IDisposable
 {
     private readonly CustomWebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
 
-    public MoviesIntegrationTests(CustomWebApplicationFactory<Program> factory)
+    public ShowtimesIntegrationTests(CustomWebApplicationFactory<Program> factory)
     {
         _factory = factory;
         _client = _factory.CreateClient();
@@ -53,6 +54,21 @@ public class MoviesIntegrationTests : IDisposable
                 Rating = Rating.R,
                 Synopsis = "Synopsis 3",
                 PosterUrl = "URL-X"
+            }
+        );
+
+        db.Cinemas.AddRange( 
+            new Cinemas{
+                Cinema_Id = 1,
+                CinemaName = "Guadalajara",
+                Address = "Hidalgo #1",
+                City = City.Guadalajara
+            }, 
+            new Cinemas{
+                Cinema_Id = 2,
+                CinemaName = "Tijuana",
+                Address = "Juarez #2",
+                City = City.Tijuana
             }
         );
 
@@ -111,26 +127,45 @@ public class MoviesIntegrationTests : IDisposable
                 Price = 4.9m
             }
         );
+
+
         db.SaveChanges();
     }
 
     [Fact]
-    public async Task GetMovies_ReturnsTheCurrentMoviesWithShowtimes()
+    public async Task GetShowtimeByCinema_ReturnsOkWithCorrectShowtimes()
     {
+        
         // Arrange
-        CinemaDbContext db = _factory.Services.CreateScope().ServiceProvider.GetRequiredService<CinemaDbContext>();
+        using CinemaDbContext db = _factory.Services.CreateScope().ServiceProvider.GetRequiredService<CinemaDbContext>();
         SeedTestData(db);
     
         // Act
-        var response = await _client.GetAsync("api/movies");
+        var response = await _client.GetAsync("api/showtime/cinema-1");
     
         // Assert
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         response.Content.Should().NotBeNull();
 
-        var movies = await response.Content.ReadFromJsonAsync<List<MoviesDTO>>();
-        movies.Should().HaveCount(2);
-        movies.Should().Contain(movies => movies.Title == "Dune");
-        movies.Should().Contain(movies => movies.Title == "Titanic");
+        var showtimes = await response.Content.ReadFromJsonAsync<List<ShowtimeDto>>();
+        showtimes.Should().HaveCount(2);
+        showtimes.Should().Contain(s => s.Movie == "Dune");
+        showtimes.Should().Contain(s => s.Movie == "Titanic");
+
+    }
+
+    [Fact]
+    public async Task GetShowtimeByCinema_ReturnsNotFoundWithUnexistingCinema()
+    {
+        
+        // Arrange
+        using CinemaDbContext db = _factory.Services.CreateScope().ServiceProvider.GetRequiredService<CinemaDbContext>();
+        SeedTestData(db);
+    
+        // Act
+        var response = await _client.GetAsync("api/showtime/cinema-10");
+    
+        // Assert
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
     }
 }

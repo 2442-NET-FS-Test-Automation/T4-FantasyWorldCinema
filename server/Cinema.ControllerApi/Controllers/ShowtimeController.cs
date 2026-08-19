@@ -66,6 +66,8 @@ public class ShowtimeController : ControllerBase
     {
         IReadOnlyList<Showtimes> showtimes = await _service.GetByCinemaAsync(cinema_Id);
 
+        if(showtimes.Count == 0) return NotFound(new { message = "Cinema not found"});
+
         IEnumerable<ShowtimeDto> mappedItems = _mapper.Map<IEnumerable<ShowtimeDto>>(showtimes);
         return Ok(mappedItems);
     }
