@@ -4,10 +4,13 @@ using System.ComponentModel.DataAnnotations;
 public class CreateTransactionDto
 {
     [Required(ErrorMessage = "The Showtime ID is required")]
+    [Range(1, int.MaxValue, ErrorMessage = "The Showtime ID is required")]
     public int ShowtimeId {get; set;}
-    [Required]
+    
+    [Required(ErrorMessage = "Seat IDs are required")]
     [MinLength(1, ErrorMessage = "You must select at least one seat")]
-    public List<int> SeatIds {get; set;}
+    [MaxLength(10, ErrorMessage = "A maximum of 10 seats is allowed per transaction")]
+    public List<int> SeatIds {get; set;} = new();
 }
 
 public class TransactionResponseDto

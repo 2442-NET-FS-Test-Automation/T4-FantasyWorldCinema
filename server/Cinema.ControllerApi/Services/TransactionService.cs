@@ -38,14 +38,26 @@ public class TransactionService : ITransactionService
     public async Task<ServiceResult<TransactionResponseDto>> CreateAsync(int userId, CreateTransactionDto requestDto)
     {
         // 1. Checks if the requested showtime exists.
-        Showtimes? showtime = await _showtimeService.IsShowtimeValid(requestDto.ShowtimeId);
+        Showtimes? showtime = await _showtimeService.GetShowtimeByIdAsync(requestDto.ShowtimeId);
         if (showtime is null)
         {
-            Log.Warning("Transaction creation failure. Selected Showtime: {ShowtimeId} does not exist or has finished. User: {UserId}.", requestDto.ShowtimeId, userId);
+            Log.Warning("Transaction creation failure. Selected Showtime: {ShowtimeId} does not exist. User: {UserId}.", requestDto.ShowtimeId, userId);
             return new ServiceResult<TransactionResponseDto>
             {
                 IsSuccess = false,
                 ErrorType = ErrorType.NotFound
+            };
+        }
+
+        DateTime endTime = showtime.ShowDate.ToDateTime(showtime.EndTime);
+        if (endTime <= DateTime.UtcNow)
+        {
+            Log.Warning("Transaction creation failure. Selected Showtime: {ShowtimeId} has finished. User: {UserId}.", requestDto.ShowtimeId, userId);
+            return new ServiceResult<TransactionResponseDto>
+            {
+                IsSuccess = false,
+                ErrorMessage = "Tickets cannot be purchased for past events.",
+                ErrorType = ErrorType.BadRequest
             };
         }
 

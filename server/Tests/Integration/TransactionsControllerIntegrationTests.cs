@@ -131,7 +131,7 @@ public class TransactionsControllerIntegrationTests
     }
 
     [Fact]
-    public async Task TC26_CreateTransaction_WhenSeatIsOutOfBounds_ReturnsBadRequest()
+    public async Task TC31_CreateTransaction_WhenSeatIsOutOfBounds_ReturnsBadRequest()
     {
         // Arrange
         int userId = 26;
@@ -193,5 +193,146 @@ public class TransactionsControllerIntegrationTests
         createdTransaction.Should().NotBeNull();
         createdTransaction!.Status.Should().Be("Pending");
         createdTransaction.PurchasedSeats.Should().HaveCount(2);
+    }
+    [Fact]
+    public async Task TC15_CreateTransaction_With0Seats_ReturnsBadRequest()
+    {
+        // Arrange
+        int userId = 15;
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CinemaDbContext>();
+        
+        SeedTestData(db, userId, out int showtimeId, out int roomId, out int seatA1Id, out int seatA2Id);
+
+        var token = GetToken(userId);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var requestDto = new CreateTransactionDto
+        {
+            ShowtimeId = showtimeId,
+            SeatIds = new List<int>() // Empty seats array
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/transactions", requestDto);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var content = await response.Content.ReadAsStringAsync();
+        content.Should().Contain("You must select at least one seat");
+    }
+
+    [Fact]
+    public async Task TC15b_CreateTransaction_WithMoreThan10Seats_ReturnsBadRequest()
+    {
+        // Arrange
+        int userId = 152;
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CinemaDbContext>();
+        
+        SeedTestData(db, userId, out int showtimeId, out int roomId, out int seatA1Id, out int seatA2Id);
+
+        var token = GetToken(userId);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var requestDto = new CreateTransactionDto
+        {
+            ShowtimeId = showtimeId,
+            SeatIds = Enumerable.Range(1, 11).ToList() // 11 seats
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/transactions", requestDto);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var content = await response.Content.ReadAsStringAsync();
+        content.Should().Contain("A maximum of 10 seats is allowed");
+    }
+
+    [Fact]
+    public async Task TC32_CreateTransaction_WithMissingFields_ReturnsBadRequest()
+    {
+        // Arrange
+        int userId = 32;
+        var token = GetToken(userId);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        // Submit empty payload (missing ShowtimeId and SeatIds entirely)
+        var requestDto = new {};
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/transactions", requestDto);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var content = await response.Content.ReadAsStringAsync();
+        content.Should().Contain("The Showtime ID is required");
+    }
+    [Fact]
+    public async Task TC16_CreateTransaction_NonExistentShowtime_ReturnsNotFound()
+    {
+        // Arrange
+        int userId = 16;
+        var token = GetToken(userId);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var requestDto = new CreateTransactionDto
+        {
+            ShowtimeId = 99999, // Does not exist
+            SeatIds = new List<int> { 1, 2 }
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/transactions", requestDto);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task TC33_CreateTransaction_PastShowtime_ReturnsBadRequest()
+    {
+        // Arrange
+        int userId = 33;
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CinemaDbContext>();
+        
+        // SeedTestData will create a valid showtime, we will create another one in the past
+        SeedTestData(db, userId, out int _, out int roomId, out int seatA1Id, out int seatA2Id);
+
+        var movie = new Movies { Title = $"Test Movie Past", PosterUrl = "N/A", Synopsis = "N/A" };
+        db.Movies.Add(movie);
+        db.SaveChanges();
+
+        // Add Past Showtime
+        var pastShowtime = new Showtimes 
+        { 
+            Movie_Id = movie.Movie_Id, 
+            Room_Id = roomId, 
+            Price = 10m,
+            ShowDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)), // Yesterday
+            StartTime = TimeOnly.FromDateTime(DateTime.UtcNow),
+            EndTime = TimeOnly.FromDateTime(DateTime.UtcNow.AddHours(2))
+        };
+        db.Showtimes.Add(pastShowtime);
+        db.SaveChanges();
+
+        var token = GetToken(userId);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var requestDto = new CreateTransactionDto
+        {
+            ShowtimeId = pastShowtime.Showtime_Id,
+            SeatIds = new List<int> { seatA1Id }
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/transactions", requestDto);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var content = await response.Content.ReadAsStringAsync();
+        content.Should().Contain("Tickets cannot be purchased for past events.");
     }
 }
