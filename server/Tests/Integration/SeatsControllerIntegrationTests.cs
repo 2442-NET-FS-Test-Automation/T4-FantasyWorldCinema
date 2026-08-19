@@ -115,7 +115,7 @@ public class SeatsControllerIntegrationTests : IDisposable
     }
 
     [Fact]
-    public async Task TC24_GetSeats_WhenCinemaIsCompletelyFull_Returns200AndAllOccupied()
+    public async Task TC29_GetSeats_WhenCinemaIsCompletelyFull_Returns200AndAllOccupied()
     {
         // Arrange
         using var scope = _factory.Services.CreateScope();
@@ -138,7 +138,7 @@ public class SeatsControllerIntegrationTests : IDisposable
     }
 
     [Fact]
-    public async Task TC25_GetSeats_WhenCinemaIsCompletelyEmpty_Returns200AndAllAvailable()
+    public async Task TC30_GetSeats_WhenCinemaIsCompletelyEmpty_Returns200AndAllAvailable()
     {
         // Arrange
         using var scope = _factory.Services.CreateScope();
