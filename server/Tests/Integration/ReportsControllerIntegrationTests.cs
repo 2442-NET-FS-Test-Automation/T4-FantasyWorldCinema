@@ -13,7 +13,7 @@ using Xunit;
 namespace Cinema.Tests.Integration;
 
 [Collection("Cinema API")]
-public class ReportsControllerIntegrationTests
+public class ReportsControllerIntegrationTests : IDisposable
 {
     private readonly CustomWebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
@@ -22,6 +22,11 @@ public class ReportsControllerIntegrationTests
     {
         _factory = factory;
         _client = factory.CreateClient();
+    }
+
+    public void Dispose()
+    {
+        _factory.ResetDatabase();
     }
 
     private string GetToken(int userId)

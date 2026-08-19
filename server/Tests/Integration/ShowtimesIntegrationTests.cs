@@ -153,4 +153,19 @@ public class ShowtimesIntegrationTests : IDisposable
         showtimes.Should().Contain(s => s.Movie == "Titanic");
 
     }
+
+    [Fact]
+    public async Task GetShowtimeByCinema_ReturnsNotFoundWithUnexistingCinema()
+    {
+        
+        // Arrange
+        using CinemaDbContext db = _factory.Services.CreateScope().ServiceProvider.GetRequiredService<CinemaDbContext>();
+        SeedTestData(db);
+    
+        // Act
+        var response = await _client.GetAsync("api/showtime/cinema-10");
+    
+        // Assert
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+    }
 }

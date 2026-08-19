@@ -130,6 +130,7 @@ public class MoviesIntegrationTests : IDisposable
 
         var movies = await response.Content.ReadFromJsonAsync<List<MoviesDTO>>();
         movies.Should().HaveCount(2);
-        movies[0].Title.Should().Be("Dune");
+        movies.Should().Contain(movies => movies.Title == "Dune");
+        movies.Should().Contain(movies => movies.Title == "Titanic");
     }
 }
