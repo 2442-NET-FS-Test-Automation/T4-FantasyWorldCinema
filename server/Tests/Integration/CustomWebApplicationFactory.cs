@@ -40,9 +40,6 @@ public class CustomWebApplicationFactory<TProgram>
             
             using var db =  factory.CreateDbContext();
 
-            // Create the database
-            db.Database.EnsureCreated();
-
 
             // Mock Hangfire IBackgroundJobClient
             var hangfireDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(Hangfire.IBackgroundJobClient));
@@ -71,6 +68,7 @@ public class CustomWebApplicationFactory<TProgram>
         db.Seats.RemoveRange(db.Seats);
         db.Rooms.RemoveRange(db.Rooms);
         db.Movies.RemoveRange(db.Movies);
+        db.Cinemas.RemoveRange(db.Cinemas);
 
         db.SaveChanges();
     }
@@ -82,14 +80,6 @@ public class CustomWebApplicationFactory<TProgram>
         using var scope = host.Services.CreateScope();
         var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<CinemaDbContext>>();
         using var db = factory.CreateDbContext();
-
-        db.Database.EnsureCreated();
-        
-        if (db.Showtimes.Any())
-        {
-            db.Showtimes.RemoveRange(db.Showtimes);
-            db.SaveChanges();
-        }
 
         return host;
     }
