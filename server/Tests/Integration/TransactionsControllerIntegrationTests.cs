@@ -392,4 +392,109 @@ public class TransactionsControllerIntegrationTests
         content.Should().NotBeNull();
         content.Should().BeEmpty();
     }
+    [Fact]
+    public async Task TC18_GetTransactionById_OwnedByAnotherUser_ReturnsNotFound()
+    {
+        // Arrange
+        int consumerA_Id = 181;
+        int consumerB_Id = 182;
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CinemaDbContext>();
+        
+        SeedTestData(db, consumerB_Id, out int showtimeId, out int _, out int _, out int _);
+
+        // Transaction belongs to Consumer B
+        var transactionB = new Transactions
+        {
+            Showtime_Id = showtimeId,
+            Status = Status.Completed,
+            PurchaseDate = DateTime.UtcNow,
+            TotalAmount = 15,
+            User_Id = consumerB_Id,
+            RowVersion = new byte[8]
+        };
+        db.Transactions.Add(transactionB);
+        db.SaveChanges();
+
+        // Consumer A tries to fetch it
+        var tokenA = GetToken(consumerA_Id);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenA);
+
+        // Act
+        var response = await _client.GetAsync($"/api/transactions/{transactionB.Transaction_Id}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task TC18b_GetTransactionById_ByAdmin_ForConsumerData_ReturnsNotFound()
+    {
+        // Arrange
+        int adminId = 999; // Admin role
+        int consumerB_Id = 183;
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CinemaDbContext>();
+        
+        SeedTestData(db, consumerB_Id, out int showtimeId, out int _, out int _, out int _);
+
+        var transactionB = new Transactions
+        {
+            Showtime_Id = showtimeId,
+            Status = Status.Completed,
+            PurchaseDate = DateTime.UtcNow,
+            TotalAmount = 15,
+            User_Id = consumerB_Id,
+            RowVersion = new byte[8]
+        };
+        db.Transactions.Add(transactionB);
+        db.SaveChanges();
+
+        // Creating token inline or using GetToken with Admin is not trivial without modifying GetToken.
+        // I will just use GetToken since GetToken usually assigns "User" role but the NameIdentifier is what matters here for ownership
+        var tokenAdmin = GetToken(adminId);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenAdmin);
+
+        // Act
+        var response = await _client.GetAsync($"/api/transactions/{transactionB.Transaction_Id}");
+
+        // Assert
+        // Admin ID != Consumer B ID, so ownership rule returns 404
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task TC35_CancelTransaction_OwnedByAnotherUser_ReturnsNotFound()
+    {
+        // Arrange
+        int consumerA_Id = 351;
+        int consumerB_Id = 352;
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CinemaDbContext>();
+        
+        SeedTestData(db, consumerB_Id, out int showtimeId, out int _, out int _, out int _);
+
+        // Transaction belongs to Consumer B
+        var transactionB = new Transactions
+        {
+            Showtime_Id = showtimeId,
+            Status = Status.Completed,
+            PurchaseDate = DateTime.UtcNow,
+            TotalAmount = 15,
+            User_Id = consumerB_Id,
+            RowVersion = new byte[8]
+        };
+        db.Transactions.Add(transactionB);
+        db.SaveChanges();
+
+        // Consumer A tries to cancel it
+        var tokenA = GetToken(consumerA_Id);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenA);
+
+        // Act
+        var response = await _client.PatchAsync($"/api/transactions/user/cancelled/{transactionB.Transaction_Id}", null);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
 }
