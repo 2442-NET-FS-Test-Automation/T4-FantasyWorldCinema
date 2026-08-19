@@ -1,5 +1,8 @@
+using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Cinema.ControllerApi.DTOs;
+using Cinema.ControllerApi.Services;
 using Cinema.Data;
 using Cinema.Data.Entities;
 using FluentAssertions;
@@ -23,6 +26,26 @@ public class ShowtimesIntegrationTests : IDisposable
     public void Dispose()
     {
         _factory.ResetDatabase();
+    }
+
+    private HttpClient CreateAdminClient()
+    {
+        using var scope = _factory.Services.CreateScope();
+        var tokenService = scope.ServiceProvider.GetRequiredService<ITokenService>();
+        var admin = new Users
+        {
+            User_Id = 99,
+            Username = "showtimes-admin",
+            Email = "showtimes-admin@test.com",
+            PasswordHash = "test-hash",
+            Role_Id = 2,
+            Role = new Roles { RoleName = "Admin" }
+        };
+
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", tokenService.Issue(admin));
+        return client;
     }
 
     private void SeedTestData(CinemaDbContext db)
@@ -167,5 +190,77 @@ public class ShowtimesIntegrationTests : IDisposable
     
         // Assert
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task TC21_AdminCreatesShowtime_ReturnsCreatedAndPersistsShowtime()
+    {
+        using var scope = _factory.Services.CreateScope();
+        SeedTestData(scope.ServiceProvider.GetRequiredService<CinemaDbContext>());
+        using var client = CreateAdminClient();
+        var request = new ShowtimeCreateDto(1, 2, "2030-08-20", "18:00", "20:00", 7.5m);
+
+        var response = await client.PostAsJsonAsync("api/showtime", request);
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        using var verifyScope = _factory.Services.CreateScope();
+        var db = verifyScope.ServiceProvider.GetRequiredService<CinemaDbContext>();
+        db.Showtimes.Should().Contain(showtime =>
+            showtime.Movie_Id == 1 && showtime.Room_Id == 2 && showtime.Price == 7.5m);
+    }
+
+    [Fact]
+    public async Task TC22_AdminUpdatesExistingShowtime_ReturnsOkAndPersistsNewValues()
+    {
+        using var scope = _factory.Services.CreateScope();
+        SeedTestData(scope.ServiceProvider.GetRequiredService<CinemaDbContext>());
+        using var client = CreateAdminClient();
+        var request = new ShowtimeUpdateDto(2, 3, 3, "2030-08-21", "19:00", "22:00", 9.5m);
+
+        var response = await client.PutAsJsonAsync("api/showtime", request);
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        using var verifyScope = _factory.Services.CreateScope();
+        var showtime = verifyScope.ServiceProvider.GetRequiredService<CinemaDbContext>()
+            .Showtimes.Single(item => item.Showtime_Id == 2);
+        showtime.Movie_Id.Should().Be(3);
+        showtime.Room_Id.Should().Be(3);
+        showtime.Price.Should().Be(9.5m);
+    }
+
+    [Fact]
+    public async Task TC23_AdminDeletesExistingShowtime_ReturnsNoContentAndRemovesShowtime()
+    {
+        using var scope = _factory.Services.CreateScope();
+        SeedTestData(scope.ServiceProvider.GetRequiredService<CinemaDbContext>());
+        using var client = CreateAdminClient();
+
+        var response = await client.DeleteAsync("api/showtime/2");
+
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        using var verifyScope = _factory.Services.CreateScope();
+        verifyScope.ServiceProvider.GetRequiredService<CinemaDbContext>().Showtimes
+            .Should().NotContain(showtime => showtime.Showtime_Id == 2);
+    }
+
+    [Fact]
+    public async Task TC24_AdminUpdatesNonExistingShowtime_ReturnsNotFound()
+    {
+        using var client = CreateAdminClient();
+        var request = new ShowtimeUpdateDto(999, 1, 1, "2030-08-20", "18:00", "20:00", 7.5m);
+
+        var response = await client.PutAsJsonAsync("api/showtime", request);
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task TC25_AdminDeletesNonExistingShowtime_ReturnsNotFound()
+    {
+        using var client = CreateAdminClient();
+
+        var response = await client.DeleteAsync("api/showtime/999");
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
