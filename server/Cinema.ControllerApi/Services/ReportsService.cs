@@ -14,15 +14,12 @@ public class ReportsService : IReportsService
 
     public async Task<ServiceResult<IEnumerable<CinemaRevenueDto>>> GetCinemaPerformanceAsync(DateTime startDate, DateTime endDate)
     {
-        IEnumerable<CinemaRevenueDto> cinemaRevenues = await _reportsRepository.GetCinemaPerformanceAsync(startDate, endDate);
-        if (!cinemaRevenues.Any())
+        if (startDate > endDate)
         {
-            return new ServiceResult<IEnumerable<CinemaRevenueDto>>
-            {
-                IsSuccess = false,
-                ErrorType = ErrorType.NotFound
-            };
+            return new ServiceResult<IEnumerable<CinemaRevenueDto>> { IsSuccess = false, ErrorType = ErrorType.BadRequest, ErrorMessage = "Invalid date range." };
         }
+
+        IEnumerable<CinemaRevenueDto> cinemaRevenues = await _reportsRepository.GetCinemaPerformanceAsync(startDate, endDate);
 
         return new ServiceResult<IEnumerable<CinemaRevenueDto>>
         {
@@ -33,15 +30,12 @@ public class ReportsService : IReportsService
 
     public async Task<ServiceResult<IEnumerable<OccupancyRateDto>>> GetOccupancyRatesAsync(DateTime startDate, DateTime endDate, int? cinemaId = null)
     {
-        IEnumerable<OccupancyRateDto> occupancyRates = await _reportsRepository.GetOccupancyRatesAsync(startDate, endDate, cinemaId);
-        if (!occupancyRates.Any())
+        if (startDate > endDate)
         {
-            return new ServiceResult<IEnumerable<OccupancyRateDto>>
-            {
-                IsSuccess = false,
-                ErrorType = ErrorType.NotFound
-            };
+            return new ServiceResult<IEnumerable<OccupancyRateDto>> { IsSuccess = false, ErrorType = ErrorType.BadRequest, ErrorMessage = "Invalid date range." };
         }
+
+        IEnumerable<OccupancyRateDto> occupancyRates = await _reportsRepository.GetOccupancyRatesAsync(startDate, endDate, cinemaId);
 
         return new ServiceResult<IEnumerable<OccupancyRateDto>>
         {
@@ -52,15 +46,12 @@ public class ReportsService : IReportsService
 
     public async Task<ServiceResult<IEnumerable<MovieRevenueDto>>> GetTopMoviesByRevenueAsync(DateTime startDate, DateTime endDate, int limit = 10)
     {
-        IEnumerable<MovieRevenueDto> topMovies = await _reportsRepository.GetTopMoviesByRevenueAsync(startDate, endDate, limit);
-        if (!topMovies.Any())
+        if (startDate > endDate)
         {
-            return new ServiceResult<IEnumerable<MovieRevenueDto>>
-            {
-                IsSuccess = false,
-                ErrorType = ErrorType.NotFound
-            };
+            return new ServiceResult<IEnumerable<MovieRevenueDto>> { IsSuccess = false, ErrorType = ErrorType.BadRequest, ErrorMessage = "Invalid date range." };
         }
+
+        IEnumerable<MovieRevenueDto> topMovies = await _reportsRepository.GetTopMoviesByRevenueAsync(startDate, endDate, limit);
 
         return new ServiceResult<IEnumerable<MovieRevenueDto>>
         {
@@ -71,15 +62,12 @@ public class ReportsService : IReportsService
 
     public async Task<ServiceResult<IEnumerable<TransactionStatusSummaryDto>>> GetTransactionStatusSummaryAsync(DateTime startDate, DateTime endDate)
     {
-        IEnumerable<TransactionStatusSummaryDto> statusSummary = await _reportsRepository.GetTransactionStatusSummaryAsync(startDate, endDate);
-        if (!statusSummary.Any())
+        if (startDate > endDate)
         {
-            return new ServiceResult<IEnumerable<TransactionStatusSummaryDto>>
-            {
-                IsSuccess = false,
-                ErrorType = ErrorType.NotFound
-            };
+            return new ServiceResult<IEnumerable<TransactionStatusSummaryDto>> { IsSuccess = false, ErrorType = ErrorType.BadRequest, ErrorMessage = "Invalid date range." };
         }
+
+        IEnumerable<TransactionStatusSummaryDto> statusSummary = await _reportsRepository.GetTransactionStatusSummaryAsync(startDate, endDate);
 
         return new ServiceResult<IEnumerable<TransactionStatusSummaryDto>>
         {
@@ -90,6 +78,11 @@ public class ReportsService : IReportsService
 
     public async Task<ServiceResult<int>> GetTotalTicketsSold(DateTime startDate, DateTime endDate)
     {
+        if (startDate > endDate)
+        {
+            return new ServiceResult<int> { IsSuccess = false, ErrorType = ErrorType.BadRequest, ErrorMessage = "Invalid date range." };
+        }
+
         int result = await _reportsRepository.GetTotalTicketsSold(startDate, endDate);
 
         return new ServiceResult<int>
@@ -101,6 +94,11 @@ public class ReportsService : IReportsService
     
     public async Task<ServiceResult<decimal>> GetTotalRevenue(DateTime startDate, DateTime endDate)
     {
+        if (startDate > endDate)
+        {
+            return new ServiceResult<decimal> { IsSuccess = false, ErrorType = ErrorType.BadRequest, ErrorMessage = "Invalid date range." };
+        }
+
         decimal result = await _reportsRepository.GetTotalRevenue(startDate, endDate);
 
         return new ServiceResult<decimal>

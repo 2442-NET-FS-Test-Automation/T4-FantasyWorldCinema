@@ -31,16 +31,6 @@ public class CustomWebApplicationFactory<TProgram>
                 options.UseInMemoryDatabase("InMemoryDbForTesting");
             });
 
-            var serviceProvider = services.BuildServiceProvider();
-
-            using var scope = serviceProvider.CreateScope();
-
-            var factory = scope.ServiceProvider
-                .GetRequiredService<IDbContextFactory<CinemaDbContext>>();
-            
-            using var db =  factory.CreateDbContext();
-
-
             // Mock Hangfire IBackgroundJobClient
             var hangfireDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(Hangfire.IBackgroundJobClient));
             if (hangfireDescriptor != null)

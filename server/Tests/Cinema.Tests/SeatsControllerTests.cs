@@ -60,7 +60,7 @@ public class SeatsControllerTests : IClassFixture<MapperFixture>
     }
 
     [Fact]
-    public async Task TC24_GetSeats_WhenCinemaIsCompletelyFull_Returns200AndAllOccupied()
+    public async Task TC29_GetSeats_WhenCinemaIsCompletelyFull_Returns200AndAllOccupied()
     {
         // Arrange
         int showtimeId = 2;
@@ -90,7 +90,7 @@ public class SeatsControllerTests : IClassFixture<MapperFixture>
     }
 
     [Fact]
-    public async Task TC25_GetSeats_WhenCinemaIsCompletelyEmpty_Returns200AndAllAvailable()
+    public async Task TC30_GetSeats_WhenCinemaIsCompletelyEmpty_Returns200AndAllAvailable()
     {
         // Arrange
         int showtimeId = 3;

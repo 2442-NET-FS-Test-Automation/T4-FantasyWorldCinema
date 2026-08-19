@@ -46,9 +46,15 @@ public class TransactionServiceTests
             ShowtimeId = 1, 
             SeatIds = new List<int> { 1 } 
         };
-        var showtime = new Showtimes { Showtime_Id = 1, Price = 10m };
+        var showtime = new Showtimes 
+        { 
+            Showtime_Id = 1, 
+            Price = 10m,
+            ShowDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)),
+            EndTime = TimeOnly.FromDateTime(DateTime.UtcNow.AddHours(2))
+        };
         
-        _mockShowtimeService.Setup(s => s.IsShowtimeValid(requestDto.ShowtimeId))
+        _mockShowtimeService.Setup(s => s.GetShowtimeByIdAsync(requestDto.ShowtimeId))
             .ReturnsAsync(showtime);
         
         // Simulating the seat is occupied or invalid
@@ -65,7 +71,7 @@ public class TransactionServiceTests
     }
 
     [Fact]
-    public async Task TC26_CreateAsync_WhenSeatIsOutOfBounds_ReturnsBadRequest()
+    public async Task TC31_CreateAsync_WhenSeatIsOutOfBounds_ReturnsBadRequest()
     {
         // Arrange
         int userId = 1;
@@ -74,9 +80,15 @@ public class TransactionServiceTests
             ShowtimeId = 1, 
             SeatIds = new List<int> { 99 } 
         };
-        var showtime = new Showtimes { Showtime_Id = 1, Price = 10m };
+        var showtime = new Showtimes 
+        { 
+            Showtime_Id = 1, 
+            Price = 10m,
+            ShowDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)),
+            EndTime = TimeOnly.FromDateTime(DateTime.UtcNow.AddHours(2))
+        };
 
-        _mockShowtimeService.Setup(s => s.IsShowtimeValid(requestDto.ShowtimeId))
+        _mockShowtimeService.Setup(s => s.GetShowtimeByIdAsync(requestDto.ShowtimeId))
             .ReturnsAsync(showtime);
 
         // Simulating out of bounds validSeats verification fails
@@ -101,9 +113,15 @@ public class TransactionServiceTests
             ShowtimeId = 1, 
             SeatIds = new List<int> { 1, 2 } 
         };
-        var showtime = new Showtimes { Showtime_Id = 1, Price = 10m };
+        var showtime = new Showtimes 
+        { 
+            Showtime_Id = 1, 
+            Price = 10m,
+            ShowDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)),
+            EndTime = TimeOnly.FromDateTime(DateTime.UtcNow.AddHours(2))
+        };
 
-        _mockShowtimeService.Setup(s => s.IsShowtimeValid(requestDto.ShowtimeId))
+        _mockShowtimeService.Setup(s => s.GetShowtimeByIdAsync(requestDto.ShowtimeId))
             .ReturnsAsync(showtime);
 
         _mockSeatsRepo.Setup(r => r.AreSeatsOccupiedAsync(requestDto.ShowtimeId, requestDto.SeatIds))

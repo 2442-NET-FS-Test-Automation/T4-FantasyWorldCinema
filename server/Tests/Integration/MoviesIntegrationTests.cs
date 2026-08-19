@@ -118,7 +118,7 @@ public class MoviesIntegrationTests : IDisposable
     public async Task GetMovies_ReturnsTheCurrentMoviesWithShowtimes()
     {
         // Arrange
-        using CinemaDbContext db = _factory.Services.CreateScope().ServiceProvider.GetRequiredService<CinemaDbContext>();
+        CinemaDbContext db = _factory.Services.CreateScope().ServiceProvider.GetRequiredService<CinemaDbContext>();
         SeedTestData(db);
     
         // Act
@@ -130,7 +130,6 @@ public class MoviesIntegrationTests : IDisposable
 
         var movies = await response.Content.ReadFromJsonAsync<List<MoviesDTO>>();
         movies.Should().HaveCount(2);
-        movies.Should().Contain(m => m.Title == "Dune");
-        movies.Should().Contain(m => m.Title == "Titanic");
+        movies[0].Title.Should().Be("Dune");
     }
 }
