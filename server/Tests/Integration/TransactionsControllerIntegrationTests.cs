@@ -538,4 +538,161 @@ public class TransactionsControllerIntegrationTests
         updatedTransaction.Should().NotBeNull();
         updatedTransaction!.Status.Should().Be(Status.Cancelled);
     }
+
+    [Fact]
+    public async Task TC20_CancelTransaction_StatusUsed_ReturnsBadRequest()
+    {
+        // Arrange
+        int userId = 20;
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CinemaDbContext>();
+        SeedTestData(db, userId, out int showtimeId, out int _, out int _, out int _);
+
+        var transaction = new Transactions
+        {
+            Showtime_Id = showtimeId,
+            Status = Status.Used,
+            PurchaseDate = DateTime.UtcNow,
+            TotalAmount = 25,
+            User_Id = userId,
+            RowVersion = new byte[8]
+        };
+        db.Transactions.Add(transaction);
+        db.SaveChanges();
+
+        var token = GetToken(userId);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        // Act
+        var response = await _client.PatchAsync($"/api/transactions/user/cancelled/{transaction.Transaction_Id}", null);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var content = await response.Content.ReadAsStringAsync();
+        content.Should().Contain("The ticket has already been used.");
+    }
+
+    [Fact]
+    public async Task TC20b_CancelTransaction_StatusPending_ReturnsBadRequest()
+    {
+        // Arrange
+        int userId = 202;
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CinemaDbContext>();
+        SeedTestData(db, userId, out int showtimeId, out int _, out int _, out int _);
+
+        var transaction = new Transactions
+        {
+            Showtime_Id = showtimeId,
+            Status = Status.Pending,
+            PurchaseDate = DateTime.UtcNow,
+            TotalAmount = 25,
+            User_Id = userId,
+            RowVersion = new byte[8]
+        };
+        db.Transactions.Add(transaction);
+        db.SaveChanges();
+
+        var token = GetToken(userId);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        // Act
+        var response = await _client.PatchAsync($"/api/transactions/user/cancelled/{transaction.Transaction_Id}", null);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var content = await response.Content.ReadAsStringAsync();
+        content.Should().Contain("Unpaid transactions cannot be refunded.");
+    }
+
+    [Fact]
+    public async Task TC36_CancelTransaction_StatusCancelled_ReturnsBadRequest()
+    {
+        // Arrange
+        int userId = 36;
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CinemaDbContext>();
+        SeedTestData(db, userId, out int showtimeId, out int _, out int _, out int _);
+
+        var transaction = new Transactions
+        {
+            Showtime_Id = showtimeId,
+            Status = Status.Cancelled,
+            PurchaseDate = DateTime.UtcNow,
+            TotalAmount = 25,
+            User_Id = userId,
+            RowVersion = new byte[8]
+        };
+        db.Transactions.Add(transaction);
+        db.SaveChanges();
+
+        var token = GetToken(userId);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        // Act
+        var response = await _client.PatchAsync($"/api/transactions/user/cancelled/{transaction.Transaction_Id}", null);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var content = await response.Content.ReadAsStringAsync();
+        content.Should().Contain("The transaction is already cancelled.");
+    }
+
+    [Fact]
+    public async Task TC37_CancelTransaction_TooCloseToShowtime_ReturnsBadRequest()
+    {
+        // Arrange
+        int userId = 37;
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CinemaDbContext>();
+        
+        // Add a showtime that starts in 5 minutes
+        var movie = new Movies { Title = "Fast Movie", PosterUrl = "N/A", Synopsis = "N/A" };
+        db.Movies.Add(movie);
+        db.SaveChanges();
+        
+        var cinema = new Cinemas { CinemaName = "Quick Cinema", City = City.Tijuana, Address = "Test" };
+        db.Cinemas.Add(cinema);
+        db.SaveChanges();
+        
+        var room = new Rooms { RoomName = "Room Q", Cinema_Id = cinema.Cinema_Id };
+        db.Rooms.Add(room);
+        db.SaveChanges();
+
+        var closeDate = DateTime.UtcNow.AddMinutes(5);
+        var showtime = new Showtimes 
+        { 
+            Movie_Id = movie.Movie_Id, 
+            Room_Id = room.Room_Id, 
+            ShowDate = DateOnly.FromDateTime(closeDate), 
+            StartTime = TimeOnly.FromDateTime(closeDate),
+            EndTime = TimeOnly.FromDateTime(closeDate.AddMinutes(120)),
+            Price = 10m 
+        };
+        db.Showtimes.Add(showtime);
+        db.SaveChanges();
+
+        var transaction = new Transactions
+        {
+            Showtime_Id = showtime.Showtime_Id,
+            Status = Status.Completed,
+            PurchaseDate = DateTime.UtcNow.AddHours(-1),
+            TotalAmount = 25,
+            User_Id = userId,
+            RowVersion = new byte[8]
+        };
+        db.Transactions.Add(transaction);
+        db.SaveChanges();
+
+        var token = GetToken(userId);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        // Act
+        var response = await _client.PatchAsync($"/api/transactions/user/cancelled/{transaction.Transaction_Id}", null);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var content = await response.Content.ReadAsStringAsync();
+        content.Should().Contain("Refunds are not allowed too close to the showtime.");
+    }
 }

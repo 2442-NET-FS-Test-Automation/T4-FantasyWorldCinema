@@ -220,6 +220,38 @@ public class TransactionService : ITransactionService
 
     public async Task<ServiceResult<bool>> SetCancelledTransaction(int transactionId, int userId)
     {
+        Transactions? transactionEntity = await _transactionRepository.GetTransactionWithDetailsAsync(transactionId);
+        if (transactionEntity is null || transactionEntity.User_Id != userId)
+        {
+            return new ServiceResult<bool>
+            {
+                IsSuccess = false,
+                ErrorType = ErrorType.NotFound
+            };
+        }
+
+        if (transactionEntity.Status == Status.Used)
+        {
+            return new ServiceResult<bool> { IsSuccess = false, ErrorType = ErrorType.BadRequest, ErrorMessage = "The ticket has already been used." };
+        }
+        if (transactionEntity.Status == Status.Pending)
+        {
+            return new ServiceResult<bool> { IsSuccess = false, ErrorType = ErrorType.BadRequest, ErrorMessage = "Unpaid transactions cannot be refunded." };
+        }
+        if (transactionEntity.Status == Status.Cancelled || transactionEntity.Status == Status.Expired)
+        {
+            return new ServiceResult<bool> { IsSuccess = false, ErrorType = ErrorType.BadRequest, ErrorMessage = "The transaction is already cancelled." };
+        }
+
+        if (transactionEntity.Showtime != null)
+        {
+            DateTime showDateTime = transactionEntity.Showtime.ShowDate.ToDateTime(transactionEntity.Showtime.StartTime);
+            if (showDateTime <= DateTime.UtcNow.AddMinutes(30))
+            {
+                return new ServiceResult<bool> { IsSuccess = false, ErrorType = ErrorType.BadRequest, ErrorMessage = "Refunds are not allowed too close to the showtime." };
+            }
+        }
+
         bool cancellationMade = await _transactionRepository.SetCancelledTransaction(transactionId, userId);
 
         if (cancellationMade == false)
