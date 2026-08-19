@@ -497,4 +497,45 @@ public class TransactionsControllerIntegrationTests
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
+
+    [Fact]
+    public async Task TC19_CancelTransaction_HappyPath_ReturnsOkAndChangesStatus()
+    {
+        // Arrange
+        int userId = 19;
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CinemaDbContext>();
+        
+        SeedTestData(db, userId, out int showtimeId, out int roomId, out int seatA1Id, out int seatA2Id);
+
+        // Transaction belongs to the user and is Completed
+        var transaction = new Transactions
+        {
+            Showtime_Id = showtimeId,
+            Status = Status.Completed,
+            PurchaseDate = DateTime.UtcNow,
+            TotalAmount = 25,
+            User_Id = userId,
+            RowVersion = new byte[8]
+        };
+        db.Transactions.Add(transaction);
+        db.SaveChanges();
+
+        var token = GetToken(userId);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        // Act
+        var response = await _client.PatchAsync($"/api/transactions/user/cancelled/{transaction.Transaction_Id}", null);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        // Verify database state
+        using var verifyScope = _factory.Services.CreateScope();
+        var verifyDb = verifyScope.ServiceProvider.GetRequiredService<CinemaDbContext>();
+        var updatedTransaction = await verifyDb.Transactions.FindAsync(transaction.Transaction_Id);
+        
+        updatedTransaction.Should().NotBeNull();
+        updatedTransaction!.Status.Should().Be(Status.Cancelled);
+    }
 }
