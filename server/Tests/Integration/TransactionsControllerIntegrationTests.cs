@@ -335,4 +335,61 @@ public class TransactionsControllerIntegrationTests
         var content = await response.Content.ReadAsStringAsync();
         content.Should().Contain("Tickets cannot be purchased for past events.");
     }
+    [Fact]
+    public async Task TC17_GetAllTransactionsByUser_With3Transactions_Returns200OKAndTransactions()
+    {
+        // Arrange
+        int userId = 17;
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CinemaDbContext>();
+        
+        SeedTestData(db, userId, out int showtimeId, out int _, out int seatA1Id, out int seatA2Id);
+
+        // Add 3 transactions for the user
+        for (int i = 1; i <= 3; i++)
+        {
+            var transaction = new Transactions
+            {
+                Showtime_Id = showtimeId,
+                Status = Status.Completed,
+                PurchaseDate = DateTime.UtcNow,
+                TotalAmount = 20,
+                User_Id = userId,
+                RowVersion = new byte[8]
+            };
+            db.Transactions.Add(transaction);
+            db.SaveChanges();
+        }
+
+        var token = GetToken(userId);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        // Act
+        var response = await _client.GetAsync("/api/transactions/user");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var content = await response.Content.ReadFromJsonAsync<List<TransactionResponseDto>>();
+        content.Should().NotBeNull();
+        content.Should().HaveCount(3);
+    }
+
+    [Fact]
+    public async Task TC34_GetAllTransactionsByUser_With0Transactions_Returns200OKAndEmptyArray()
+    {
+        // Arrange
+        int userId = 34; // Newly registered consumer
+        
+        var token = GetToken(userId);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        // Act
+        var response = await _client.GetAsync("/api/transactions/user");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var content = await response.Content.ReadFromJsonAsync<List<TransactionResponseDto>>();
+        content.Should().NotBeNull();
+        content.Should().BeEmpty();
+    }
 }
