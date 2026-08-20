@@ -26,3 +26,5 @@ dist-ssr
 cypress.env.json
 cypress-image-diff-html-report/*
 cypress-image-diff-screenshots/*
+.nyc_output/
+coverage/

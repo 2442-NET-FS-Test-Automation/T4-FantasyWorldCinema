@@ -484,3 +484,5 @@ $RECYCLE.BIN/
 cypress.env.json
 cypress-image-diff-html-report/*
 cypress-image-diff-screenshots/*
+client/cinema/.nyc_output/
+client/cinema/coverage/
