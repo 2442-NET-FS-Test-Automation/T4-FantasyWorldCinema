@@ -3,11 +3,11 @@ import registerCodeCoverage from "@cypress/code-coverage/task";
 import getCompareSnapshotsPlugin from "cypress-image-diff-js/plugin";
 
 export default defineConfig({
-  allowCypressEnv: false,
+  allowCypressEnv: true,
 
   e2e: {
     baseUrl: "http://localhost:5173",
-    supportFile: "Cypress/support/e2e.js",
+    supportFile: "cypress/support/e2e.ts",
     setupNodeEvents(on, config) {
       on("task", {
         log(message) {
