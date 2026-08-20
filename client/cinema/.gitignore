@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 
 cypress.env.json
+cypress-image-diff-html-report/*
+cypress-image-diff-screenshots/*
