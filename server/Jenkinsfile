@@ -6,6 +6,9 @@ pipeline {
         ConnectionStrings__Cinema = credentials('test-conn')
         JwtSettings__Issuer = "CinemaApi"
         JwtSettings__Audience = "CinemaClient"
+
+        REGISTRY ='fawocinemaapi.azurecr.io'
+        IMAGE = "${REGISTRY}/cinema-api"
     }
 
     stages {
@@ -22,6 +25,23 @@ pipeline {
                 dir(env.API_DIR) {
                     powershell 'Remove-Item -Recurse -Force */TestResults -ErrorAction SilentlyContinue'
                     bat 'dotnet test Cinema.slnx -c Release --no-build --logger "junit;LogFilePath=TestResults/{assembly}.junit.xml" --logger trx'
+                }
+            }
+        }
+
+        stage('Build image') {
+            steps {
+                bat 'docker build -t %IMAGE%:%BUILD_NUMBER% -t %IMAGE%:latest -f "%API_DIR%/Dockerfile" .'
+            }
+        }
+
+        stage('Push to ACR') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'acr-admin', usernameVariable: 'ACR_USER', passwordVariable: 'ACR_PASS')]) {
+                    bat 'echo %ACR_PASS%| docker login %REGISTRY% -u %ACR_USER% --password-stdin'
+                    bat 'docker push %IMAGE%:%BUILD_NUMBER%'
+                    bat 'docker push %IMAGE%:latest'
+                    bat 'docker logout %REGISTRY%'
                 }
             }
         }
