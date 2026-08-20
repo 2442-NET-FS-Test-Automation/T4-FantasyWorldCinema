@@ -2,7 +2,7 @@ pipeline {
     agent { label 'windows' }
 
     environment {
-        FRONT_DIR = 'cinema/' 
+        FRONT_DIR = 'client' 
         
         SAS_TOKEN = credentials('web-sas')
         
