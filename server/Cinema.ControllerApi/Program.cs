@@ -98,11 +98,24 @@ builder.Host.UseSerilog(); // Telling the builder to use Serilog
 const string SpaCorsPolicy = "spa"; // string name for our policy
 
 // Configuring our CORS policy
-builder.Services.AddCors( o=> o.AddPolicy(SpaCorsPolicy, p =>
-    p.WithOrigins("http://localhost:5173", "http://127.0.0.1:5500")
-    .AllowAnyHeader() // Map the hangfire dashboard UI
+// builder.Services.AddCors( o=> o.AddPolicy(SpaCorsPolicy, p =>
+//     p.WithOrigins("http://localhost:5173", "http://127.0.0.1:5500")
+//     .AllowAnyHeader() // Map the hangfire dashboard UI
+//     .AllowAnyMethod()
+// ));
+
+var extraOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+var spaOrigins = new[] { "http://localhost:5173", "http://127.0.0.1:5500" }
+    .Concat(extraOrigins)
+    .ToArray();
+
+builder.Services.AddCors(o => o.AddPolicy(SpaCorsPolicy, p => p
+    .WithOrigins(spaOrigins)
+    .AllowAnyHeader()
     .AllowAnyMethod()
 ));
+
+
 
 builder.Services.AddSwaggerGen();
 

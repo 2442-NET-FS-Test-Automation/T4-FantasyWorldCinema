@@ -17,7 +17,7 @@ body {
 #LoginRegister {
     background-image:
         linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
-        url(signWallpaper.jpg);
+        url(./signWallpaper.jpg);
     padding: 3%;
 }
 

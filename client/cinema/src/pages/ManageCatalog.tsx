@@ -28,7 +28,7 @@ export function ManageCatalog() {
     const [movieRefreshTrigger, setMovieRefreshTrigger] = useState(0);
     const [showtimeRefreshTrigger, setShowtimeRefreshTrigger] = useState(0);
     
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSubmitting] = useState(false);
 
     const handleOpenCreateMovie = () => {
         setEditingMovie(undefined);
