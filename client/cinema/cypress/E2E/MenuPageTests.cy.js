@@ -14,7 +14,7 @@ describe("home page gets cinemas and movies", () => {
 
         menu.visit();
 
-        menu.getMovies("The Chronicles of Narnia: The Lion, the Witch and the Wardrobe")
+        menu.getMovie("The Chronicles of Narnia: The Lion, the Witch and the Wardrobe")
             .should("exist");
     });
 });

@@ -18,7 +18,7 @@ export class MenuPage {
             .should('be.visible');
     }
 
-    getMovies(name) {
+    getMovie(name) {
 
         return cy.get(`img[alt="${name}"]`);
     }
