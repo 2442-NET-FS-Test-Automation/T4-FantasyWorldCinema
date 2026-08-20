@@ -9,6 +9,9 @@ pipeline {
         STORAGE_URL = 'https://cinemaclient.blob.core.windows.net/$web'
         
         VITE_API_URL = 'https://cinema-api-g6gqh3gjetehcnfw.centralus-01.azurewebsites.net/api'
+
+        CYPRESS_loginIdentifier = credentials('cy-user')
+        CYPRESS_loginPassword = credentials('cy-pass')
     }
 
     stages {
