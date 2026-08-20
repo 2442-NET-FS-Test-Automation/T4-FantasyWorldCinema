@@ -28,6 +28,14 @@ pipeline {
             }
         }
 
+        stage('E2E Tests') {
+            steps {
+                dir(env.FRONT_DIR) {
+                    bat 'npm run test:e2e:ci'
+                }
+            }
+        }
+
         stage('Deploy to Azure Blob') {
             steps {
                 dir(env.FRONT_DIR) {

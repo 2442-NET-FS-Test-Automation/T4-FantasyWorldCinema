@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "e2e": "cypress run --e2e",
+    "test:e2e:ci": "start-server-and-test \"preview -- --host 127.0.0.1 --port 5173\" http://127.0.0.1:5173 e2e"
   },
   "dependencies": {
     "@ant-design/icons": "^5.5.2",
@@ -37,6 +39,7 @@
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.7.0",
     "postcss": "^8.5.23",
+    "start-server-and-test": "^3.0.12",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.62.0",
