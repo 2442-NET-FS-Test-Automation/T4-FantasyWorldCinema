@@ -2,7 +2,7 @@ pipeline {
     agent { label 'windows' }
     environment {
         API_DIR = 'server/'
-        Jwt__Key = credentials('jwt-key')
+        JwtSettings__Secret = credentials('jwt-key')
         ConnectionStrings__Cinema = credentials('test-conn')
     }
 
