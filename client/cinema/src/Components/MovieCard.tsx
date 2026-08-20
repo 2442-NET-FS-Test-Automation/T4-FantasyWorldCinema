@@ -16,6 +16,7 @@ export function MovieCard({ movie, onClick }: MovieProps) {
 
     return (
         <div 
+            data-cy="movie-item"
             onClick={onClick} 
             className="group relative w-full h-100 sm:h-120 rounded-4xl overflow-hidden shadow-lg transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] select-none cursor-grab active:cursor-grabbing"
         >

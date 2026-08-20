@@ -21,6 +21,7 @@ export function CinemaSearchBar({ cinemas }: CinemaSearchBarProps) {
                     .includes(query.toLowerCase())
             )
             .map(cinema => ({
+
                 value: cinema.cinemaName,
                 label: cinema.cinemaName,
                 id: cinema.cinema_Id
@@ -55,6 +56,7 @@ export function CinemaSearchBar({ cinemas }: CinemaSearchBarProps) {
         >
             <div className="flex flex-col sm:flex-row gap-4 w-full max-w-2xl mx-auto mt-6">
                 <AutoComplete
+                    data-cy="cinema-input"
                     size="large"
                     className="flex-1 w-full [&_.ant-select-clear]:bg-[#dddde9]! [&_.ant-select-clear]:flex! [&_.ant-select-clear]:items-center! [&_.ant-select-clear]:justify-center! [&_.ant-select-clear]:w-6! [&_.ant-select-clear]:h-6! [&_.ant-select-clear]:-mt-3!"
                     placeholder="Search for a cinema..."
