@@ -3,6 +3,7 @@ pipeline {
     environment {
         API_DIR = 'server/'
         Jwt__Key = credentials('jwt-key')
+        ConnectionStrings__Cinema = credentials('test-conn')
     }
 
     stages {
