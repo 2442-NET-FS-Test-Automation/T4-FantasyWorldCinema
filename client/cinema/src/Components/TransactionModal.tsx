@@ -1,4 +1,4 @@
-import React, { useState, useEffect, use } from 'react';
+import React, { useState, useEffect} from 'react';
 import { Modal, Typography, Button, Divider, Tag, message } from 'antd';
 import { ClockCircleOutlined, CalendarOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { payTransaction, refundTransaction } from '../api/Transaction';

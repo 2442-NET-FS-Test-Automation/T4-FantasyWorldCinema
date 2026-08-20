@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ConfigProvider, Input, Select, Typography, Empty, message, Spin } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import type { TransactionItem } from '../types';

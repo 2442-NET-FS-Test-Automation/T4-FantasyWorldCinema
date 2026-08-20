@@ -1,4 +1,4 @@
-import { Flex, Typography } from "antd";
+import { Flex } from "antd";
 import "../CSS/Styles.css";
 import "../CSS/Backgrounds.css";
 
