@@ -4,6 +4,8 @@ pipeline {
         API_DIR = 'server/'
         JwtSettings__Secret = credentials('jwt-key')
         ConnectionStrings__Cinema = credentials('test-conn')
+        JwtSettings__Issuer = "CinemaApi"
+        JwtSettings__Audience = "CinemaClient"
     }
 
     stages {
