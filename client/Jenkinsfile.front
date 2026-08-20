@@ -1,0 +1,39 @@
+pipeline {
+    agent { label 'windows' }
+
+    environment {
+        FRONT_DIR = 'cinema/' 
+        
+        SAS_TOKEN = credentials('web-sas')
+        
+        STORAGE_URL = 'https://cinemaclient.blob.core.windows.net/$web'
+        
+        VITE_API_URL = 'https://cinema-api-g6gqh3gjetehcnfw.centralus-01.azurewebsites.net/'
+    }
+
+    stages {
+        stage('Install Dependencies') {
+            steps {
+                dir(env.FRONT_DIR) {
+                    bat 'npm install'
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir(env.FRONT_DIR) {
+                    bat 'npm run build'
+                }
+            }
+        }
+
+        stage('Deploy to Azure Blob') {
+            steps {
+                dir(env.FRONT_DIR) {
+                    bat 'azcopy copy "dist\\*" "%STORAGE_URL%?%SAS_TOKEN%" --recursive=true'
+                }
+            }
+        }
+    }
+}
