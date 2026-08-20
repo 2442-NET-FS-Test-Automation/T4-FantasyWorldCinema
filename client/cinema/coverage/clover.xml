@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1787248886041" clover="3.2.0">
-  <project timestamp="1787248886041" name="All files">
+<coverage generated="1787254512744" clover="3.2.0">
+  <project timestamp="1787254512745" name="All files">
     <metrics statements="925" coveredstatements="127" conditionals="456" coveredconditionals="36" methods="314" coveredmethods="31" elements="1695" coveredelements="194" complexity="0" loc="925" ncloc="925" packages="6" files="37" classes="37"/>
     <package name="src">
       <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
@@ -16,10 +16,10 @@
       <metrics statements="365" coveredstatements="45" conditionals="234" coveredconditionals="21" methods="137" coveredmethods="13"/>
       <file name="CinemaSearchBar.tsx" path="C:/Users/MasterDigimon/OneDrive/Documentos/Proyectos/REVATURE TRAINING/T4-FantasyWorldCinema/client/cinema/src/Components/CinemaSearchBar.tsx">
         <metrics statements="13" coveredstatements="7" conditionals="3" coveredconditionals="0" methods="8" coveredmethods="4"/>
-        <line num="12" count="6" type="stmt"/>
-        <line num="13" count="6" type="stmt"/>
-        <line num="14" count="6" type="stmt"/>
-        <line num="16" count="6" type="stmt"/>
+        <line num="12" count="4" type="stmt"/>
+        <line num="13" count="4" type="stmt"/>
+        <line num="14" count="4" type="stmt"/>
+        <line num="16" count="4" type="stmt"/>
         <line num="17" count="4" type="stmt"/>
         <line num="19" count="16" type="stmt"/>
         <line num="23" count="16" type="stmt"/>
@@ -233,9 +233,9 @@
       </file>
       <file name="MovieCard.tsx" path="C:/Users/MasterDigimon/OneDrive/Documentos/Proyectos/REVATURE TRAINING/T4-FantasyWorldCinema/client/cinema/src/Components/MovieCard.tsx">
         <metrics statements="5" coveredstatements="3" conditionals="11" coveredconditionals="8" methods="2" coveredmethods="2"/>
-        <line num="10" count="92" type="stmt"/>
-        <line num="11" count="92" type="cond" truecount="4" falsecount="0"/>
-        <line num="12" count="36" type="cond" truecount="3" falsecount="0"/>
+        <line num="10" count="138" type="stmt"/>
+        <line num="11" count="138" type="cond" truecount="4" falsecount="0"/>
+        <line num="12" count="54" type="cond" truecount="3" falsecount="0"/>
         <line num="13" count="0" type="cond" truecount="0" falsecount="3"/>
         <line num="14" count="0" type="stmt"/>
       </file>
@@ -829,7 +829,7 @@
         <line num="81" count="14" type="cond" truecount="4" falsecount="0"/>
         <line num="157" count="2" type="stmt"/>
         <line num="158" count="0" type="stmt"/>
-        <line num="167" count="60" type="stmt"/>
+        <line num="167" count="90" type="stmt"/>
         <line num="168" count="0" type="stmt"/>
         <line num="180" count="0" type="stmt"/>
       </file>
