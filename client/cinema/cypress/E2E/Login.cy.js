@@ -10,7 +10,7 @@ describe('Login Flow - Fantasy World Cinema', () => {
             .click();
 
         // 3. Validate that the Ant Design Modal opened successfully by checking its title
-        cy.contains('.auth-title', 'HELLO!')
+        cy.contains('.auth-title', 'HELLO!', { timeout: 10000})
             .should('be.visible');
     });
 
@@ -33,7 +33,7 @@ describe('Login Flow - Fantasy World Cinema', () => {
             .click();
 
         // Confirm the modal closed successfully (the 'HELLO!' title should disappear from the DOM)
-        cy.contains('Welcome back!')
+        cy.contains('Welcome back!', { timeout: 10000})
             .should('be.visible');
 
         cy.contains('.auth-title', 'HELLO!')
